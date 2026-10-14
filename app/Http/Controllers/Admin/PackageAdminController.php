@@ -33,12 +33,13 @@ class PackageAdminController extends Controller
                 $join->on('service_packages.id', '=', 'service_package_translations.service_package_id')
                     ->where('service_package_translations.locale', '=', app()->getLocale());
             })->select('service_packages.*', 'package_billing_cycles.code as cycle_code', 'service_package_translations.name')
-            ->withCount('')->orderByDesc('service_packages.id')->paginate(20);
+            ->selectSub(DB::table('service_package_services')->selectRaw('COUNT(*)')->whereColumn('service_package_services.service_package_id', 'service_packages.id'), 'services_count')
+            ->orderByDesc('service_packages.id')->paginate(20);
 
         $packageServices = DB::table('service_package_services')
             ->join('service_packages', 'service_package_services.service_package_id', '=', 'service_packages.id')
             ->join('services', 'service_package_services.service_id', '=', 'services.id')
-            ->select('service_package_services.*', 'services.code as service_code')
+            ->leftJoin('service_translations', function ($join) {\n                $join->on('services.id', '=', 'service_translations.service_id')->where('service_translations.locale', '=', app()->getLocale());\n            })->select('service_package_services.*', 'services.code as service_code', 'service_translations.name as service_name')
             ->get()->groupBy('service_package_id');
 
         return view('admin.packages.index', compact('services', 'categories', 'cycles', 'packages', 'packageServices'));
