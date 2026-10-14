@@ -21,6 +21,9 @@ Route::prefix('v1')->group(function () {
             Route::get('/bookings', [BookingController::class, 'index']);
             Route::post('/bookings', [BookingController::class, 'store'])->middleware('throttle:20,1');
             Route::post('/bookings/{bookingId}/cancel', [BookingController::class, 'cancel'])->middleware('throttle:10,1');
+            Route::get('/emergency-requests', [EmergencyRequestController::class, 'index']);
+            Route::post('/emergency-requests', [EmergencyRequestController::class, 'store'])->middleware('throttle:3,1');
+            Route::delete('/emergency-requests/{requestId}', [EmergencyRequestController::class, 'cancel'])->middleware('throttle:3,1');
             Route::post('/bookings/{bookingId}/rating', [ResidentJourneyController::class, 'rateBooking']);
 
             Route::get('/association', [ResidentJourneyController::class, 'association']);
