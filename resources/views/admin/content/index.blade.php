@@ -7,7 +7,7 @@
 <a href="{{ route('admin.dashboard') }}">▦ &nbsp;{{ __('Dashboard') }}</a>
 <a href="{{ route('admin.users.index') }}">♙ &nbsp;{{ __('Users') }}</a>
 <a href="{{ route('admin.homes.index') }}">⌂ &nbsp;{{ __('Homes') }}</a>
-<a href="{{ route('admin.providers.index') }}">⚒ &nbsp;{{ __('Providers and contracts') }}</a><a href="{{ route('admin.packages.index') }}">◫ &nbsp;{{ __('Packages and services') }}</a><a class="active" href="{{ route('admin.content.index') }}">◈ &nbsp;{{ __('Resident operations') }}</a>
+<a href="{{ route('admin.providers.index') }}">⚒ &nbsp;{{ __('Providers and contracts') }}</a><a href="{{ route('admin.packages.index') }}">◫ &nbsp;{{ __('Packages and services') }}</a><a class="active" href="{{ route('admin.content.index') }}">◈ &nbsp;{{ __('Resident operations') }}</a><a href="{{ route('admin.emergencies.index') }}">🚨 &nbsp;{{ __('Emergency requests') }}</a><a href="{{ route('admin.service-orders.index') }}">▣ &nbsp;{{ __('Service orders') }}</a>
 <a href="{{ route('admin.about') }}">ⓘ &nbsp;{{ __('About Rounder') }}</a>
 </div></aside>
 <main class="col-md-9 col-xl-10 content">
