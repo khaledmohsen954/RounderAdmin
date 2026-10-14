@@ -1,6 +1,6 @@
 <?php
-namespace App\\Models;
-use Illuminate\\Database\\Eloquent\\Model;
+namespace App\Models;
+use Illuminate\Database\Eloquent\Model;
 class Booking extends Model {
  protected $fillable=['resident_id','home_id','service_id','provider_id','booking_status_id','scheduled_at','total_amount','notes'];
  protected function casts():array{return ['scheduled_at'=>'datetime','total_amount'=>'decimal:2'];}
