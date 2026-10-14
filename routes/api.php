@@ -17,7 +17,7 @@ Route::prefix('v1')->group(function () {
             Route::put('/profile', [ResidentJourneyController::class, 'updateProfile']);
             Route::get('/homes', [ResidentHomeController::class, 'index']);
             Route::post('/homes/link', [ResidentHomeController::class, 'link'])->middleware('throttle:10,1');
-            Route::get('/services', ServiceCatalogController::class);
+            Route::get('/services', ServiceCatalogController::class);\n            Route::get('/packages', [ResidentPackageController::class, 'index']);\n            Route::post('/subscriptions', [ResidentPackageController::class, 'subscribe'])->middleware('throttle:5,1');\n            Route::delete('/subscriptions/{subscriptionId}', [ResidentPackageController::class, 'cancel']);
             Route::get('/bookings', [BookingController::class, 'index']);
             Route::post('/bookings', [BookingController::class, 'store'])->middleware('throttle:20,1');
             Route::post('/bookings/{bookingId}/cancel', [BookingController::class, 'cancel'])->middleware('throttle:10,1');
