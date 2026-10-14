@@ -1,36 +1,40 @@
 # Rounder API & Admin
 
-Laravel 13 backend and Bootstrap administration dashboard for the Rounder resident app.
+Laravel 13 API and Bootstrap dashboard for the Rounder resident app.
 
-## Requirements and local setup
+## Local setup
 
-- PHP 8.3+, Composer, and MySQL 8+
-- Copy `.env.example` to `.env`; configure the database and set a strong `ROUND_ADMIN_EMAIL` and `ROUND_ADMIN_PASSWORD`.
-- Run `composer install`, `php artisan key:generate`, and `php artisan migrate --seed`.
-- Run `php artisan serve`; open `/admin/login`.
-- The initial administrator is only created when its environment credentials are set. Do not commit `.env`.
+Requirements: PHP 8.3+, Composer and MySQL 8+.
 
-## Data and account model
+1. Copy `.env.example` to `.env` and configure the MySQL connection.
+2. Set `ROUND_ADMIN_EMAIL` and a strong `ROUND_ADMIN_PASSWORD` for the first administrator.
+3. Run `composer install`, `php artisan key:generate`, then `php artisan migrate --seed`.
+4. Run `php artisan serve` and open `/admin/login`.
 
-A shared `users` table holds admin, resident and provider accounts, distinguished by required `role_id`. Passwords are hashed by Laravel's model cast. The admin panel lists accounts and can create users or reset passwords; resetting revokes existing mobile tokens. Admin routes require both an authenticated session and the admin role.
+The seeder creates the administrator only when both environment credentials are set. Do not commit `.env`.
 
-MySQL relations include translated role/city/service/status lookup rows, homes and resident memberships, categorized services, bookings, booking status history, providers and payments. Reference values use foreign key IDs and stable codes; translations live in related tables.
+## API surface
 
-## API
+All app endpoints are versioned under `/api/v1`.
 
-- `GET /api/v1/health`
-- `POST /api/v1/auth/register`, `POST /api/v1/auth/login`
-- `GET /api/v1/me`, `POST /api/v1/auth/logout` (Sanctum bearer token)
-- `GET /api/v1/resident/dashboard`
-- `GET /api/v1/resident/services`
-- `GET|POST /api/v1/resident/bookings`
+- Public: `GET /health`, `POST /auth/register`, `POST /auth/login`
+- Authenticated: `GET /me`, `POST /auth/logout`
+- Resident: `GET /resident/dashboard`, `GET /resident/homes`, `POST /resident/homes/link`
+- Resident services: `GET /resident/services`
+- Resident bookings: `GET|POST /resident/bookings`, `POST /resident/bookings/{id}/cancel`
 
-The mobile client sends the bearer token and `Accept-Language`; Arabic and English are supported in the dashboard, and resident-facing API text uses Arabic/English/Urdu locale codes.
+Mobile requests use Sanctum bearer tokens and an `Accept-Language` header. Configure Flutter with `--dart-define=API_BASE_URL=https://your-host/api/v1`.
+
+## Accounts, data and security
+
+A shared `users` table serves administrator, resident and provider accounts; `role_id` references `roles`. Laravel's hashed password cast stores no plaintext. Admin dashboard routes require both a web session and the admin role. Residents use Sanctum tokens; resetting a password through the admin revokes their active app tokens.
+
+The MySQL schema includes resident-home membership, cities, categorized services, booking and payment statuses, bookings, booking status history and payments. Lookup rows have numeric IDs and stable codes; localized labels live in related translation tables. API writes validate ownership, unique identifiers, E.164 phone format, allow-listed locale, strong confirmed password, active service IDs, future booking dates and bounded user-entered notes.
 
 ## Admin dashboard
 
-The admin defaults to Arabic and switches between Arabic RTL and English LTR. The About page introduces Rounder. The dashboard KPIs (residents, approved providers, booking totals, pending bookings and paid revenue) are computed from database rows, so an empty installation shows real zeros.
+Bootstrap pages cover session login, real database KPI totals, account administration, home administration and an About page. Arabic is the default with RTL layout; English switches the dashboard to LTR. KPI sources are residents, approved providers, bookings, pending bookings and paid payment totals.
 
 ## Verification
 
-GitHub Actions runs Composer validation and Laravel route bootstrap checks. The mobile repository builds a release APK and uploads it as an Actions artifact when its workflow succeeds.
+GitHub Actions validates Composer, boots the route table, runs migrations and seeders on SQLite, and runs the API registration/validation tests. See [Project Guide](docs/PROJECT_GUIDE.md) for schema, route, validation and editing details.
