@@ -19,3 +19,5 @@ jobs:
       - run: cp .env.example .env
       - run: php artisan key:generate
       - run: php artisan route:list
+      - name: Verify schema and reference seeding on SQLite
+        run: DB_CONNECTION=sqlite DB_DATABASE=:memory: php artisan migrate:fresh --seed --force
