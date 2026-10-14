@@ -1,14 +1,14 @@
 <?php
-namespace App\\Http\\Controllers\\Api\\V1;
-use App\\Http\\Controllers\\Controller;
-use App\\Models\\Role; use App\\Models\\User;
-use Illuminate\\Http\\Request; use Illuminate\\Support\\Facades\\Hash; use Illuminate\\Validation\\ValidationException;
+namespace App\Http\Controllers\Api\V1;
+use App\Http\Controllers\Controller;
+use App\Models\Role; use App\Models\User;
+use Illuminate\Http\Request; use Illuminate\Support\Facades\Hash; use Illuminate\Validation\ValidationException;
 class AuthController extends Controller {
  public function register(Request $request){
   $data=$request->validate([
    'name'=>['required','string','min:2','max:120'],
    'email'=>['required','string','email:rfc','max:254','unique:users,email'],
-   'phone'=>['nullable','string','regex:/^\\+[1-9][0-9]{7,14}$/','unique:users,phone'],
+   'phone'=>['nullable','string','regex:/^\+[1-9][0-9]{7,14}$/','unique:users,phone'],
    'password'=>['required','string','min:10','max:72','confirmed','regex:/[a-z]/','regex:/[A-Z]/','regex:/[0-9]/'],
    'locale'=>['sometimes','in:ar,en,ur'],
   ]);
