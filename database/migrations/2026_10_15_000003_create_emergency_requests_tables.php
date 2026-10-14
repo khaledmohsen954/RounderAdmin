@@ -75,7 +75,8 @@ return new class extends Migration
     {
         foreach ([
             'emergency_request_updates', 'emergency_requests',
-            'emergency_request_status_translations', 'emergency_request_statuses',\n            'emergency_type_translations', 'emergency_types',
+            'emergency_request_status_translations', 'emergency_request_statuses',
+            'emergency_type_translations', 'emergency_types',
         ] as $table) {
             Schema::dropIfExists($table);
         }
