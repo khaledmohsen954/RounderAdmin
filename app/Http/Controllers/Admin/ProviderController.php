@@ -25,7 +25,9 @@ class ProviderController extends Controller
                 'users.email', 'users.phone', 'provider_contracts.reference as contract_reference',
                 'provider_contracts.service_commission_percent', 'provider_contracts.emergency_commission_percent',
                 'provider_contracts.starts_on', 'provider_contract_statuses.code as contract_status'
-            )->orderByDesc('provider_profiles.id')->paginate(20);
+            )->selectSub(DB::table('provider_commission_entries')->selectRaw('COALESCE(SUM(commission_amount), 0)')
+                ->whereColumn('provider_commission_entries.provider_profile_id', 'provider_profiles.id'), 'commission_total')
+            ->orderByDesc('provider_profiles.id')->paginate(20);
 
         return view('admin.providers.index', compact('providers'));
     }
