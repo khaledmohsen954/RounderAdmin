@@ -7,7 +7,7 @@ class AuthController extends Controller {
  public function register(Request $request){
   $data=$request->validate([
    'name'=>['required','string','min:2','max:120'],
-   'email'=>['required','string','email:rfc,dns','max:254','unique:users,email'],
+   'email'=>['required','string','email:rfc','max:254','unique:users,email'],
    'phone'=>['nullable','string','regex:/^\\+[1-9][0-9]{7,14}$/','unique:users,phone'],
    'password'=>['required','string','min:10','max:72','confirmed','regex:/[a-z]/','regex:/[A-Z]/','regex:/[0-9]/'],
    'locale'=>['sometimes','in:ar,en,ur'],
@@ -17,7 +17,7 @@ class AuthController extends Controller {
   return response()->json(['data'=>['user'=>$user->only(['id','name','email','phone','locale']),'token'=>$user->createToken('rounder-mobile')->plainTextToken]],201);
  }
  public function login(Request $request){
-  $data=$request->validate(['email'=>['required','email:rfc,dns'],'password'=>['required','string','max:72']]);
+  $data=$request->validate(['email'=>['required','email:rfc'],'password'=>['required','string','max:72']]);
   $user=User::with('role')->where('email',$data['email'])->first();
   if(!$user||!Hash::check($data['password'],$user->password)||!in_array($user->role->code,['resident','provider'],true))
    throw ValidationException::withMessages(['email'=>__('auth.failed')]);
