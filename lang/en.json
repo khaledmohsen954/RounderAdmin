@@ -53,5 +53,20 @@
   "User updated successfully.": "User updated successfully.",
   "You cannot change your own account here.": "You cannot change your own account here.",
   "Password updated and active app sessions revoked.": "Password updated and active app sessions revoked.",
-  "Use at least 12 characters, including uppercase, lowercase and a number.": "Use at least 12 characters, including uppercase, lowercase and a number."
+  "Use at least 12 characters, including uppercase, lowercase and a number.": "Use at least 12 characters, including uppercase, lowercase and a number.",
+  "Homes": "Homes",
+  "Create homes and share their property code with residents.": "Create homes and share their property code with residents.",
+  "Add home": "Add home",
+  "Home": "Home",
+  "City": "City",
+  "Property code": "Property code",
+  "Address": "Address",
+  "No homes found": "No homes found",
+  "Home name": "Home name",
+  "Property health": "Property health",
+  "Association balance": "Association balance",
+  "Home created successfully.": "Home created successfully.",
+  "Resident app description": "Resident home, property services, booking, tracking, association balance and community flows in Arabic, English and Urdu.",
+  "API description": "Versioned REST endpoints, Sanctum tokens, request validation, MySQL relationships and translated reference data.",
+  "Admin description": "Bootstrap admin with role checks, Arabic/English interface and database-backed KPI totals."
 }
