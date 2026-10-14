@@ -1,7 +1,7 @@
 <?php
-namespace App\\Http\\Controllers\\Api\\V1;
-use App\\Http\\Controllers\\Controller;
-use App\\Models\\Booking; use Illuminate\\Http\\Request;
+namespace App\Http\Controllers\Api\V1;
+use App\Http\Controllers\Controller;
+use App\Models\Booking; use Illuminate\Http\Request;
 class ResidentDashboardController extends Controller {
  public function __invoke(Request $request){
   $user=$request->user(); $home=$user->residentHomes()->with('city.translations')->wherePivot('is_primary',true)->first() ?? $user->residentHomes()->with('city.translations')->first();
