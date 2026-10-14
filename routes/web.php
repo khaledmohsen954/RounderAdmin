@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\{AboutController,AuthController,DashboardController,HomeController,LocaleController,ResidentContentController,UserController};
+use App\Http\Controllers\Admin\{AboutController,AuthController,DashboardController,HomeController,LocaleController,PackageAdminController,ProviderController,ResidentContentController,UserController};
 
 Route::post('/locale', [LocaleController::class, 'update'])->name('locale.update');
 Route::redirect('/login', '/admin/login')->name('login');
@@ -19,6 +19,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/users', [UserController::class, 'index'])->name('users.index');
         Route::get('/homes', [HomeController::class, 'index'])->name('homes.index');
         Route::post('/homes', [HomeController::class, 'store'])->name('homes.store');
+        Route::get('/providers', [ProviderController::class, 'index'])->name('providers.index');
+        Route::post('/providers', [ProviderController::class, 'store'])->name('providers.store');
+        Route::get('/packages', [PackageAdminController::class, 'index'])->name('packages.index');
+        Route::post('/packages/services', [PackageAdminController::class, 'storeService'])->name('packages.services.store');
+        Route::post('/packages', [PackageAdminController::class, 'storePackage'])->name('packages.store');
         Route::get('/content', [ResidentContentController::class, 'index'])->name('content.index');
         Route::post('/content/announcements', [ResidentContentController::class, 'storeAnnouncement'])->name('content.announcements.store');
         Route::post('/content/initiatives', [ResidentContentController::class, 'storeInitiative'])->name('content.initiatives.store');
