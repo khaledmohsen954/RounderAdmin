@@ -1,7 +1,7 @@
 <?php
 namespace Database\Seeders;
 use App\Models\{BookingStatus,BookingStatusTranslation,City,CityTranslation,PaymentStatus,Role,RoleTranslation,Service,ServiceCategory,ServiceCategoryTranslation,ServiceTranslation,User};
-use Illuminate\Database\Seeder;
+use Illuminate\Database\Seeder;\nuse Illuminate\Support\Facades\DB;
 class DatabaseSeeder extends Seeder {
  public function run():void {
   foreach(['admin'=>['ar'=>'مدير النظام','en'=>'Administrator'],'resident'=>['ar'=>'ساكن','en'=>'Resident'],'provider'=>['ar'=>'مقدم خدمة','en'=>'Service provider']] as $code=>$names){
