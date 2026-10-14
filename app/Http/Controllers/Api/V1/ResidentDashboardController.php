@@ -6,7 +6,7 @@ class ResidentDashboardController extends Controller {
  public function __invoke(Request $request){
   $user=$request->user(); $home=$user->residentHomes()->with('city.translations')->wherePivot('is_primary',true)->first() ?? $user->residentHomes()->with('city.translations')->first();
   abort_unless($home,404,'No residence is linked to this account.');
-  $locale=$request->getLocale();
+  $locale=app()->getLocale();
   $upcoming=Booking::with(['service.translations','status.translations'])->where('resident_id',$user->id)->where('home_id',$home->id)->whereHas('status',fn($q)=>$q->whereIn('code',['confirmed','in_progress']))->where('scheduled_at','>=',now())->orderBy('scheduled_at')->first();
   $latest=Booking::with(['service.translations','status.translations'])->where('resident_id',$user->id)->where('home_id',$home->id)->latest()->first();
   $present=fn($booking)=>$booking?['title'=>$booking->service->translations->firstWhere('locale',$locale)?->name ?? $booking->service->code,'subtitle'=>$booking->scheduled_at->translatedFormat('d M Y')]:null;
