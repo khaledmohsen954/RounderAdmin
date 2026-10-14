@@ -14,10 +14,11 @@ class PackageAdminController extends Controller
     {
         $services = DB::table('services')
             ->join('service_categories', 'services.service_category_id', '=', 'service_categories.id')
+            ->leftJoin('service_category_translations', function ($join) {\n                $join->on('service_categories.id', '=', 'service_category_translations.service_category_id')->where('service_category_translations.locale', '=', app()->getLocale());\n            })
             ->leftJoin('service_translations', function ($join) {
                 $join->on('services.id', '=', 'service_translations.service_id')
                     ->where('service_translations.locale', '=', app()->getLocale());
-            })->select('services.*', 'service_categories.code as category_code', 'service_translations.name')
+            })->select('services.*', 'service_category_translations.name as category_name', 'service_translations.name')
             ->orderBy('service_categories.code')->orderBy('services.code')->get();
 
         $categories = DB::table('service_categories')->join('service_category_translations', function ($join) {
