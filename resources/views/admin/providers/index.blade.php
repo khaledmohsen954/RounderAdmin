@@ -34,9 +34,9 @@
 <div class="col-12 d-flex justify-content-end"><button class="btn btn-primary px-4">{{ __('Register provider and contract') }}</button></div>
 </div></form></div>
 <div class="panel p-3 p-lg-4"><h2 class="h5 fw-bold">{{ __('Registered providers') }}</h2>
-<div class="table-responsive"><table class="table align-middle"><thead><tr><th>#</th><th>{{ __('Company name') }}</th><th>{{ __('Contact name') }}</th><th>{{ __('Email address') }}</th><th>{{ __('Approval') }}</th><th>{{ __('Service commission (%)') }}</th><th>{{ __('Emergency commission (%)') }}</th><th>{{ __('Contract') }}</th></tr></thead><tbody>
-@forelse($providers as $provider)<tr><td>{{ $provider->provider_id }}</td><td>{{ $provider->company_name }}</td><td>{{ $provider->name }}</td><td>{{ $provider->email }}</td><td><span class="pill">{{ $provider->is_approved ? __('Approved') : __('Pending approval') }}</span></td><td>{{ $provider->service_commission_percent ?? '—' }}%</td><td>{{ $provider->emergency_commission_percent ?? '—' }}%</td><td>{{ $provider->contract_reference ?? '—' }}<div class="small text-secondary">{{ $provider->contract_status ?? '' }}</div></td></tr>
-@empty<tr><td colspan="8" class="text-center text-secondary">{{ __('No providers found') }}</td></tr>@endforelse
+<div class="table-responsive"><table class="table align-middle"><thead><tr><th>#</th><th>{{ __('Company name') }}</th><th>{{ __('Contact name') }}</th><th>{{ __('Email address') }}</th><th>{{ __('Approval') }}</th><th>{{ __('Service commission (%)') }}</th><th>{{ __('Emergency commission (%)') }}</th><th>{{ __('Commission accrued') }}</th><th>{{ __('Contract') }}</th></tr></thead><tbody>
+@forelse($providers as $provider)<tr><td>{{ $provider->provider_id }}</td><td>{{ $provider->company_name }}</td><td>{{ $provider->name }}</td><td>{{ $provider->email }}</td><td><span class="pill">{{ $provider->is_approved ? __('Approved') : __('Pending approval') }}</span></td><td>{{ $provider->service_commission_percent ?? '—' }}%</td><td>{{ $provider->emergency_commission_percent ?? '—' }}%</td><td>{{ number_format($provider->commission_total ?? 0,2) }} SAR</td><td>{{ $provider->contract_reference ?? '—' }}<div class="small text-secondary">{{ $provider->contract_status ? __($provider->contract_status) : '' }}</div></td></tr>
+@empty<tr><td colspan="9" class="text-center text-secondary">{{ __('No providers found') }}</td></tr>@endforelse
 </tbody></table>{{ $providers->links() }}</div>
 </div>
 </main></div></div>
