@@ -123,13 +123,13 @@ class ResidentPackageController extends Controller
     {
         $subscription = DB::table('resident_subscriptions')
             ->join('resident_homes', 'resident_subscriptions.resident_home_id', '=', 'resident_homes.id')
+            ->join('subscription_statuses', 'resident_subscriptions.status_id', '=', 'subscription_statuses.id')
             ->where('resident_subscriptions.id', $subscriptionId)
             ->where('resident_homes.user_id', $request->user()->id)
-            ->select('resident_subscriptions.*')->first();
+            ->select('resident_subscriptions.*', 'subscription_statuses.code as status_code')->first();
         abort_unless($subscription, 404);
 
-        $pendingId = DB::table('subscription_statuses')->where('code', 'pending')->value('id');
-        abort_unless((int) $subscription->status_id === (int) $pendingId && $subscription->starts_at > now(), 409,
+        abort_unless($subscription->status_code === 'pending', 409,
             'An active package cancellation must be handled by support.');
 
         $cancelledId = DB::table('subscription_statuses')->where('code', 'cancelled')->value('id');
