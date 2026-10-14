@@ -14,7 +14,9 @@ class PackageAdminController extends Controller
     {
         $services = DB::table('services')
             ->join('service_categories', 'services.service_category_id', '=', 'service_categories.id')
-            ->leftJoin('service_category_translations', function ($join) {\n                $join->on('service_categories.id', '=', 'service_category_translations.service_category_id')->where('service_category_translations.locale', '=', app()->getLocale());\n            })
+            ->leftJoin('service_category_translations', function ($join) {
+                $join->on('service_categories.id', '=', 'service_category_translations.service_category_id')->where('service_category_translations.locale', '=', app()->getLocale());
+            })
             ->leftJoin('service_translations', function ($join) {
                 $join->on('services.id', '=', 'service_translations.service_id')
                     ->where('service_translations.locale', '=', app()->getLocale());
@@ -40,7 +42,9 @@ class PackageAdminController extends Controller
         $packageServices = DB::table('service_package_services')
             ->join('service_packages', 'service_package_services.service_package_id', '=', 'service_packages.id')
             ->join('services', 'service_package_services.service_id', '=', 'services.id')
-            ->leftJoin('service_translations', function ($join) {\n                $join->on('services.id', '=', 'service_translations.service_id')->where('service_translations.locale', '=', app()->getLocale());\n            })->select('service_package_services.*', 'services.code as service_code', 'service_translations.name as service_name')
+            ->leftJoin('service_translations', function ($join) {
+                $join->on('services.id', '=', 'service_translations.service_id')->where('service_translations.locale', '=', app()->getLocale());
+            })->select('service_package_services.*', 'services.code as service_code', 'service_translations.name as service_name')
             ->get()->groupBy('service_package_id');
 
         return view('admin.packages.index', compact('services', 'categories', 'cycles', 'packages', 'packageServices'));
