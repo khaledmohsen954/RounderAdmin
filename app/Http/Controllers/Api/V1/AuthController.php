@@ -19,7 +19,7 @@ class AuthController extends Controller {
  public function login(Request $request){
   $data=$request->validate(['email'=>['required','email:rfc'],'password'=>['required','string','max:72']]);
   $user=User::with('role')->where('email',$data['email'])->first();
-  if(!$user||!Hash::check($data['password'],$user->password)||!in_array($user->role->code,['resident','provider'],true))
+  if(!$user||!Hash::check($data['password'],$user->password)||$user->role->code!=='resident')
    throw ValidationException::withMessages(['email'=>__('auth.failed')]);
   return response()->json(['data'=>['user'=>$user->only(['id','name','email','phone','locale']),'token'=>$user->createToken('rounder-mobile')->plainTextToken]]);
  }
