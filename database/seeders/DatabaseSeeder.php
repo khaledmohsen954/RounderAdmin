@@ -7,22 +7,22 @@ class DatabaseSeeder extends Seeder {
   foreach(['admin'=>['ar'=>'مدير النظام','en'=>'Administrator'],'resident'=>['ar'=>'ساكن','en'=>'Resident'],'provider'=>['ar'=>'مقدم خدمة','en'=>'Service provider']] as $code=>$names){
    $role=Role::firstOrCreate(['code'=>$code]); foreach($names as $locale=>$name) RoleTranslation::updateOrCreate(['role_id'=>$role->id,'locale'=>$locale],['name'=>$name]);
   }
-  foreach(['pending'=>['ar'=>'قيد الانتظار','en'=>'Pending'],'confirmed'=>['ar'=>'مؤكد','en'=>'Confirmed'],'in_progress'=>['ar'=>'جارٍ التنفيذ','en'=>'In progress'],'completed'=>['ar'=>'مكتمل','en'=>'Completed'],'cancelled'=>['ar'=>'ملغي','en'=>'Cancelled']] as $code=>$names){
+  foreach(['pending'=>['ar'=>'قيد الانتظار','en'=>'Pending','ur'=>'زیرِ التوا'],'confirmed'=>['ar'=>'مؤكد','en'=>'Confirmed','ur'=>'تصدیق شدہ'],'in_progress'=>['ar'=>'جارٍ التنفيذ','en'=>'In progress','ur'=>'جاری ہے'],'completed'=>['ar'=>'مكتمل','en'=>'Completed','ur'=>'مکمل'],'cancelled'=>['ar'=>'ملغي','en'=>'Cancelled','ur'=>'منسوخ']] as $code=>$names){
    $status=BookingStatus::firstOrCreate(['code'=>$code]); foreach($names as $locale=>$name) BookingStatusTranslation::updateOrCreate(['booking_status_id'=>$status->id,'locale'=>$locale],['name'=>$name]);
   }
   foreach(['pending','paid','failed','refunded'] as $code) PaymentStatus::firstOrCreate(['code'=>$code]);
   $city=City::firstOrCreate(['code'=>'cairo']);
-  foreach(['ar'=>'القاهرة','en'=>'Cairo'] as $locale=>$name) CityTranslation::updateOrCreate(['city_id'=>$city->id,'locale'=>$locale],['name'=>$name]);
+  foreach(['ar'=>'القاهرة','en'=>'Cairo','ur'=>'قاہرہ'] as $locale=>$name) CityTranslation::updateOrCreate(['city_id'=>$city->id,'locale'=>$locale],['name'=>$name]);
   $catalog=[
-   'maintenance'=>['ar'=>'الصيانة','en'=>'Maintenance','services'=>['plumbing'=>['ar'=>'إصلاح السباكة','en'=>'Plumbing repair','price'=>250],'electrical'=>['ar'=>'إصلاح الكهرباء','en'=>'Electrical repair','price'=>300]]],
-   'cleaning'=>['ar'=>'النظافة','en'=>'Cleaning','services'=>['home_cleaning'=>['ar'=>'تنظيف المنزل','en'=>'Home cleaning','price'=>400]]],
+   'maintenance'=>['ar'=>'الصيانة','en'=>'Maintenance','ur'=>'مرمت','services'=>['plumbing'=>['ar'=>'إصلاح السباكة','en'=>'Plumbing repair','ur'=>'پلمبنگ کی مرمت','price'=>250],'electrical'=>['ar'=>'إصلاح الكهرباء','en'=>'Electrical repair','ur'=>'بجلی کی مرمت','price'=>300]]],
+   'cleaning'=>['ar'=>'النظافة','en'=>'Cleaning','ur'=>'صفائی','services'=>['home_cleaning'=>['ar'=>'تنظيف المنزل','en'=>'Home cleaning','ur'=>'گھر کی صفائی','price'=>400]]],
   ];
   foreach($catalog as $code=>$categoryData){
    $category=ServiceCategory::firstOrCreate(['code'=>$code],['is_active'=>true]);
-   foreach(['ar','en'] as $locale) ServiceCategoryTranslation::updateOrCreate(['service_category_id'=>$category->id,'locale'=>$locale],['name'=>$categoryData[$locale]]);
+   foreach(['ar','en','ur'] as $locale) ServiceCategoryTranslation::updateOrCreate(['service_category_id'=>$category->id,'locale'=>$locale],['name'=>$categoryData[$locale]]);
    foreach($categoryData['services'] as $serviceCode=>$serviceData){
     $service=Service::firstOrCreate(['code'=>$serviceCode],['service_category_id'=>$category->id,'base_price'=>$serviceData['price'],'is_active'=>true]);
-    foreach(['ar','en'] as $locale) ServiceTranslation::updateOrCreate(['service_id'=>$service->id,'locale'=>$locale],['name'=>$serviceData[$locale],'description'=>null]);
+    foreach(['ar','en','ur'] as $locale) ServiceTranslation::updateOrCreate(['service_id'=>$service->id,'locale'=>$locale],['name'=>$serviceData[$locale],'description'=>null]);
    }
   }
   $email=env('ROUND_ADMIN_EMAIL'); $password=env('ROUND_ADMIN_PASSWORD');
