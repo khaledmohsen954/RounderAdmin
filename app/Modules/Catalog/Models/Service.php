@@ -14,7 +14,10 @@ class Service extends Model
     protected $table = 'services';
 
     /** الحقول المسموح حفظها؛ يجب تمرير البيانات المتحقق منها فقط من طبقة الطلب. */
+    protected $hidden = ['original_price'];
+
     protected $fillable = [
+        'original_price', 'price_before_discount', 'discount_type', 'discount_value', 'image_path',
         'service_category_id',
         'code',
         'base_price',
@@ -28,6 +31,10 @@ class Service extends Model
     protected function casts(): array
     {
         return [
+            'original_price' => 'decimal:2',
+            'price_before_discount' => 'decimal:2',
+            'discount_type' => \App\Modules\Catalog\Enums\DiscountType::class,
+            'discount_value' => 'decimal:2',
             'service_category_id' => 'integer',
             'base_price' => 'decimal:2',
             'is_active' => 'boolean',

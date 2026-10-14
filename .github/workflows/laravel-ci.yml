@@ -1,7 +1,7 @@
 name: Laravel checks
 on:
   push:
-    branches: [main, refactor/domain-modules]
+    branches: [main, refactor/domain-modules, feature/dynamic-catalog]
   pull_request:
     branches: [main]
 jobs:
@@ -33,7 +33,7 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: "8.3"
-          extensions: mbstring, pdo_mysql
+          extensions: mbstring, pdo_mysql, gd
           coverage: none
       - run: composer validate --strict
       - run: composer install --no-interaction --prefer-dist

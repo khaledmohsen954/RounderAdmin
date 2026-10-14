@@ -80,4 +80,26 @@ class PackageAdminController extends Controller
     {
         return redirect()->route('admin.packages.index')->with('status', $this->service->updateService($request->validated(), $request->user(), $serviceId));
     }
+
+    /**
+     * @param \App\Modules\Catalog\Requests\AdminPackageAdminEditPackageRequest $request
+     * @param int $packageId
+     * @return \Illuminate\Contracts\View\View
+     * @throws \Throwable
+     */
+    public function editPackage(\App\Modules\Catalog\Requests\AdminPackageAdminEditPackageRequest $request, int $packageId): \Illuminate\Contracts\View\View
+    {
+        return view('admin.packages.edit-package', $this->service->editPackage($request->validated(), $request->user(), $packageId));
+    }
+
+    /**
+     * @param \App\Modules\Catalog\Requests\AdminPackageAdminUpdatePackageRequest $request
+     * @param int $packageId
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \Throwable
+     */
+    public function updatePackage(\App\Modules\Catalog\Requests\AdminPackageAdminUpdatePackageRequest $request, int $packageId): \Illuminate\Http\RedirectResponse
+    {
+        return redirect()->route('admin.packages.index')->with('status', $this->service->updatePackage($request->validated(), $request->user(), $packageId));
+    }
 }

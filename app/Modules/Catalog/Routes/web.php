@@ -9,4 +9,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::put('/packages/services/{serviceId}', [\App\Modules\Catalog\Controllers\Admin\PackageAdminController::class, 'updateService'])->whereNumber('serviceId')->name('packages.services.update');
     Route::post('/packages/services', [\App\Modules\Catalog\Controllers\Admin\PackageAdminController::class, 'storeService'])->name('packages.services.store');
     Route::post('/packages', [\App\Modules\Catalog\Controllers\Admin\PackageAdminController::class, 'storePackage'])->name('packages.store');
+    Route::get('/packages/{packageId}/edit', [\App\Modules\Catalog\Controllers\Admin\PackageAdminController::class, 'editPackage'])->whereNumber('packageId')->name('packages.edit');
+    Route::put('/packages/{packageId}', [\App\Modules\Catalog\Controllers\Admin\PackageAdminController::class, 'updatePackage'])->whereNumber('packageId')->name('packages.update');
 });

@@ -47,6 +47,10 @@ class ApiResidentPackageService
             'name' => $package->translations->first()?->name ?? $package->code,
             'description' => $package->translations->first()?->description,
             'price' => $package->price,
+            'price_before_discount' => $package->price_before_discount ?? $package->price,
+            'discount_type' => $package->discount_type?->value ?? \App\Modules\Catalog\Enums\DiscountType::None->value,
+            'discount_value' => $package->discount_value ?? '0.00',
+            'image_url' => $package->image_path ? \Illuminate\Support\Facades\Storage::disk('public')->url($package->image_path) : null,
             'currency_code' => $package->currency_code,
             'duration_months' => $package->duration_months,
             'billing_cycle' => [
@@ -109,7 +113,7 @@ class ApiResidentPackageService
             DomainViolation::rejectIf($current, FailureReason::Conflict, __('This home already has an active or pending package.'));
 
             $package = ServicePackage::query()->where('id', $data['service_package_id'])
-                ->where('is_active', true)->first();
+                ->where('is_active', true)->lockForUpdate()->first();
             DomainViolation::unless($package, FailureReason::NotFound);
 
             $statusCode = (float) $package->price === 0.0 ? SubscriptionStatusCode::Active->value : SubscriptionStatusCode::Pending->value;

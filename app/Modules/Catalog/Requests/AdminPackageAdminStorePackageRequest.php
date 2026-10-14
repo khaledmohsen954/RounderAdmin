@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 /** التحقق من مدخلات PackageAdminController::storePackage قبل تشغيل الخدمة. */
 class AdminPackageAdminStorePackageRequest extends AdminRequest
 {
+    use CatalogPricingRules;
     /**
      * توحيد كود الكتالوج قبل التحقق من التكرار.
      * @return void
@@ -25,10 +26,10 @@ class AdminPackageAdminStorePackageRequest extends AdminRequest
      */
     public function rules(): array
     {
-        return [
+        return array_merge($this->pricingRules(), [
             'billing_cycle_id' => ['required', 'integer', 'exists:package_billing_cycles,id'],
             'code' => ['required', 'alpha_dash', 'min:2', 'max:60', 'unique:service_packages,code'],
-            'price' => ['required', 'numeric', 'min:0', 'max:9999999999.99'],
+            'price' => ['required', 'numeric', 'min:0', 'max:9999999999.99', 'decimal:0,2'],
             'currency_code' => ['required', 'string', 'size:3', 'regex:/^[A-Z]{3}$/'],
             'duration_months' => ['required', 'integer', 'between:1,120'],
             'name_ar' => ['required', 'string', 'min:2', 'max:140'],
@@ -41,6 +42,6 @@ class AdminPackageAdminStorePackageRequest extends AdminRequest
             'services.*.service_id' => ['required', 'integer', 'distinct', 'exists:services,id'],
             'services.*.included_quantity' => ['nullable', 'integer', 'between:1,1000'],
             'services.*.is_unlimited' => ['required', 'boolean'],
-        ];
+        ]);
     }
 }

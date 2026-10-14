@@ -23,6 +23,34 @@ use App\Modules\Catalog\Enums\Operation;
 /** قواعد عمل Catalog؛ تستقبل بيانات متحققاً منها دون الاعتماد على HTTP. */
 class AdminPackageAdminService
 {
+    /**
+     * @param CatalogPricingService $pricing
+     * @param \App\Services\CatalogImageStorage $images
+     */
+    public function __construct(
+        private readonly CatalogPricingService $pricing,
+        private readonly \App\Services\CatalogImageStorage $images,
+    ) {}
+
+    /**
+     * الاحتفاظ بالصور السابقة يمنع كسرها إذا تراجعت المعاملة أو كان لها قارئ متزامن.
+     * تنظيف الملفات غير المشار إليها عملية صيانة مستقلة عن المعاملة المالية.
+     * @param array<string, mixed> $input
+     * @param string $priceField
+     * @return array<string, mixed>
+     * @throws \Throwable
+     */
+    private function catalogAttributes(array $input, string $priceField): array
+    {
+        $attributes = $this->pricing->attributes($input, $priceField);
+        if (!empty($input['image'])) {
+            $attributes['image_path'] = $this->images->store($input['image']);
+        } elseif (!empty($input['remove_image'])) {
+            $attributes['image_path'] = null;
+        }
+        return $attributes;
+    }
+
 
     /**
      * قراءة بيانات المجال مع الحفاظ على قيود الوصول.
@@ -120,11 +148,12 @@ class AdminPackageAdminService
         
         
 
-        DB::transaction(function () use ($data) {
+        $attributes = $this->catalogAttributes($data, 'base_price');
+        DB::transaction(function () use ($data, $attributes) {
             $serviceId = Service::query()->create([
+                ...$attributes,
                 'service_category_id' => $data['service_category_id'],
                 'code' => Str::lower($data['code']),
-                'base_price' => $data['base_price'],
                 'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -182,11 +211,12 @@ class AdminPackageAdminService
             }
         }
 
-        DB::transaction(function () use ($data) {
+        $attributes = $this->catalogAttributes($data, 'price');
+        DB::transaction(function () use ($data, $attributes) {
             $packageId = ServicePackage::query()->create([
+                ...$attributes,
                 'billing_cycle_id' => $data['billing_cycle_id'],
                 'code' => Str::lower($data['code']),
-                'price' => $data['price'],
                 'currency_code' => $data['currency_code'],
                 'duration_months' => $data['duration_months'],
                 'is_active' => true,
@@ -268,15 +298,17 @@ class AdminPackageAdminService
         $data = $input;
 
         DomainViolation::unless(Service::query()->where('id', $serviceId)->exists(), FailureReason::NotFound);
-        // Normalize before uniqueness validation so MySQL and SQLite behave consistently.
+        // FormRequest سبق أن وحّد الكود قبل التحقق من التفرد.
         
         
-        DB::transaction(function () use ($serviceId, $data) {
+        $attributes = $this->catalogAttributes($data, 'base_price');
+        DB::transaction(function () use ($serviceId, $data, $attributes) {
             DomainViolation::unless(Service::query()->where('id', $serviceId)->lockForUpdate()->first(), FailureReason::NotFound);
             // Catalogue edits never rewrite prices already recorded on orders.
             Service::query()->where('id', $serviceId)->update([
+                ...$attributes,
                 'service_category_id' => $data['service_category_id'], 'code' => $data['code'],
-                'base_price' => $data['base_price'], 'is_active' => $data['is_active'], 'updated_at' => now(),
+                'is_active' => $data['is_active'], 'updated_at' => now(),
             ]);
             foreach (array_column(SupportedLocale::cases(), 'value') as $locale) {
                 ServiceTranslation::query()->updateOrCreate(
@@ -287,5 +319,65 @@ class AdminPackageAdminService
             }
         });
         return __('Service updated successfully.');
+    }
+
+    /**
+     * @param array $input
+     * @param User|null $actor
+     * @param int $packageId
+     * @return array
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
+    public function editPackage(array $input, ?User $actor, int $packageId): array
+    {
+        $package = ServicePackage::with(['translations', 'includedServices'])->findOrFail($packageId);
+        $translations = $package->translations->keyBy('locale');
+        $cycles = PackageBillingCycle::orderBy('months')->get();
+        $services = Service::with('translations')->orderBy('code')->get();
+        return compact('package', 'translations', 'cycles', 'services');
+    }
+
+    /**
+     * تحديث التعريف فقط؛ حصص المشتركين وأسعارهم المحفوظة لا يعاد كتابتها.
+     * @param array $input
+     * @param User|null $actor
+     * @param int $packageId
+     * @return string
+     * @throws \Throwable
+     */
+    public function updatePackage(array $input, ?User $actor, int $packageId): string
+    {
+        return DB::transaction(function () use ($input, $actor, $packageId) {
+            $package = ServicePackage::whereKey($packageId)->lockForUpdate()->firstOrFail();
+            foreach ($input['services'] as $index => $included) {
+                if (!$included['is_unlimited'] && empty($included['included_quantity'])) {
+                    throw ValidationException::withMessages([
+                        "services.$index.included_quantity" => __('Set an included quantity or mark this service unlimited.'),
+                    ]);
+                }
+            }
+            $package->update([
+                ...$this->catalogAttributes($input, 'price'),
+                'code' => $input['code'], 'billing_cycle_id' => $input['billing_cycle_id'],
+                'currency_code' => $input['currency_code'], 'duration_months' => $input['duration_months'],
+                'is_active' => $input['is_active'],
+            ]);
+            foreach (SupportedLocale::cases() as $locale) {
+                $package->translations()->updateOrCreate(['locale' => $locale->value], [
+                    'name' => $input['name_'.$locale->value],
+                    'description' => $input['description_'.$locale->value] ?? null,
+                ]);
+            }
+            $ids = array_column($input['services'], 'service_id');
+            $package->includedServices()->whereNotIn('service_id', $ids)->delete();
+            foreach ($input['services'] as $included) {
+                $package->includedServices()->updateOrCreate(['service_id' => $included['service_id']], [
+                    'included_quantity' => $included['is_unlimited'] ? null : $included['included_quantity'],
+                    'is_unlimited' => $included['is_unlimited'],
+                ]);
+            }
+            DB::afterCommit(fn () => event(new CatalogChanged(Operation::AdminPackageAdminUpdatePackage, $actor?->id)));
+            return __('Package updated successfully.');
+        });
     }
 }
