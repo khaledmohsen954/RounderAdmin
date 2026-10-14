@@ -54,5 +54,20 @@
   "You cannot change your own account here.": "لا يمكنك تعديل حسابك من هذه الصفحة.",
   "Password updated and active app sessions revoked.": "تم تحديث كلمة المرور وإنهاء جلسات التطبيق الحالية.",
   "Use at least 12 characters, including uppercase, lowercase and a number.": "استخدم 12 حرفًا على الأقل، مع حرف كبير وصغير ورقم.",
-  "Save": "حفظ"
+  "Save": "حفظ",
+  "Homes": "العقارات",
+  "Create homes and share their property code with residents.": "أنشئ العقارات وشارك رمز العقار مع السكان.",
+  "Add home": "إضافة عقار",
+  "Home": "العقار",
+  "City": "المدينة",
+  "Property code": "رمز العقار",
+  "Address": "العنوان",
+  "No homes found": "لا توجد عقارات",
+  "Home name": "اسم العقار",
+  "Property health": "حالة العقار",
+  "Association balance": "رصيد الاتحاد",
+  "Home created successfully.": "تم إنشاء العقار بنجاح.",
+  "Resident app description": "تطبيق السكان: الصفحة الرئيسية وخدمات العقار والحجوزات والمتابعة ورصيد الاتحاد والمجتمع بثلاث لغات.",
+  "API description": "واجهات REST بإصدارات واضحة، ورموز Sanctum، والتحقق من المدخلات، وعلاقات MySQL، وبيانات مرجعية مترجمة.",
+  "Admin description": "لوحة Bootstrap بصلاحيات حسب الدور وواجهات عربية وإنجليزية ومؤشرات مرتبطة ببيانات قاعدة البيانات."
 }
