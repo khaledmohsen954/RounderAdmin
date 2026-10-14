@@ -15,6 +15,7 @@ Route::prefix('v1')->group(function(){
    Route::get('/services',ServiceCatalogController::class);
    Route::get('/bookings',[BookingController::class,'index']);
    Route::post('/bookings',[BookingController::class,'store'])->middleware('throttle:20,1');
+   Route::post('/bookings/{bookingId}/cancel',[BookingController::class,'cancel'])->middleware('throttle:10,1');
   });
  });
 });
