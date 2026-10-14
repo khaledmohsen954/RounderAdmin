@@ -1,6 +1,6 @@
 <?php
 namespace Tests\Feature;
-use App\Models\Role; use App\Models\User; use Illuminate\Foundation\Testing\RefreshDatabase; use Tests\TestCase;
+use App\Modules\Identity\Models\Role; use App\Modules\Identity\Models\User; use Illuminate\Foundation\Testing\RefreshDatabase; use Tests\TestCase;
 class ResidentAuthenticationTest extends TestCase {
  use RefreshDatabase;
  protected function setUp():void { parent::setUp(); $this->seed(); }

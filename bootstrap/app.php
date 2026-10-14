@@ -10,5 +10,20 @@ return Application::configure(basePath: dirname(__DIR__))
   $middleware->api(append:[SetApiLocale::class]);
   $middleware->alias(['admin'=>EnsureAdmin::class,'resident'=>EnsureResident::class]);
  })
- ->withExceptions(function(Exceptions $exceptions):void{})
+ ->withExceptions(function (Exceptions $exceptions): void {
+  // الخدمات تصدر أخطاء مجال، وهذه الطبقة وحدها تختار كود HTTP.
+  $exceptions->render(function (\App\Core\Exceptions\DomainViolation $error, \Illuminate\Http\Request $request) {
+   $status = match ($error->reason) {
+    \App\Core\Enums\FailureReason::NotFound => 404,
+    \App\Core\Enums\FailureReason::Forbidden => 403,
+    \App\Core\Enums\FailureReason::Unauthorized => 401,
+    \App\Core\Enums\FailureReason::Conflict => 409,
+    \App\Core\Enums\FailureReason::InvalidInput => 422,
+    \App\Core\Enums\FailureReason::Configuration => 500,
+   };
+   return $request->expectsJson()
+    ? response()->json(['message' => $error->getMessage()], $status)
+    : response(e($error->getMessage()), $status);
+  });
+ })
  ->create();

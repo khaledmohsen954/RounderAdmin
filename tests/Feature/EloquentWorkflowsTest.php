@@ -2,9 +2,19 @@
 
 namespace Tests\Feature;
 
-use App\Models\{City, Home, ResidentHome, Role, User, Service, ServicePackage,
-    PackageBillingCycle, ResidentSubscription, CommunityPost, CommunityReaction,
-    Booking, BookingStatusHistory};
+use App\Modules\Properties\Models\City;
+use App\Modules\Properties\Models\Home;
+use App\Modules\Properties\Models\ResidentHome;
+use App\Modules\Identity\Models\Role;
+use App\Modules\Identity\Models\User;
+use App\Modules\Catalog\Models\Service;
+use App\Modules\Catalog\Models\ServicePackage;
+use App\Modules\Catalog\Models\PackageBillingCycle;
+use App\Modules\Catalog\Models\ResidentSubscription;
+use App\Modules\Community\Models\CommunityPost;
+use App\Modules\Community\Models\CommunityReaction;
+use App\Modules\Bookings\Models\Booking;
+use App\Modules\Bookings\Models\BookingStatusHistory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\Sanctum;

@@ -1,15 +1,26 @@
 <?php
 namespace Database\Seeders;
-use App\Models\EmergencyRequestStatus;
-use App\Models\EmergencyRequestStatusTranslation;
-use App\Models\EmergencyType;
-use App\Models\EmergencyTypeTranslation;
-use App\Models\PackageBillingCycle;
-use App\Models\ProviderCommissionStatus;
-use App\Models\ProviderContractStatus;
-use App\Models\SubscriptionStatus;
-use App\Models\SubscriptionStatusTranslation;
-use App\Models\{BookingStatus,BookingStatusTranslation,City,CityTranslation,PaymentStatus,Role,RoleTranslation,Service,ServiceCategory,ServiceCategoryTranslation,ServiceTranslation,User};
+use App\Modules\Emergencies\Models\EmergencyRequestStatus;
+use App\Modules\Emergencies\Models\EmergencyRequestStatusTranslation;
+use App\Modules\Emergencies\Models\EmergencyType;
+use App\Modules\Emergencies\Models\EmergencyTypeTranslation;
+use App\Modules\Catalog\Models\PackageBillingCycle;
+use App\Modules\Providers\Models\ProviderCommissionStatus;
+use App\Modules\Providers\Models\ProviderContractStatus;
+use App\Modules\Catalog\Models\SubscriptionStatus;
+use App\Modules\Catalog\Models\SubscriptionStatusTranslation;
+use App\Modules\Bookings\Models\BookingStatus;
+use App\Modules\Bookings\Models\BookingStatusTranslation;
+use App\Modules\Properties\Models\City;
+use App\Modules\Properties\Models\CityTranslation;
+use App\Modules\Finance\Models\PaymentStatus;
+use App\Modules\Identity\Models\Role;
+use App\Modules\Identity\Models\RoleTranslation;
+use App\Modules\Catalog\Models\Service;
+use App\Modules\Catalog\Models\ServiceCategory;
+use App\Modules\Catalog\Models\ServiceCategoryTranslation;
+use App\Modules\Catalog\Models\ServiceTranslation;
+use App\Modules\Identity\Models\User;
 use Illuminate\Database\Seeder;
 
 /** بيانات مرجعية قابلة لإعادة التشغيل؛ لا تنشئ حساب مدير إلا من إعدادات البيئة. */

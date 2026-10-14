@@ -1,0 +1,67 @@
+<?php
+
+namespace App\Modules\Community\Models;
+
+use App\Modules\Properties\Models\ResidentHome;
+use App\Modules\Identity\Models\User;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+/** يمثل بيانات initiative_participations وعلاقاتها بالمفاتيح الأجنبية في قاعدة البيانات. */
+class InitiativeParticipation extends Model
+{
+    protected $table = 'initiative_participations';
+
+    /** الحقول المسموح حفظها؛ يجب تمرير البيانات المتحقق منها فقط من طبقة الطلب. */
+    protected $fillable = [
+        'initiative_id',
+        'resident_home_id',
+        'user_id',
+        'pledged_amount',
+        'joined_at',
+    ];
+
+    /**
+     * أنواع البيانات المسموح إرجاعها وحفظها عبر Eloquent.
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'initiative_id' => 'integer',
+            'resident_home_id' => 'integer',
+            'user_id' => 'integer',
+            'pledged_amount' => 'decimal:2',
+            'joined_at' => 'datetime:Y-m-d H:i:s',
+        ];
+    }
+
+    /**
+     * السجل المرتبط عبر initiative_id.
+     * @return BelongsTo
+     */
+    public function initiative(): BelongsTo
+    {
+        return $this->belongsTo(Initiative::class, 'initiative_id');
+    }
+
+    /**
+     * السجل المرتبط عبر resident_home_id.
+     * @return BelongsTo
+     */
+    public function residentHome(): BelongsTo
+    {
+        return $this->belongsTo(ResidentHome::class, 'resident_home_id');
+    }
+
+    /**
+     * السجل المرتبط عبر user_id.
+     * @return BelongsTo
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+}

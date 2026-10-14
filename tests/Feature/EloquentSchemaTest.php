@@ -16,8 +16,9 @@ class EloquentSchemaTest extends TestCase
 
     public function test_declared_relations_can_query_the_migrated_schema(): void
     {
-        foreach (glob(app_path('Models/*.php')) as $file) {
-            $class = 'App\\Models\\'.basename($file, '.php');
+        foreach (glob(app_path('Modules/*/Models/*.php')) as $file) {
+            $domain = basename(dirname($file, 2));
+            $class = 'App\\Modules\\'.$domain.'\\Models\\'.basename($file, '.php');
             $reflection = new ReflectionClass($class);
             if ($reflection->isAbstract() || !$reflection->isSubclassOf(Model::class)) {
                 continue;
