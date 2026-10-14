@@ -1,23 +1,36 @@
-# Rounder Admin and API
+# Rounder API & Admin
 
-Laravel 13 application providing the Rounder REST API and responsive administration dashboard.
+Laravel 13 backend and Bootstrap administration dashboard for the Rounder resident app.
 
-## Product scope
+## Requirements and local setup
 
-- API consumed by the Flutter application in [Rounderapplication](https://github.com/khaledmohsen954/Rounderapplication).
-- MySQL schema with normalized reference data, foreign keys, indexes, and explicit relationships.
-- Bootstrap administration UI in Arabic (default) and English with RTL/LTR layout.
-- Role and permission protected administration.
-- Dashboard KPIs and charts are computed from persisted application data.
+- PHP 8.3+, Composer, and MySQL 8+
+- Copy `.env.example` to `.env`; configure the database and set a strong `ROUND_ADMIN_EMAIL` and `ROUND_ADMIN_PASSWORD`.
+- Run `composer install`, `php artisan key:generate`, and `php artisan migrate --seed`.
+- Run `php artisan serve`; open `/admin/login`.
+- The initial administrator is only created when its environment credentials are set. Do not commit `.env`.
 
-## Backend conventions
+## Data and account model
 
-- Form Requests validate every write field.
-- API Resources define stable response shapes.
-- Policies authorize record access.
-- Reference and status values use related tables and IDs; free text is reserved for genuine notes/descriptions.
-- Database credentials, third-party secrets, and environment-specific values are supplied via `.env`, never committed.
+A shared `users` table holds admin, resident and provider accounts, distinguished by required `role_id`. Passwords are hashed by Laravel's model cast. The admin panel lists accounts and can create users or reset passwords; resetting revokes existing mobile tokens. Admin routes require both an authenticated session and the admin role.
 
-## Product modules
+MySQL relations include translated role/city/service/status lookup rows, homes and resident memberships, categorized services, bookings, booking status history, providers and payments. Reference values use foreign key IDs and stable codes; translations live in related tables.
 
-Residence and membership, authentication, service catalog, bookings, providers, order lifecycle, payments, association operations, rewards, notifications, ratings, and aftercare are modeled from the Resident App design.
+## API
+
+- `GET /api/v1/health`
+- `POST /api/v1/auth/register`, `POST /api/v1/auth/login`
+- `GET /api/v1/me`, `POST /api/v1/auth/logout` (Sanctum bearer token)
+- `GET /api/v1/resident/dashboard`
+- `GET /api/v1/resident/services`
+- `GET|POST /api/v1/resident/bookings`
+
+The mobile client sends the bearer token and `Accept-Language`; Arabic and English are supported in the dashboard, and resident-facing API text uses Arabic/English/Urdu locale codes.
+
+## Admin dashboard
+
+The admin defaults to Arabic and switches between Arabic RTL and English LTR. The About page introduces Rounder. The dashboard KPIs (residents, approved providers, booking totals, pending bookings and paid revenue) are computed from database rows, so an empty installation shows real zeros.
+
+## Verification
+
+GitHub Actions runs Composer validation and Laravel route bootstrap checks. The mobile repository builds a release APK and uploads it as an Actions artifact when its workflow succeeds.
