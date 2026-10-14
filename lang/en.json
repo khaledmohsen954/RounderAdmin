@@ -192,5 +192,6 @@
   "Active subscriptions": "Active subscriptions",
   "Available packages": "Available packages",
   "This home already has an active or pending package.": "This home already has an active or pending package.",
-  "Pending package request cancelled.": "Pending package request cancelled."
+  "Pending package request cancelled.": "Pending package request cancelled.",
+  "Save": "Save"
 }
