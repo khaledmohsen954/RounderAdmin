@@ -11,6 +11,6 @@
 @endforeach</div>
 <div class="panel p-3 p-lg-4 mb-4"><h2 class="h5 fw-bold mb-3">{{ __('Recent bookings') }}</h2><div class="table-responsive"><table class="table align-middle mb-0"><thead><tr><th>#</th><th>{{ __('Resident') }}</th><th>{{ __('Service') }}</th><th>{{ __('Status') }}</th><th>{{ __('Date') }}</th></tr></thead><tbody>
 @forelse($recent as $booking)<tr><td>{{ $booking->id }}</td><td>{{ $booking->resident->name }}</td><td>{{ $booking->service->translations->firstWhere('locale',app()->getLocale())?->name ?? $booking->service->code }}</td><td><span class="pill">{{ $booking->status->translations->firstWhere('locale',app()->getLocale())?->name ?? $booking->status->code }}</span></td><td>{{ $booking->created_at->format('Y-m-d') }}</td></tr>
-@empty<tr><td colspan="5" class="text-center text-secondary py-4">{{ __('No bookings yet') }}</td></tr>@endforelse</tbody></table></div>{{ $recent->links() }}</div>
+@empty<tr><td colspan="5" class="text-center text-secondary py-4">{{ __('No bookings yet') }}</td></tr>@endforelse</tbody></table></div></div>
 </main></div></div>
 @endsection
