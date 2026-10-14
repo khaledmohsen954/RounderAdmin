@@ -46,7 +46,7 @@ return new class extends Migration
             $table->timestamp('calculated_at');
             $table->timestamp('settled_at')->nullable();
             $table->timestamps();
-            $table->index(['provider_profile_id', 'status_id', 'calculated_at']);
+            $table->index(['provider_profile_id', 'status_id', 'calculated_at'], 'prov_commission_entries_index');
         });
 
         Schema::create('emergency_provider_assignments', function (Blueprint $table) {
@@ -108,7 +108,7 @@ return new class extends Migration
             $table->foreignId('subscription_status_id')->constrained()->cascadeOnDelete();
             $table->string('locale', 5);
             $table->string('name', 80);
-            $table->unique(['subscription_status_id', 'locale']);
+            $table->unique(['subscription_status_id', 'locale'], 'subscription_status_tr_unique');
             $table->timestamps();
         });
         Schema::create('resident_subscriptions', function (Blueprint $table) {
@@ -134,7 +134,7 @@ return new class extends Migration
             $table->unsignedSmallInteger('used_quantity')->default(0);
             $table->boolean('is_unlimited')->default(false);
             $table->timestamps();
-            $table->unique(['resident_subscription_id', 'service_id']);
+            $table->unique(['resident_subscription_id', 'service_id'], 'resident_subscription_services_unique');
         });
     }
 

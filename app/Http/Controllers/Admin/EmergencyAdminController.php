@@ -85,7 +85,7 @@ class EmergencyAdminController extends Controller
         if ($status->code === 'assigned' && !$providerId) {
             throw ValidationException::withMessages(['provider_profile_id' => __('Select a provider before assignment.')]);
         }
-        if ($status->code === 'resolved' && (!$providerId || $data['gross_amount'] === null)) {
+        if ($status->code === 'resolved' && (!$providerId || ($data['gross_amount'] ?? null) === null)) {
             throw ValidationException::withMessages(['gross_amount' => __('Assign a provider and enter the final amount before resolving.')]);
         }
 

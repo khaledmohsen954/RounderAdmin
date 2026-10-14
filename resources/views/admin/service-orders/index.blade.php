@@ -13,6 +13,7 @@
 <div class="mb-4"><div class="small text-secondary">{{ __('Provider assignment and commissions') }}</div><h1 class="h3 fw-bold">{{ __('Service orders') }}</h1></div>
 @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
 @if($errors->any())<div class="alert alert-danger"><ul class="mb-0">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
+<a class="btn btn-primary mb-3" href="{{ route('admin.service-orders.create') }}">{{ __('Create service order') }}</a>
 <div class="panel p-3 p-lg-4"><div class="table-responsive"><table class="table align-middle"><thead><tr><th>{{ __('Order') }}</th><th>{{ __('Resident and home') }}</th><th>{{ __('Service') }}</th><th>{{ __('Status') }}</th><th>{{ __('Assignment and commission') }}</th></tr></thead><tbody>
 @forelse($orders as $order)<tr><td><strong>#{{ $order->id }}</strong><div class="small text-secondary">{{ $order->scheduled_at }}</div></td>
 <td>{{ $order->resident_name }}<div class="small text-secondary">{{ $order->home_name }}</div></td>

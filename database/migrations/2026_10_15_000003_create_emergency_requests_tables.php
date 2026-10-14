@@ -17,10 +17,10 @@ return new class extends Migration
 
         Schema::create('emergency_request_status_translations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('emergency_request_status_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('emergency_request_status_id')->constrained(indexName: 'emg_status_translation_fk')->cascadeOnDelete();
             $table->string('locale', 5);
             $table->string('name', 100);
-            $table->unique(['emergency_request_status_id', 'locale']);
+            $table->unique(['emergency_request_status_id', 'locale'], 'emg_request_status_tr_unique');
             $table->timestamps();
         });
 

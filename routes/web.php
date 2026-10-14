@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\{
+    OrderCreationController,
     AboutController,
     AuthController,
     DashboardController,
@@ -49,6 +50,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/content/initiatives', [ResidentContentController::class, 'storeInitiative'])->name('content.initiatives.store');
         Route::put('/content/facility-reports/{reportId}', [ResidentContentController::class, 'updateFacilityReport'])->name('content.reports.update');
 
+        Route::get('/service-orders/create', [OrderCreationController::class, 'serviceForm'])->name('service-orders.create');
+        Route::post('/service-orders', [OrderCreationController::class, 'storeService'])->name('service-orders.store');
+        Route::get('/emergencies/create', [OrderCreationController::class, 'emergencyForm'])->name('emergencies.create');
+        Route::post('/emergencies', [OrderCreationController::class, 'storeEmergency'])->name('emergencies.store');
         Route::get('/service-orders', [ServiceOrderAdminController::class, 'index'])->name('service-orders.index');
         Route::put('/service-orders/{bookingId}', [ServiceOrderAdminController::class, 'update'])->name('service-orders.update');
         Route::get('/emergencies', [EmergencyAdminController::class, 'index'])->name('emergencies.index');

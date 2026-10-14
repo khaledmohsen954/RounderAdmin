@@ -46,7 +46,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->timestamp('posted_at');
             $table->timestamps();
-            $table->index(['association_account_id', 'posted_at']);
+            $table->index(['association_account_id', 'posted_at'], 'association_ledger_entries_index');
         });
 
         Schema::create('facility_categories', function (Blueprint $table) {
@@ -60,7 +60,7 @@ return new class extends Migration
             $table->foreignId('facility_category_id')->constrained()->cascadeOnDelete();
             $table->string('locale', 5);
             $table->string('name', 120);
-            $table->unique(['facility_category_id', 'locale']);
+            $table->unique(['facility_category_id', 'locale'], 'facility_category_tr_unique');
             $table->timestamps();
         });
         Schema::create('facility_reports', function (Blueprint $table) {
@@ -205,7 +205,7 @@ return new class extends Migration
             $table->foreignId('notification_type_id')->constrained()->cascadeOnDelete();
             $table->string('locale', 5);
             $table->string('name', 100);
-            $table->unique(['notification_type_id', 'locale']);
+            $table->unique(['notification_type_id', 'locale'], 'notification_type_tr_unique');
             $table->timestamps();
         });
         Schema::create('resident_notifications', function (Blueprint $table) {

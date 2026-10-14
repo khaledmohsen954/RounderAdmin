@@ -78,7 +78,7 @@ class ServiceOrderAdminController extends Controller
         if ($targetStatus->code === 'confirmed' && !$providerId) {
             throw ValidationException::withMessages(['provider_profile_id' => __('Select a provider before confirming this booking.')]);
         }
-        if ($targetStatus->code === 'completed' && (!$providerId || $data['gross_amount'] === null)) {
+        if ($targetStatus->code === 'completed' && (!$providerId || ($data['gross_amount'] ?? null) === null)) {
             throw ValidationException::withMessages(['gross_amount' => __('Assign a provider and enter the final amount before completing this booking.')]);
         }
 
