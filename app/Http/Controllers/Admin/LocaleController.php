@@ -1,7 +1,7 @@
 <?php
-namespace App\\Http\\Controllers\\Admin;
-use App\\Http\\Controllers\\Controller;
-use Illuminate\\Http\\Request;
+namespace App\Http\Controllers\Admin;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 class LocaleController extends Controller {
  public function update(Request $request){
   $data=$request->validate(['locale'=>['required','in:ar,en']]);
