@@ -38,3 +38,14 @@ Bootstrap pages cover session login, real database KPI totals, account administr
 ## Verification
 
 GitHub Actions validates Composer, boots the route table, runs migrations and seeders on SQLite, and runs the API registration/validation tests. See [Project Guide](docs/PROJECT_GUIDE.md) for schema, route, validation and editing details.
+
+
+## Resident journeys and commerce
+
+The schema also includes standalone emergency requests and their translated type/status lookups, facility reports, visitor passes, announcements, community posts/comments/reactions, initiatives, resident notifications, booking media, additional work, ratings and warranties. Emergency requests are deliberately separate from scheduled service bookings.
+
+Providers are created from the admin provider screen with an account, approval state, and a contract. Contracts store separate service and emergency commission percentages. Admin order and dispatch screens assign providers against an active contract; completion records a commission entry with the contract and percentage snapshot plus the gross amount used for calculation.
+
+Admin catalog screens create services with Arabic, English and Urdu labels and create customer packages with billing cycle, term, price and a per-service included-use count (or unlimited usage). Package/service names and descriptions are stored in locale translation tables. Resident package endpoints expose the translated catalog and allow an authenticated resident to request a subscription for a home they own. Paid subscriptions remain pending until payment processing is connected; free subscriptions activate immediately.
+
+Additional API routes include resident profile updates, association account/dues, facility reports, visits, announcements, community posts/comments/reactions, initiatives, notifications, service ratings, package catalog/subscriptions, and emergency request create/list/cancel. Admin pages include emergency dispatch, service order assignment, provider contracts, catalog and resident content operations.
