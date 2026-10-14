@@ -61,14 +61,18 @@ class ServiceOrderAdminController extends Controller
 
         if ($providerId) {
             abort_unless(DB::table('provider_profiles')->where('id', $providerId)->where('is_approved', true)->exists(), 422, __('Choose an approved provider.'));
-            $contract = DB::table('provider_contracts')
-                ->join('provider_contract_statuses', 'provider_contracts.status_id', '=', 'provider_contract_statuses.id')
-                ->where('provider_contracts.provider_profile_id', $providerId)
-                ->where('provider_contract_statuses.code', 'active')
-                ->whereDate('provider_contracts.starts_on', '<=', today())
-                ->where(function ($query) {
-                    $query->whereNull('provider_contracts.ends_on')->orWhereDate('provider_contracts.ends_on', '>=', today());
-                })->orderByDesc('provider_contracts.starts_on')->select('provider_contracts.*')->first();
+            if ($assignment && (int) $assignment->provider_profile_id === (int) $providerId) {
+                $contract = DB::table('provider_contracts')->where('id', $assignment->provider_contract_id)->first();
+            } else {
+                $contract = DB::table('provider_contracts')
+                    ->join('provider_contract_statuses', 'provider_contracts.status_id', '=', 'provider_contract_statuses.id')
+                    ->where('provider_contracts.provider_profile_id', $providerId)
+                    ->where('provider_contract_statuses.code', 'active')
+                    ->whereDate('provider_contracts.starts_on', '<=', today())
+                    ->where(function ($query) {
+                        $query->whereNull('provider_contracts.ends_on')->orWhereDate('provider_contracts.ends_on', '>=', today());
+                    })->orderByDesc('provider_contracts.starts_on')->select('provider_contracts.*')->first();
+            }
             abort_unless($contract, 422, __('Provider needs an active contract before assignment.'));
         }
         if ($targetStatus->code === 'confirmed' && !$providerId) {
