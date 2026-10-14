@@ -70,6 +70,7 @@ class PackageAdminController extends Controller
 
     public function storeService(Request $request)
     {
+        $request->merge(['code' => Str::lower((string) $request->input('code'))]);
         $data = $request->validate([
             'service_category_id' => ['required', 'integer', 'exists:service_categories,id'],
             'code' => ['required', 'alpha_dash', 'min:2', 'max:60', 'unique:services,code'],
@@ -108,6 +109,7 @@ class PackageAdminController extends Controller
 
     public function storePackage(Request $request)
     {
+        $request->merge(['code' => Str::lower((string) $request->input('code'))]);
         $data = $request->validate([
             'billing_cycle_id' => ['required', 'integer', 'exists:package_billing_cycles,id'],
             'code' => ['required', 'alpha_dash', 'min:2', 'max:60', 'unique:service_packages,code'],
@@ -168,5 +170,52 @@ class PackageAdminController extends Controller
         });
 
         return back()->with('status', __('Package created successfully.'));
+    }
+
+    public function editService(int $serviceId)
+    {
+        $service = DB::table('services')->where('id', $serviceId)->first();
+        abort_unless($service, 404);
+        $translations = DB::table('service_translations')->where('service_id', $serviceId)->get()->keyBy('locale');
+        $categories = DB::table('service_categories')->leftJoin('service_category_translations', function ($join) {
+            $join->on('service_categories.id', '=', 'service_category_translations.service_category_id')
+                ->where('service_category_translations.locale', '=', app()->getLocale());
+        })->select('service_categories.id', 'service_categories.code', 'service_category_translations.name')->get();
+        return view('admin.packages.edit-service', compact('service', 'translations', 'categories'));
+    }
+
+    public function updateService(Request $request, int $serviceId)
+    {
+        abort_unless(DB::table('services')->where('id', $serviceId)->exists(), 404);
+        // Normalize before uniqueness validation so MySQL and SQLite behave consistently.
+        $request->merge(['code' => Str::lower((string) $request->input('code'))]);
+        $rules = [
+            'service_category_id' => ['required', 'integer', 'exists:service_categories,id'],
+            'code' => ['required', 'alpha_dash', 'min:2', 'max:60',
+                \Illuminate\Validation\Rule::unique('services', 'code')->ignore($serviceId)],
+            'base_price' => ['required', 'numeric', 'min:0', 'max:9999999999.99'],
+            'is_active' => ['required', 'boolean'],
+        ];
+        foreach (['ar', 'en', 'ur'] as $locale) {
+            $rules['name_'.$locale] = ['required', 'string', 'min:2', 'max:160'];
+            $rules['description_'.$locale] = ['nullable', 'string', 'max:5000'];
+        }
+        $data = $request->validate($rules);
+        DB::transaction(function () use ($serviceId, $data) {
+            abort_unless(DB::table('services')->where('id', $serviceId)->lockForUpdate()->first(), 404);
+            // Catalogue edits never rewrite prices already recorded on orders.
+            DB::table('services')->where('id', $serviceId)->update([
+                'service_category_id' => $data['service_category_id'], 'code' => $data['code'],
+                'base_price' => $data['base_price'], 'is_active' => $data['is_active'], 'updated_at' => now(),
+            ]);
+            foreach (['ar', 'en', 'ur'] as $locale) {
+                DB::table('service_translations')->updateOrInsert(
+                    ['service_id' => $serviceId, 'locale' => $locale],
+                    ['name' => $data['name_'.$locale], 'description' => $data['description_'.$locale] ?? null,
+                     'updated_at' => now()]
+                );
+            }
+        });
+        return redirect()->route('admin.packages.index')->with('status', __('Service updated successfully.'));
     }
 }

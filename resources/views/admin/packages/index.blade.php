@@ -56,17 +56,17 @@
 </div>
 
 <div class="panel p-3 p-lg-4 mb-4"><h2 class="h5 fw-bold">{{ __('Available services') }}</h2><div class="table-responsive"><table class="table align-middle"><thead><tr><th>#</th><th>{{ __('Service') }}</th><th>{{ __('Category') }}</th><th>{{ __('Base price') }}</th><th>{{ __('Status') }}</th></tr></thead><tbody>
-@forelse($services as $service)<tr><td>{{ $service->id }}</td><td>{{ $service->name ?? $service->code }}<div class="small text-secondary">{{ $service->code }}</div></td><td>{{ $service->category_name ?? '' }}</td><td>{{ number_format($service->base_price,2) }} {{ __('SAR') }}</td><td>{{ $service->is_active ? __('Active') : __('Inactive') }}</td></tr>@empty<tr><td colspan="5">{{ __('No services found') }}</td></tr>@endforelse
+@forelse($services as $service)<tr><td>{{ $service->id }}</td><td>{{ $service->name ?? $service->code }}<div class="small text-secondary">{{ $service->code }}</div></td><td>{{ $service->category_name ?? '' }}</td><td>{{ number_format($service->base_price,2) }} {{ __('SAR') }}</td><td>{{ $service->is_active ? __('Active') : __('Inactive') }} <a class="btn btn-sm btn-outline-primary" href="{{ route('admin.packages.services.edit', $service->id) }}">{{ __('Edit') }}</a></td></tr>@empty<tr><td colspan="5">{{ __('No services found') }}</td></tr>@endforelse
 </tbody></table></div></div>
 
 <div class="panel p-3 p-lg-4"><h2 class="h5 fw-bold">{{ __('Customer packages') }}</h2><div class="table-responsive"><table class="table align-middle"><thead><tr><th>#</th><th>{{ __('Package') }}</th><th>{{ __('Cycle') }}</th><th>{{ __('Price') }}</th><th>{{ __('Services included') }}</th><th>{{ __('Duration') }}</th><th>{{ __('Status') }}</th></tr></thead><tbody>
 @forelse($packages as $package)<tr><td>{{ $package->id }}</td><td>{{ $package->name ?? $package->code }}<div class="small text-secondary">{{ $package->code }}</div></td><td>{{ __($package->cycle_code === 'semiannual' ? 'Semiannual' : ucfirst($package->cycle_code)) }}</td><td>{{ number_format($package->price,2) }} {{ $package->currency_code }}</td><td><strong>{{ $package->services_count }}</strong><div class="small text-secondary">@foreach($packageServices->get($package->id,collect()) as $included){{ $included->service_name ?? $included->service_code }} ({{ $included->is_unlimited ? __('Unlimited') : $included->included_quantity }})@if(!$loop->last), @endif @endforeach</div></td><td>{{ $package->duration_months }} {{ __('months') }}</td><td>{{ $package->is_active ? __('Active') : __('Inactive') }}</td></tr>
 @empty<tr><td colspan="7">{{ __('No packages found') }}</td>@endforelse
 </tbody></table>{{ $packages->links() }}</div></div>
-</main></div></div>
 <div class="panel p-3 p-lg-4 mt-4"><h2 class="h5 fw-bold">{{ __('Customer subscriptions') }}</h2><div class="table-responsive"><table class="table align-middle"><thead><tr><th>#</th><th>{{ __('Resident') }}</th><th>{{ __('Home') }}</th><th>{{ __('Package') }}</th><th>{{ __('Status') }}</th><th>{{ __('Price') }}</th><th>{{ __('Start date') }}</th><th>{{ __('End date') }}</th></tr></thead><tbody>
 @forelse($subscriptions as $subscription)<tr><td>{{ $subscription->id }}</td><td>{{ $subscription->resident_name }}</td><td>{{ $subscription->home_name }}</td><td>{{ $subscription->package_name ?? $subscription->reference }}</td><td><span class="pill">{{ $subscription->status_name }}</span></td><td>{{ number_format($subscription->price_snapshot,2) }} {{ $subscription->currency_code }}</td><td>{{ $subscription->starts_at }}</td><td>{{ $subscription->ends_at }}</td></tr>@empty<tr><td colspan="8">{{ __('No subscriptions found') }}</td></tr>@endforelse
 </tbody></table>{{ $subscriptions->links() }}</div></div>
+</main></div></div>
 @endsection
 @push('scripts')
 <script>

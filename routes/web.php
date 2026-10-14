@@ -42,6 +42,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/providers', [ProviderController::class, 'store'])->name('providers.store');
 
         Route::get('/packages', [PackageAdminController::class, 'index'])->name('packages.index');
+        Route::get('/packages/services/{serviceId}/edit', [PackageAdminController::class, 'editService'])->whereNumber('serviceId')->name('packages.services.edit');
+        Route::put('/packages/services/{serviceId}', [PackageAdminController::class, 'updateService'])->whereNumber('serviceId')->name('packages.services.update');
         Route::post('/packages/services', [PackageAdminController::class, 'storeService'])->name('packages.services.store');
         Route::post('/packages', [PackageAdminController::class, 'storePackage'])->name('packages.store');
 

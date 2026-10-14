@@ -212,5 +212,8 @@
   "Select a valid resident unit.": "اختر وحدة مرتبطة بعميل صحيح.",
   "Choose an active service.": "اختر خدمة مفعلة.",
   "Service order created successfully.": "تم إنشاء طلب الخدمة بنجاح.",
-  "Platform commissions": "عمولات المنصة"
+  "Platform commissions": "عمولات المنصة",
+  "Edit service": "تعديل الخدمة",
+  "Service updated successfully.": "تم تعديل الخدمة بنجاح.",
+  "Service changes apply to new orders. Existing order prices stay unchanged.": "تسري تعديلات الخدمة على الطلبات الجديدة. تظل أسعار الطلبات السابقة كما هي."
 }
