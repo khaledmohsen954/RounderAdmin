@@ -28,13 +28,13 @@ class DashboardController extends Controller
             'active_subscriptions' => DB::table('resident_subscriptions')
                 ->join('subscription_statuses', 'resident_subscriptions.status_id', '=', 'subscription_statuses.id')
                 ->where('subscription_statuses.code', 'active')->where('resident_subscriptions.ends_at', '>', now())->count(),
+            'commission_total' => DB::table('provider_commission_entries')
+                ->join('provider_commission_statuses', 'provider_commission_entries.status_id', '=', 'provider_commission_statuses.id')
+                ->where('provider_commission_statuses.code', '!=', 'reversed')->sum('commission_amount'),
             'available_packages' => DB::table('service_packages')->where('is_active', true)->count(),
         ];
 
         $recent = Booking::with(['resident', 'service.translations', 'status.translations'])->latest()->limit(8)->get();
-        $monthly = Booking::selectRaw('MONTH(created_at) as month, COUNT(*) as total')
-            ->whereYear('created_at', now()->year)->groupBy('month')->orderBy('month')->get();
-
-        return view('admin.dashboard', compact('stats', 'recent', 'monthly'));
+        return view('admin.dashboard', compact('stats', 'recent'));
     }
 }

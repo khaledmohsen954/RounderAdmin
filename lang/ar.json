@@ -211,5 +211,6 @@
   "Create request": "إنشاء الطلب",
   "Select a valid resident unit.": "اختر وحدة مرتبطة بعميل صحيح.",
   "Choose an active service.": "اختر خدمة مفعلة.",
-  "Service order created successfully.": "تم إنشاء طلب الخدمة بنجاح."
+  "Service order created successfully.": "تم إنشاء طلب الخدمة بنجاح.",
+  "Platform commissions": "عمولات المنصة"
 }
