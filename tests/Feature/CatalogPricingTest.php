@@ -139,4 +139,52 @@ class CatalogPricingTest extends TestCase
         $this->actingAs($resident)->get('/admin/packages/'.$package->id.'/edit')->assertForbidden();
         $this->put('/admin/packages/'.$package->id,$data)->assertForbidden();
     }
+
+    /** @return void */
+    public function test_comparison_definitions_are_editable_id_based_and_localized(): void
+    {
+        $admin = $this->admin();
+        $feature = ['code'=>'report-frequency','name_ar'=>'التقارير','name_en'=>'Reports','name_ur'=>'رپورٹس','sort_order'=>1,'is_active'=>1];
+        $this->actingAs($admin)->post('/admin/package-features',$feature)->assertSessionHasNoErrors();
+        $definition = \App\Modules\Catalog\Models\PackageFeature::where('code',$feature['code'])->firstOrFail();
+        $data = $this->packageInput();
+        $data['features'] = [['package_feature_id'=>$definition->id,'availability'=>'included',
+            'value_ar'=>'أسبوعياً','value_en'=>'Weekly','value_ur'=>'ہفتہ وار']];
+        $this->post('/admin/packages',$data)->assertSessionHasNoErrors();
+        $package = ServicePackage::where('code',$data['code'])->firstOrFail();
+        $this->get('/admin/packages')->assertOk()->assertSee('report-frequency');
+        $this->get('/admin/packages/'.$package->id.'/edit')->assertOk()->assertSee('Weekly');
+        app()->setLocale('en');
+        $entry = app(ApiResidentPackageService::class)->index([], null)['data']->firstWhere('id',$package->id);
+        $this->assertSame('Weekly',$entry['features'][0]['value']);
+        $this->assertSame($definition->id,$entry['features'][0]['id']);
+        $this->assertSame('included',$entry['features'][0]['availability']);
+        $data['features'][0]['availability']='addon';
+        $data['features'][0]['value_en']='Optional weekly report';
+        $this->put('/admin/packages/'.$package->id,$data)->assertSessionHasNoErrors();
+        $this->assertDatabaseHas('package_feature_values',[
+            'service_package_id'=>$package->id,'package_feature_id'=>$definition->id,
+            'availability'=>'addon','value_en'=>'Optional weekly report',
+        ]);
+        $invalid = $data;
+        $invalid['features'][0]['package_feature_id']=999999;
+        $this->put('/admin/packages/'.$package->id,$invalid)->assertSessionHasErrors('features.0.package_feature_id');
+        $invalid = $data;
+        $invalid['features'][]=$invalid['features'][0];
+        $this->put('/admin/packages/'.$package->id,$invalid)->assertSessionHasErrors('features.0.package_feature_id');
+        $invalid = $data;
+        $invalid['features'][0]['availability']='arbitrary';
+        $this->put('/admin/packages/'.$package->id,$invalid)->assertSessionHasErrors('features.0.availability');
+        $feature['name_en']='Maintenance reports';
+        $feature['is_active']=0;
+        $this->put('/admin/package-features/'.$definition->id,$feature)->assertSessionHasNoErrors();
+        $this->assertSame('Maintenance reports',$definition->fresh()->name_en);
+        $entry = app(ApiResidentPackageService::class)->index([],null)['data']->firstWhere('id',$package->id);
+        $this->assertCount(0,$entry['features']);
+        $this->assertDatabaseHas('package_feature_values',['package_feature_id'=>$definition->id]);
+        $resident=User::create(['name'=>'Resident','email'=>'feature-resident@example.test','password'=>'StrongPassword123!',
+            'role_id'=>Role::where('code','resident')->value('id'),'locale'=>'en']);
+        $this->actingAs($resident)->post('/admin/package-features',$feature)->assertForbidden();
+        $this->put('/admin/package-features/'.$definition->id,$feature)->assertForbidden();
+    }
 }

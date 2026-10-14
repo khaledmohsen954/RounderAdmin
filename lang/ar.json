@@ -231,5 +231,20 @@
     "Edit package": "تعديل الباقة",
     "Package updated successfully.": "تم تحديث الباقة بنجاح.",
     "Invalid discount for this price.": "قيمة الخصم غير صالحة لهذا السعر.",
-    "Use a non-negative price with at most two decimals.": "استخدم سعراً غير سالب بمنزلتين عشريتين كحد أقصى."
+    "Use a non-negative price with at most two decimals.": "استخدم سعراً غير سالب بمنزلتين عشريتين كحد أقصى.",
+    "Feature code": "كود بند المقارنة",
+    "Feature name": "اسم البند",
+    "Display order": "ترتيب العرض",
+    "Save comparison feature": "حفظ بند المقارنة",
+    "Package comparison features": "بنود مقارنة الباقات",
+    "Define shared comparison rows, then set the value in each package.": "عرّف بنود المقارنة المشتركة، ثم حدد قيمة كل بند داخل كل باقة.",
+    "Add comparison feature": "إضافة بند مقارنة",
+    "Comparison feature saved.": "تم حفظ بند المقارنة.",
+    "Comparison text describes the package. Bookable service quantities are configured separately below.": "بنود المقارنة تصف الباقة. تُحدد حصص الخدمات القابلة للحجز بشكل مستقل أدناه.",
+    "Availability in package": "الإتاحة داخل الباقة",
+    "Feature details": "تفاصيل البند",
+    "feature.included": "مشمول",
+    "feature.excluded": "غير مشمول",
+    "feature.addon": "برسوم إضافية",
+    "Add comparison definitions from the catalog page first.": "أضف تعريفات بنود المقارنة من صفحة الكتالوج أولاً."
 }

@@ -20,6 +20,7 @@
 <label class="form-label mt-2">{{ __('Package details') }} · {{ $label }}</label><textarea name="description_{{ $locale }}" rows="4" maxlength="5000" class="form-control" dir="{{ $locale === 'en' ? 'ltr' : 'rtl' }}">{{ old('description_'.$locale,$translations->get($locale)?->description) }}</textarea></div>
 @endforeach
 </div>
+@include('admin.packages.partials.comparison-values')
 @include('admin.packages.partials.included-services')
 <div class="mt-4"><button class="btn btn-primary">{{ __('Save package') }}</button></div>
 </form></div></main>

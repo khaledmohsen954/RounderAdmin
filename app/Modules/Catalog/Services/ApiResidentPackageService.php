@@ -35,6 +35,7 @@ class ApiResidentPackageService
         $packages = ServicePackage::query()
             ->with([
                 'billingCycle',
+                'comparisonFeatures.feature',
                 'translations' => fn ($query) => $query->where('locale', $locale),
                 'includedServices.service.translations' => fn ($query) => $query->where('locale', $locale),
             ])
@@ -58,6 +59,16 @@ class ApiResidentPackageService
                 'code' => $package->billingCycle->code,
                 'months' => $package->billingCycle->months,
             ],
+            'features' => $package->comparisonFeatures
+                ->filter(fn ($value) => $value->feature->is_active)
+                ->sortBy(fn ($value) => $value->feature->sort_order)
+                ->map(fn ($value) => [
+                    'id' => $value->feature->id,
+                    'code' => $value->feature->code,
+                    'name' => $value->feature->{'name_'.$locale},
+                    'availability' => $value->availability->value,
+                    'value' => $value->{'value_'.$locale},
+                ])->values(),
             'services' => $package->includedServices->map(fn ($included) => [
                 'service_package_id' => $package->id,
                 'id' => $included->service->id,

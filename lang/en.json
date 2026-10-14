@@ -196,5 +196,8 @@
     "Save": "Save",
     "discount.none": "No discount",
     "discount.fixed": "Fixed amount",
-    "discount.percentage": "Percentage"
+    "discount.percentage": "Percentage",
+    "feature.included": "Included",
+    "feature.excluded": "Not included",
+    "feature.addon": "Additional fee"
 }

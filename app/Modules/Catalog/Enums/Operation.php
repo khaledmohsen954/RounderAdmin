@@ -3,6 +3,7 @@ namespace App\Modules\Catalog\Enums;
 /** أسماء عمليات المجال المستخدمة في الأحداث. */
 enum Operation: string
 {
+    case SavePackageFeature = 'PackageFeatureService.save';
     case AdminPackageAdminUpdatePackage = 'AdminPackageAdminService.updatePackage';
     case AdminPackageAdminStoreService = 'AdminPackageAdminService.storeService';
     case AdminPackageAdminStorePackage = 'AdminPackageAdminService.storePackage';

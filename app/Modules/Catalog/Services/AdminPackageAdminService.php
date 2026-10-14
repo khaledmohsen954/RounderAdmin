@@ -29,6 +29,7 @@ class AdminPackageAdminService
      */
     public function __construct(
         private readonly CatalogPricingService $pricing,
+        private readonly PackageFeatureService $features,
         private readonly \App\Services\CatalogImageStorage $images,
     ) {}
 
@@ -115,7 +116,8 @@ class AdminPackageAdminService
             })->select('service_package_services.*', 'services.code as service_code', 'service_translations.name as service_name')
             ->get()->groupBy('service_package_id');
 
-        return compact('services', 'categories', 'cycles', 'packages', 'packageServices', 'subscriptions');
+        $featureDefinitions = \App\Modules\Catalog\Models\PackageFeature::orderBy('sort_order')->orderBy('id')->get();
+        return compact('services', 'categories', 'cycles', 'packages', 'packageServices', 'subscriptions', 'featureDefinitions');
     }
 
     /**
@@ -223,6 +225,7 @@ class AdminPackageAdminService
                 'created_at' => now(),
                 'updated_at' => now(),
             ])->getKey();
+            $this->features->sync(ServicePackage::findOrFail($packageId), $data['features'] ?? null);
             foreach (array_column(SupportedLocale::cases(), 'value') as $locale) {
                 ServicePackageTranslation::query()->create([
                     'service_package_id' => $packageId,
@@ -334,7 +337,9 @@ class AdminPackageAdminService
         $translations = $package->translations->keyBy('locale');
         $cycles = PackageBillingCycle::orderBy('months')->get();
         $services = Service::with('translations')->orderBy('code')->get();
-        return compact('package', 'translations', 'cycles', 'services');
+        $featureDefinitions = \App\Modules\Catalog\Models\PackageFeature::orderBy('sort_order')->orderBy('id')->get();
+        $featureValues = $package->comparisonFeatures->keyBy('package_feature_id');
+        return compact('package', 'translations', 'cycles', 'services', 'featureDefinitions', 'featureValues');
     }
 
     /**
@@ -376,6 +381,7 @@ class AdminPackageAdminService
                     'is_unlimited' => $included['is_unlimited'],
                 ]);
             }
+            $this->features->sync($package, $input['features'] ?? null);
             DB::afterCommit(fn () => event(new CatalogChanged(Operation::AdminPackageAdminUpdatePackage, $actor?->id)));
             return __('Package updated successfully.');
         });

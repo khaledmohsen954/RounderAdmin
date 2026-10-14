@@ -107,4 +107,10 @@ class ServicePackage extends Model
     {
         return $query->where($this->qualifyColumn('is_active'), true);
     }
+
+    /** @return HasMany */
+    public function comparisonFeatures(): HasMany
+    {
+        return $this->hasMany(PackageFeatureValue::class);
+    }
 }

@@ -16,6 +16,7 @@
 @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
 @if($errors->any())<div class="alert alert-danger"><ul class="mb-0">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
 
+@include('admin.packages.partials.feature-definitions')
 <div class="panel p-3 p-lg-4 mb-4"><h2 class="h5 fw-bold">{{ __('Create service') }}</h2>
 <form method="post" enctype="multipart/form-data" action="{{ route('admin.packages.services.store') }}">@csrf
 <div class="row g-3">
@@ -45,6 +46,7 @@
 <div class="col-md-4"><label class="form-label">{{ __('Package details') }} · {{ $label }}</label><textarea name="description_{{ $locale }}" class="form-control" rows="2" maxlength="5000"></textarea></div>
 @endforeach
 </div>
+@include('admin.packages.partials.comparison-values', ['featureValues'=>collect()])
 <div class="d-flex justify-content-between align-items-center mt-4 mb-2"><h3 class="h6 fw-bold mb-0">{{ __('Included services and quantities') }}</h3><button type="button" class="btn btn-sm btn-outline-primary" id="add-service-row">+ {{ __('Add service') }}</button></div>
 <div id="package-service-rows"></div>
 <div class="d-flex justify-content-end mt-3"><button class="btn btn-primary px-4">{{ __('Save package') }}</button></div>
