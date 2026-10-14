@@ -21,3 +21,5 @@ jobs:
       - run: php artisan route:list
       - name: Verify schema and reference seeding on SQLite
         run: 'DB_CONNECTION=sqlite DB_DATABASE=:memory: php artisan migrate:fresh --seed --force'
+      - name: Run API validation tests
+        run: php artisan test
