@@ -39,6 +39,24 @@ class PackageAdminController extends Controller
             ->selectSub(DB::table('service_package_services')->selectRaw('COUNT(*)')->whereColumn('service_package_services.service_package_id', 'service_packages.id'), 'services_count')
             ->orderByDesc('service_packages.id')->paginate(20);
 
+        $subscriptions = DB::table('resident_subscriptions')
+            ->join('resident_homes', 'resident_subscriptions.resident_home_id', '=', 'resident_homes.id')
+            ->join('users', 'resident_homes.user_id', '=', 'users.id')
+            ->join('homes', 'resident_homes.home_id', '=', 'homes.id')
+            ->join('service_packages', 'resident_subscriptions.service_package_id', '=', 'service_packages.id')
+            ->leftJoin('service_package_translations', function ($join) {
+                $join->on('service_packages.id', '=', 'service_package_translations.service_package_id')
+                    ->where('service_package_translations.locale', '=', app()->getLocale());
+            })
+            ->join('subscription_statuses', 'resident_subscriptions.status_id', '=', 'subscription_statuses.id')
+            ->join('subscription_status_translations', function ($join) {
+                $join->on('subscription_statuses.id', '=', 'subscription_status_translations.subscription_status_id')
+                    ->where('subscription_status_translations.locale', '=', app()->getLocale());
+            })
+            ->select('resident_subscriptions.*', 'users.name as resident_name', 'homes.name as home_name',
+                'service_package_translations.name as package_name', 'subscription_status_translations.name as status_name')
+            ->orderByDesc('resident_subscriptions.created_at')->paginate(20, ['*'], 'subscriptions');
+
         $packageServices = DB::table('service_package_services')
             ->join('service_packages', 'service_package_services.service_package_id', '=', 'service_packages.id')
             ->join('services', 'service_package_services.service_id', '=', 'services.id')
@@ -47,7 +65,7 @@ class PackageAdminController extends Controller
             })->select('service_package_services.*', 'services.code as service_code', 'service_translations.name as service_name')
             ->get()->groupBy('service_package_id');
 
-        return view('admin.packages.index', compact('services', 'categories', 'cycles', 'packages', 'packageServices'));
+        return view('admin.packages.index', compact('services', 'categories', 'cycles', 'packages', 'packageServices', 'subscriptions'));
     }
 
     public function storeService(Request $request)
