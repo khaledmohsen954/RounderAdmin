@@ -2,13 +2,31 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Models\Announcement;
+use App\Models\AssociationAccount;
+use App\Models\AssociationDue;
+use App\Models\AssociationLedgerEntry;
+use App\Models\Booking;
+use App\Models\BookingRating;
+use App\Models\BookingStatus;
+use App\Models\CommunityComment;
+use App\Models\CommunityPost;
+use App\Models\CommunityReaction;
+use App\Models\FacilityReport;
+use App\Models\FacilityReportUpdate;
+use App\Models\Initiative;
+use App\Models\InitiativeParticipation;
+use App\Models\ResidentHome;
+use App\Models\ResidentNotification;
+use App\Models\ResidentVisit;
+
 use App\Http\Controllers\Controller;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
+/** رحلات المجتمع والزيارات والمرافق مع فحص صلاحية الوصول للوحدة. */
 class ResidentJourneyController extends Controller
 {
     /**
@@ -45,15 +63,15 @@ class ResidentJourneyController extends Controller
         $membership = $this->membership($request);
         abort_unless($membership, 404, 'Resident home not found.');
 
-        $account = DB::table('association_accounts')->where('home_id', $membership->home_id)->first();
+        $account = AssociationAccount::query()->where('home_id', $membership->home_id)->first();
         if (!$account) {
             return response()->json(['data' => ['account' => null, 'dues' => [], 'ledger' => []]]);
         }
 
         return response()->json(['data' => [
             'account' => $account,
-            'dues' => DB::table('association_dues')->where('resident_home_id', $membership->id)->orderByDesc('due_at')->paginate(20),
-            'ledger' => DB::table('association_ledger_entries')->where('association_account_id', $account->id)
+            'dues' => AssociationDue::query()->where('resident_home_id', $membership->id)->orderByDesc('due_at')->paginate(20),
+            'ledger' => AssociationLedgerEntry::query()->where('association_account_id', $account->id)
                 ->where(function ($query) use ($membership, $request) {
                     $query->where('resident_home_id', $membership->id)->orWhere(function ($q) use ($request) {
                         $q->whereNull('resident_home_id')->where('user_id', $request->user()->id);
@@ -67,7 +85,7 @@ class ResidentJourneyController extends Controller
         $membership = $this->membership($request);
         abort_unless($membership, 404, 'Resident home not found.');
 
-        $query = DB::table('facility_reports')->where('home_id', $membership->home_id);
+        $query = FacilityReport::query()->where('home_id', $membership->home_id);
         if ($request->filled('status_id')) {
             $query->where('status_id', $request->integer('status_id'));
         }
@@ -86,10 +104,10 @@ class ResidentJourneyController extends Controller
             'description' => ['required', 'string', 'min:10', 'max:5000'],
             'location' => ['nullable', 'string', 'max:160'],
         ]);
-        $statusId = DB::table('booking_statuses')->where('code', 'pending')->value('id');
+        $statusId = BookingStatus::query()->where('code', 'pending')->value('id');
         abort_unless($statusId, 500, 'Default pending status is not configured.');
 
-        $id = DB::table('facility_reports')->insertGetId([
+        $id = FacilityReport::query()->create([
             'home_id' => $membership->home_id,
             'resident_home_id' => $membership->id,
             'facility_category_id' => $data['facility_category_id'],
@@ -101,8 +119,8 @@ class ResidentJourneyController extends Controller
             'reported_at' => now(),
             'created_at' => now(),
             'updated_at' => now(),
-        ]);
-        DB::table('facility_report_updates')->insert([
+        ])->getKey();
+        FacilityReportUpdate::query()->create([
             'facility_report_id' => $id,
             'status_id' => $statusId,
             'updated_by' => $request->user()->id,
@@ -110,7 +128,7 @@ class ResidentJourneyController extends Controller
             'created_at' => now(),
         ]);
 
-        return response()->json(['data' => DB::table('facility_reports')->find($id)], 201);
+        return response()->json(['data' => FacilityReport::query()->find($id)], 201);
     }
 
     public function visits(Request $request)
@@ -118,7 +136,7 @@ class ResidentJourneyController extends Controller
         $membership = $this->membership($request);
         abort_unless($membership, 404, 'Resident home not found.');
 
-        return response()->json(['data' => DB::table('resident_visits')
+        return response()->json(['data' => ResidentVisit::query()
             ->where('resident_home_id', $membership->id)
             ->where('created_by', $request->user()->id)
             ->orderByDesc('starts_at')->paginate(20)]);
@@ -135,21 +153,21 @@ class ResidentJourneyController extends Controller
             'starts_at' => ['required', 'date', 'after:now'],
             'ends_at' => ['required', 'date', 'after:starts_at'],
         ]);
-        $id = DB::table('resident_visits')->insertGetId([
+        $id = ResidentVisit::query()->create([
             ...$data,
             'resident_home_id' => $membership->id,
             'created_by' => $request->user()->id,
             'access_code' => Str::upper(Str::random(8)),
             'created_at' => now(),
             'updated_at' => now(),
-        ]);
+        ])->getKey();
 
-        return response()->json(['data' => DB::table('resident_visits')->find($id)], 201);
+        return response()->json(['data' => ResidentVisit::query()->find($id)], 201);
     }
 
     public function cancelVisit(Request $request, int $visitId)
     {
-        $deleted = DB::table('resident_visits')
+        $deleted = ResidentVisit::query()
             ->where('id', $visitId)
             ->where('created_by', $request->user()->id)
             ->whereNull('checked_in_at')
@@ -166,7 +184,7 @@ class ResidentJourneyController extends Controller
         abort_if($homeIds->isEmpty(), 403, 'Link a home first.');
 
         $locale = app()->getLocale();
-        $rows = DB::table('announcements')
+        $rows = Announcement::query()
             ->leftJoin('announcement_translations', function ($join) use ($locale) {
                 $join->on('announcements.id', '=', 'announcement_translations.announcement_id')
                     ->where('announcement_translations.locale', '=', $locale);
@@ -190,7 +208,7 @@ class ResidentJourneyController extends Controller
         $homeIds = $this->homeIds($request);
         abort_if($homeIds->isEmpty(), 403, 'Link a home first.');
 
-        return response()->json(['data' => DB::table('community_posts')
+        return response()->json(['data' => CommunityPost::query()
             ->whereIn('home_id', $homeIds)->where('is_hidden', false)
             ->orderByDesc('created_at')->paginate(20)]);
     }
@@ -201,7 +219,7 @@ class ResidentJourneyController extends Controller
         abort_unless($membership, 404, 'Resident home not found.');
         $data = $request->validate(['body' => ['required', 'string', 'min:2', 'max:5000']]);
 
-        $id = DB::table('community_posts')->insertGetId([
+        $id = CommunityPost::query()->create([
             'home_id' => $membership->home_id,
             'resident_home_id' => $membership->id,
             'created_by' => $request->user()->id,
@@ -210,41 +228,41 @@ class ResidentJourneyController extends Controller
             'is_hidden' => false,
             'created_at' => now(),
             'updated_at' => now(),
-        ]);
+        ])->getKey();
 
-        return response()->json(['data' => DB::table('community_posts')->find($id)], 201);
+        return response()->json(['data' => CommunityPost::query()->find($id)], 201);
     }
 
     public function comment(Request $request, int $postId)
     {
         $homeIds = $this->homeIds($request);
         abort_if($homeIds->isEmpty(), 403, 'Link a home first.');
-        abort_unless(DB::table('community_posts')->where('id', $postId)->whereIn('home_id', $homeIds)->where('is_hidden', false)->exists(), 404);
+        abort_unless(CommunityPost::query()->where('id', $postId)->whereIn('home_id', $homeIds)->where('is_hidden', false)->exists(), 404);
 
         $data = $request->validate([
             'body' => ['required', 'string', 'min:1', 'max:3000'],
             'parent_id' => ['nullable', 'integer', Rule::exists('community_comments', 'id')->where('community_post_id', $postId)],
         ]);
-        $id = DB::table('community_comments')->insertGetId([
+        $id = CommunityComment::query()->create([
             'community_post_id' => $postId,
             'created_by' => $request->user()->id,
             'parent_id' => $data['parent_id'] ?? null,
             'body' => $data['body'],
             'created_at' => now(),
             'updated_at' => now(),
-        ]);
+        ])->getKey();
 
-        return response()->json(['data' => DB::table('community_comments')->find($id)], 201);
+        return response()->json(['data' => CommunityComment::query()->find($id)], 201);
     }
 
     public function react(Request $request, int $postId)
     {
         $homeIds = $this->homeIds($request);
         abort_if($homeIds->isEmpty(), 403, 'Link a home first.');
-        abort_unless(DB::table('community_posts')->where('id', $postId)->whereIn('home_id', $homeIds)->where('is_hidden', false)->exists(), 404);
+        abort_unless(CommunityPost::query()->where('id', $postId)->whereIn('home_id', $homeIds)->where('is_hidden', false)->exists(), 404);
 
         $data = $request->validate(['reaction_code' => ['required', Rule::in(['like', 'love', 'support', 'thanks'])]]);
-        DB::table('community_reactions')->updateOrInsert(
+        CommunityReaction::query()->updateOrCreate(
             ['community_post_id' => $postId, 'user_id' => $request->user()->id],
             ['reaction_code' => $data['reaction_code'], 'updated_at' => now(), 'created_at' => now()]
         );
@@ -257,7 +275,7 @@ class ResidentJourneyController extends Controller
         $homeIds = $this->homeIds($request);
         abort_if($homeIds->isEmpty(), 403, 'Link a home first.');
 
-        return response()->json(['data' => DB::table('initiatives')
+        return response()->json(['data' => Initiative::query()
             ->whereIn('home_id', $homeIds)->where('is_published', true)
             ->where('ends_at', '>=', now())->orderBy('starts_at')->paginate(20)]);
     }
@@ -266,12 +284,12 @@ class ResidentJourneyController extends Controller
     {
         $membership = $this->membership($request);
         abort_unless($membership, 404, 'Resident home not found.');
-        abort_unless(DB::table('initiatives')->where('id', $initiativeId)
+        abort_unless(Initiative::query()->where('id', $initiativeId)
             ->where('home_id', $membership->home_id)->where('is_published', true)
             ->where('ends_at', '>=', now())->exists(), 404);
 
         $data = $request->validate(['pledged_amount' => ['sometimes', 'numeric', 'min:0', 'max:10000000']]);
-        DB::table('initiative_participations')->updateOrInsert(
+        InitiativeParticipation::query()->updateOrCreate(
             ['initiative_id' => $initiativeId, 'resident_home_id' => $membership->id],
             ['user_id' => $request->user()->id, 'pledged_amount' => $data['pledged_amount'] ?? 0,
                 'joined_at' => now(), 'updated_at' => now(), 'created_at' => now()]
@@ -282,13 +300,13 @@ class ResidentJourneyController extends Controller
 
     public function notifications(Request $request)
     {
-        return response()->json(['data' => DB::table('resident_notifications')
+        return response()->json(['data' => ResidentNotification::query()
             ->where('user_id', $request->user()->id)->orderByDesc('created_at')->paginate(30)]);
     }
 
     public function markNotificationRead(Request $request, int $notificationId)
     {
-        $updated = DB::table('resident_notifications')->where('id', $notificationId)
+        $updated = ResidentNotification::query()->where('id', $notificationId)
             ->where('user_id', $request->user()->id)->update(['read_at' => now(), 'updated_at' => now()]);
         abort_unless($updated, 404);
 
@@ -297,7 +315,7 @@ class ResidentJourneyController extends Controller
 
     public function rateBooking(Request $request, int $bookingId)
     {
-        $booking = DB::table('bookings')->where('id', $bookingId)
+        $booking = Booking::query()->where('id', $bookingId)
             ->where('resident_id', $request->user()->id)->first();
         abort_unless($booking, 404);
 
@@ -307,23 +325,23 @@ class ResidentJourneyController extends Controller
         ]);
 
         try {
-            $id = DB::table('booking_ratings')->insertGetId([
+            $id = BookingRating::query()->create([
                 'booking_id' => $bookingId,
                 'resident_id' => $request->user()->id,
                 ...$data,
                 'created_at' => now(),
                 'updated_at' => now(),
-            ]);
+            ])->getKey();
         } catch (QueryException) {
             abort(409, 'This booking has already been rated.');
         }
 
-        return response()->json(['data' => DB::table('booking_ratings')->find($id)], 201);
+        return response()->json(['data' => BookingRating::query()->find($id)], 201);
     }
 
     private function membership(Request $request): ?object
     {
-        $query = DB::table('resident_homes')->where('user_id', $request->user()->id);
+        $query = ResidentHome::query()->where('user_id', $request->user()->id);
         if ($request->filled('resident_home_id')) {
             $query->where('id', $request->integer('resident_home_id'));
         } else {
@@ -335,7 +353,7 @@ class ResidentJourneyController extends Controller
 
     private function homeIds(Request $request)
     {
-        return DB::table('resident_homes')->where('user_id', $request->user()->id)
+        return ResidentHome::query()->where('user_id', $request->user()->id)
             ->pluck('home_id')->unique()->values();
     }
 }

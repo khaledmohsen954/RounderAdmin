@@ -2,33 +2,43 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\Announcement;
+use App\Models\AnnouncementTranslation;
+use App\Models\BookingStatus;
+use App\Models\FacilityReport;
+use App\Models\FacilityReportUpdate;
+use App\Models\Home;
+use App\Models\Initiative;
+use App\Models\InitiativeTranslation;
+
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
+/** إدارة الإعلانات والمبادرات وبلاغات المرافق. */
 class ResidentContentController extends Controller
 {
     public function index()
     {
         return view('admin.content.index', [
-            'homes' => DB::table('homes')->orderBy('name')->get(),
-            'announcements' => DB::table('announcements')->leftJoin('announcement_translations', function ($join) {
+            'homes' => Home::query()->orderBy('name')->get(),
+            'announcements' => Announcement::query()->leftJoin('announcement_translations', function ($join) {
                 $join->on('announcements.id', '=', 'announcement_translations.announcement_id')
                     ->where('announcement_translations.locale', '=', app()->getLocale());
             })->select('announcements.*', 'announcement_translations.title')->latest('announcements.created_at')->paginate(15, ['*'], 'announcements'),
-            'initiatives' => DB::table('initiatives')->leftJoin('initiative_translations', function ($join) {
+            'initiatives' => Initiative::query()->leftJoin('initiative_translations', function ($join) {
                 $join->on('initiatives.id', '=', 'initiative_translations.initiative_id')
                     ->where('initiative_translations.locale', '=', app()->getLocale());
             })->select('initiatives.*', 'initiative_translations.title')->latest('initiatives.created_at')->paginate(15, ['*'], 'initiatives'),
-            'reports' => DB::table('facility_reports')->leftJoin('booking_statuses', 'facility_reports.status_id', '=', 'booking_statuses.id')
+            'reports' => FacilityReport::query()->leftJoin('booking_statuses', 'facility_reports.status_id', '=', 'booking_statuses.id')
                 ->leftJoin('booking_status_translations', function ($join) {
                     $join->on('booking_statuses.id', '=', 'booking_status_translations.booking_status_id')
                         ->where('booking_status_translations.locale', '=', app()->getLocale());
                 })->select('facility_reports.*', 'booking_status_translations.name as status_name')
                 ->latest('facility_reports.reported_at')->paginate(15, ['*'], 'reports'),
-            'statuses' => DB::table('booking_statuses')->join('booking_status_translations', function ($join) {
+            'statuses' => BookingStatus::query()->join('booking_status_translations', function ($join) {
                 $join->on('booking_statuses.id', '=', 'booking_status_translations.booking_status_id')
                     ->where('booking_status_translations.locale', '=', app()->getLocale());
             })->select('booking_statuses.id', 'booking_status_translations.name')->orderBy('booking_statuses.id')->get(),
@@ -48,7 +58,7 @@ class ResidentContentController extends Controller
         ]);
 
         $id = DB::transaction(function () use ($request, $data) {
-            $id = DB::table('announcements')->insertGetId([
+            $id = Announcement::query()->create([
                 'home_id' => $data['home_id'] ?? null,
                 'created_by' => $request->user()->id,
                 'reference' => 'AN-' . Str::upper(Str::random(12)),
@@ -57,9 +67,9 @@ class ResidentContentController extends Controller
                 'is_published' => $data['published'],
                 'created_at' => now(),
                 'updated_at' => now(),
-            ]);
+            ])->getKey();
             foreach (['ar', 'en'] as $locale) {
-                DB::table('announcement_translations')->insert([
+                AnnouncementTranslation::query()->create([
                     'announcement_id' => $id,
                     'locale' => $locale,
                     'title' => $data['title_' . $locale],
@@ -90,7 +100,7 @@ class ResidentContentController extends Controller
         ]);
 
         $id = DB::transaction(function () use ($request, $data) {
-            $id = DB::table('initiatives')->insertGetId([
+            $id = Initiative::query()->create([
                 'home_id' => $data['home_id'],
                 'created_by' => $request->user()->id,
                 'reference' => 'IN-' . Str::upper(Str::random(12)),
@@ -102,9 +112,9 @@ class ResidentContentController extends Controller
                 'is_published' => $data['is_published'],
                 'created_at' => now(),
                 'updated_at' => now(),
-            ]);
+            ])->getKey();
             foreach (['ar', 'en'] as $locale) {
-                DB::table('initiative_translations')->insert([
+                InitiativeTranslation::query()->create([
                     'initiative_id' => $id,
                     'locale' => $locale,
                     'title' => $data['title_' . $locale],
@@ -122,7 +132,7 @@ class ResidentContentController extends Controller
 
     public function updateFacilityReport(Request $request, int $reportId)
     {
-        $report = DB::table('facility_reports')->where('id', $reportId)->first();
+        $report = FacilityReport::query()->where('id', $reportId)->first();
         abort_unless($report, 404);
 
         $data = $request->validate([
@@ -131,12 +141,12 @@ class ResidentContentController extends Controller
         ]);
 
         DB::transaction(function () use ($request, $report, $data) {
-            DB::table('facility_reports')->where('id', $report->id)->update([
+            FacilityReport::query()->where('id', $report->id)->update([
                 'status_id' => $data['status_id'],
-                'resolved_at' => DB::table('booking_statuses')->where('id', $data['status_id'])->where('code', 'completed')->exists() ? now() : null,
+                'resolved_at' => BookingStatus::query()->where('id', $data['status_id'])->where('code', 'completed')->exists() ? now() : null,
                 'updated_at' => now(),
             ]);
-            DB::table('facility_report_updates')->insert([
+            FacilityReportUpdate::query()->create([
                 'facility_report_id' => $report->id,
                 'status_id' => $data['status_id'],
                 'updated_by' => $request->user()->id,

@@ -2,17 +2,27 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\Booking;
+use App\Models\BookingProviderAssignment;
+use App\Models\BookingStatus;
+use App\Models\BookingStatusHistory;
+use App\Models\ProviderCommissionEntry;
+use App\Models\ProviderCommissionStatus;
+use App\Models\ProviderContract;
+use App\Models\ProviderProfile;
+
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
+/** إسناد طلبات الخدمات وتحديث حالاتها وقيود عمولات المزود. */
 class ServiceOrderAdminController extends Controller
 {
     public function index()
     {
         $locale = app()->getLocale();
-        $orders = DB::table('bookings')
+        $orders = Booking::query()
             ->join('users as residents', 'bookings.resident_id', '=', 'residents.id')
             ->join('homes', 'bookings.home_id', '=', 'homes.id')
             ->join('services', 'bookings.service_id', '=', 'services.id')
@@ -33,10 +43,10 @@ class ServiceOrderAdminController extends Controller
                 'provider_profiles.id as provider_profile_id', 'provider_profiles.company_name as provider_name')
             ->orderByDesc('bookings.created_at')->paginate(25);
 
-        $providers = DB::table('provider_profiles')->join('users', 'provider_profiles.user_id', '=', 'users.id')
+        $providers = ProviderProfile::query()->join('users', 'provider_profiles.user_id', '=', 'users.id')
             ->where('provider_profiles.is_approved', true)->select('provider_profiles.id', 'provider_profiles.company_name', 'users.name')
             ->orderBy('provider_profiles.company_name')->get();
-        $statuses = DB::table('booking_statuses')->join('booking_status_translations', function ($join) use ($locale) {
+        $statuses = BookingStatus::query()->join('booking_status_translations', function ($join) use ($locale) {
             $join->on('booking_statuses.id', '=', 'booking_status_translations.booking_status_id')
                 ->where('booking_status_translations.locale', '=', $locale);
         })->select('booking_statuses.id', 'booking_statuses.code', 'booking_status_translations.name')->get();
@@ -46,7 +56,7 @@ class ServiceOrderAdminController extends Controller
 
     public function update(Request $request, int $bookingId)
     {
-        $booking = DB::table('bookings')->where('id', $bookingId)->first();
+        $booking = Booking::query()->where('id', $bookingId)->first();
         abort_unless($booking, 404);
         $data = $request->validate([
             'provider_profile_id' => ['nullable', 'integer', 'exists:provider_profiles,id'],
@@ -54,17 +64,17 @@ class ServiceOrderAdminController extends Controller
             'gross_amount' => ['nullable', 'numeric', 'min:0', 'max:9999999999.99'],
             'note' => ['nullable', 'string', 'max:2000'],
         ]);
-        $targetStatus = DB::table('booking_statuses')->where('id', $data['booking_status_id'])->first();
-        $assignment = DB::table('booking_provider_assignments')->where('booking_id', $bookingId)->first();
+        $targetStatus = BookingStatus::query()->where('id', $data['booking_status_id'])->first();
+        $assignment = BookingProviderAssignment::query()->where('booking_id', $bookingId)->first();
         $providerId = $data['provider_profile_id'] ?? $assignment?->provider_profile_id;
         $contract = null;
 
         if ($providerId) {
-            abort_unless(DB::table('provider_profiles')->where('id', $providerId)->where('is_approved', true)->exists(), 422, __('Choose an approved provider.'));
+            abort_unless(ProviderProfile::query()->where('id', $providerId)->where('is_approved', true)->exists(), 422, __('Choose an approved provider.'));
             if ($assignment && (int) $assignment->provider_profile_id === (int) $providerId) {
-                $contract = DB::table('provider_contracts')->where('id', $assignment->provider_contract_id)->first();
+                $contract = ProviderContract::query()->where('id', $assignment->provider_contract_id)->first();
             } else {
-                $contract = DB::table('provider_contracts')
+                $contract = ProviderContract::query()
                     ->join('provider_contract_statuses', 'provider_contracts.status_id', '=', 'provider_contract_statuses.id')
                     ->where('provider_contracts.provider_profile_id', $providerId)
                     ->where('provider_contract_statuses.code', 'active')
@@ -84,8 +94,8 @@ class ServiceOrderAdminController extends Controller
 
         DB::transaction(function () use ($request, $booking, $bookingId, $data, $targetStatus, $providerId, $contract, $assignment) {
             if ($providerId && $contract) {
-                $providerUserId = DB::table('provider_profiles')->where('id', $providerId)->value('user_id');
-                DB::table('booking_provider_assignments')->updateOrInsert(
+                $providerUserId = ProviderProfile::query()->where('id', $providerId)->value('user_id');
+                BookingProviderAssignment::query()->updateOrCreate(
                     ['booking_id' => $bookingId],
                     [
                         'provider_profile_id' => $providerId,
@@ -98,17 +108,17 @@ class ServiceOrderAdminController extends Controller
                         'created_at' => $assignment?->created_at ?? now(),
                     ]
                 );
-                DB::table('bookings')->where('id', $bookingId)->update([
+                Booking::query()->where('id', $bookingId)->update([
                     'provider_id' => $providerUserId,
                     'updated_at' => now(),
                 ]);
             }
 
-            DB::table('bookings')->where('id', $bookingId)->update([
+            Booking::query()->where('id', $bookingId)->update([
                 'booking_status_id' => $targetStatus->id,
                 'updated_at' => now(),
             ]);
-            DB::table('booking_status_history')->insert([
+            BookingStatusHistory::query()->create([
                 'booking_id' => $bookingId,
                 'booking_status_id' => $targetStatus->id,
                 'changed_by' => $request->user()->id,
@@ -117,10 +127,10 @@ class ServiceOrderAdminController extends Controller
             ]);
 
             if ($targetStatus->code === 'completed' && $providerId && $contract) {
-                $pendingId = DB::table('provider_commission_statuses')->where('code', 'pending')->value('id');
+                $pendingId = ProviderCommissionStatus::query()->where('code', 'pending')->value('id');
                 $gross = (float) $data['gross_amount'];
                 $rate = (float) $contract->service_commission_percent;
-                DB::table('provider_commission_entries')->updateOrInsert(
+                ProviderCommissionEntry::query()->updateOrCreate(
                     ['booking_id' => $bookingId],
                     [
                         'provider_profile_id' => $providerId,

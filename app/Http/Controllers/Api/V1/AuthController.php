@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Models\Role; use App\Models\User;
 use Illuminate\Http\Request; use Illuminate\Support\Facades\Hash; use Illuminate\Validation\ValidationException;
+/** إدارة الدخول والخروج والتحقق من بيانات الحساب؛ كلمات المرور لا تُرسل في الاستجابة. */
 class AuthController extends Controller {
  public function register(Request $request){
   $data=$request->validate([

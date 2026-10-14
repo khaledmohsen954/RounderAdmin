@@ -1,7 +1,10 @@
 <?php
 namespace App\Http\Controllers\Api\V1;
+
+use App\Models\BookingStatusHistory;
 use App\Http\Controllers\Controller;
 use App\Models\Booking; use App\Models\BookingStatus; use Illuminate\Http\Request; use Illuminate\Support\Facades\DB; use Illuminate\Validation\Rule;
+/** طلبات الساكن؛ يجب تقييد كل قراءة وتعديل بمعرف صاحب الحساب. */
 class BookingController extends Controller {
  public function index(Request $request){
   $page=Booking::with(['home','service.translations','status.translations'])->where('resident_id',$request->user()->id)->latest()->paginate(min($request->integer('per_page',15),50));
@@ -17,7 +20,7 @@ class BookingController extends Controller {
   ]);
   $pending=BookingStatus::where('code','pending')->firstOrFail();$service=\App\Models\Service::findOrFail($data['service_id']);
   $booking=Booking::create($data+['resident_id'=>$request->user()->id,'booking_status_id'=>$pending->id,'total_amount'=>$service->base_price]);
-  DB::table('booking_status_history')->insert(['booking_id'=>$booking->id,'booking_status_id'=>$pending->id,'changed_by'=>$request->user()->id,'note'=>'Created by resident','created_at'=>now()]);
+  BookingStatusHistory::query()->create(['booking_id'=>$booking->id,'booking_status_id'=>$pending->id,'changed_by'=>$request->user()->id,'note'=>'Created by resident','created_at'=>now()]);
   $booking->load(['service.translations','status.translations']);
   return response()->json(['data'=>$booking],201);
  }
@@ -28,7 +31,7 @@ class BookingController extends Controller {
   $cancelled=BookingStatus::where('code','cancelled')->firstOrFail();
   DB::transaction(function()use($booking,$cancelled,$request,$data){
    $booking->update(['booking_status_id'=>$cancelled->id,'notes'=>trim(($booking->notes? $booking->notes."\n":'').'Cancellation: '.$data['reason'])]);
-   DB::table('booking_status_history')->insert(['booking_id'=>$booking->id,'booking_status_id'=>$cancelled->id,'changed_by'=>$request->user()->id,'note'=>$data['reason'],'created_at'=>now()]);
+   BookingStatusHistory::query()->create(['booking_id'=>$booking->id,'booking_status_id'=>$cancelled->id,'changed_by'=>$request->user()->id,'note'=>$data['reason'],'created_at'=>now()]);
   });
   return response()->json(['data'=>$booking->fresh()->load(['status.translations'])]);
  }

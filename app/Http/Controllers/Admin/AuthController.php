@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request; use Illuminate\Support\Facades\Auth; use Illuminate\Validation\ValidationException;
+/** إدارة الدخول والخروج والتحقق من بيانات الحساب؛ كلمات المرور لا تُرسل في الاستجابة. */
 class AuthController extends Controller {
  public function show(){return view('admin.login');}
  public function login(Request $request){

@@ -1,4 +1,30 @@
 <?php
+
 namespace App\Models;
+
 use Illuminate\Database\Eloquent\Model;
-class Role extends Model { protected $fillable=['code']; public function translations(){return $this->hasMany(RoleTranslation::class);} public function users(){return $this->hasMany(User::class);} }
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+/** يمثل بيانات roles وعلاقاتها بالمفاتيح الأجنبية في قاعدة البيانات. */
+class Role extends Model
+{
+    protected $table = 'roles';
+
+    /** الحقول المسموح حفظها؛ يجب تمرير البيانات المتحقق منها فقط من طبقة الطلب. */
+    protected $fillable = [
+        'code',
+    ];
+
+    /** السجلات التابعة عبر role_id. */
+    public function translations(): HasMany
+    {
+        return $this->hasMany(RoleTranslation::class, 'role_id');
+    }
+
+    /** السجلات التابعة عبر role_id. */
+    public function users(): HasMany
+    {
+        return $this->hasMany(User::class, 'role_id');
+    }
+
+}

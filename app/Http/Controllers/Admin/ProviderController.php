@@ -2,17 +2,25 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\ProviderCommissionEntry;
+use App\Models\ProviderContract;
+use App\Models\ProviderContractStatus;
+use App\Models\ProviderProfile;
+use App\Models\Role;
+use App\Models\User;
+
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
+/** إنشاء حساب المزود وملفه وعقد العمولة في معاملة واحدة. */
 class ProviderController extends Controller
 {
     public function index()
     {
-        $providers = DB::table('provider_profiles')
+        $providers = ProviderProfile::query()
             ->join('users', 'provider_profiles.user_id', '=', 'users.id')
             ->leftJoin('provider_contracts', function ($join) {
                 $join->on('provider_profiles.id', '=', 'provider_contracts.provider_profile_id')
@@ -25,7 +33,7 @@ class ProviderController extends Controller
                 'users.email', 'users.phone', 'provider_contracts.reference as contract_reference',
                 'provider_contracts.service_commission_percent', 'provider_contracts.emergency_commission_percent',
                 'provider_contracts.starts_on', 'provider_contract_statuses.code as contract_status'
-            )->selectSub(DB::table('provider_commission_entries')->selectRaw('COALESCE(SUM(commission_amount), 0)')
+            )->selectSub(ProviderCommissionEntry::query()->selectRaw('COALESCE(SUM(commission_amount), 0)')
                 ->whereColumn('provider_commission_entries.provider_profile_id', 'provider_profiles.id'), 'commission_total')
             ->orderByDesc('provider_profiles.id')->paginate(20);
 
@@ -50,10 +58,10 @@ class ProviderController extends Controller
         ]);
 
         DB::transaction(function () use ($request, $data) {
-            $roleId = DB::table('roles')->where('code', 'provider')->value('id');
+            $roleId = Role::query()->where('code', 'provider')->value('id');
             abort_unless($roleId, 500, 'Provider role is not configured.');
 
-            $userId = DB::table('users')->insertGetId([
+            $userId = User::query()->create([
                 'role_id' => $roleId,
                 'name' => $data['name'],
                 'email' => $data['email'],
@@ -62,19 +70,19 @@ class ProviderController extends Controller
                 'password' => bcrypt($data['password']),
                 'created_at' => now(),
                 'updated_at' => now(),
-            ]);
-            $providerId = DB::table('provider_profiles')->insertGetId([
+            ])->getKey();
+            $providerId = ProviderProfile::query()->create([
                 'user_id' => $userId,
                 'company_name' => $data['company_name'],
                 'is_approved' => $data['is_approved'],
                 'created_at' => now(),
                 'updated_at' => now(),
-            ]);
-            $contractStatus = DB::table('provider_contract_statuses')
+            ])->getKey();
+            $contractStatus = ProviderContractStatus::query()
                 ->where('code', $data['is_approved'] ? 'active' : 'draft')->value('id');
             abort_unless($contractStatus, 500, 'Provider contract statuses are not configured.');
 
-            DB::table('provider_contracts')->insert([
+            ProviderContract::query()->create([
                 'provider_profile_id' => $providerId,
                 'status_id' => $contractStatus,
                 'reference' => 'PC-' . Str::upper(Str::random(12)),

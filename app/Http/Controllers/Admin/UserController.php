@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller; use App\Models\Role; use App\Models\User;
 use Illuminate\Http\Request; use Illuminate\Validation\Rule;
+/** إدارة حسابات الدخول والأدوار وتغيير كلمات المرور. */
 class UserController extends Controller {
  public function index(Request $request){
   $users=User::with('role.translations')->when($request->filled('q'),fn($q)=>$q->where(fn($w)=>$w->where('name','like','%'.$request->q.'%')->orWhere('email','like','%'.$request->q.'%')->orWhere('phone','like','%'.$request->q.'%')))

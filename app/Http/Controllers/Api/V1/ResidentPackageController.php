@@ -2,54 +2,58 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Models\ResidentHome;
+use App\Models\ResidentSubscription;
+use App\Models\ResidentSubscriptionService;
+use App\Models\ServicePackage;
+use App\Models\ServicePackageService;
+use App\Models\SubscriptionStatus;
+
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
+/** عرض الباقات وإنشاء الاشتراك مع تثبيت السعر والحصص عند الشراء. */
 class ResidentPackageController extends Controller
 {
+    /** تحميل العلاقات مسبقاً يمنع استعلاماً إضافياً لكل باقة وخدمة. */
     public function index()
     {
         $locale = app()->getLocale();
-        $packages = DB::table('service_packages')
-            ->join('package_billing_cycles', 'service_packages.billing_cycle_id', '=', 'package_billing_cycles.id')
-            ->leftJoin('service_package_translations', function ($join) use ($locale) {
-                $join->on('service_packages.id', '=', 'service_package_translations.service_package_id')
-                    ->where('service_package_translations.locale', '=', $locale);
-            })->where('service_packages.is_active', true)
-            ->select('service_packages.id', 'service_packages.code', 'service_packages.price',
-                'service_packages.currency_code', 'service_packages.duration_months',
-                'package_billing_cycles.id as billing_cycle_id', 'package_billing_cycles.code as billing_cycle_code',
-                'package_billing_cycles.months as billing_cycle_months', 'service_package_translations.name',
-                'service_package_translations.description')->orderBy('service_packages.price')->get();
+        $packages = ServicePackage::query()
+            ->with([
+                'billingCycle',
+                'translations' => fn ($query) => $query->where('locale', $locale),
+                'includedServices.service.translations' => fn ($query) => $query->where('locale', $locale),
+            ])
+            ->where('is_active', true)->orderBy('price')->get();
 
-        $included = DB::table('service_package_services')
-            ->join('services', 'service_package_services.service_id', '=', 'services.id')
-            ->leftJoin('service_translations', function ($join) use ($locale) {
-                $join->on('services.id', '=', 'service_translations.service_id')
-                    ->where('service_translations.locale', '=', $locale);
-            })->select('service_package_services.service_package_id', 'services.id', 'services.code',
-                'service_translations.name', 'service_translations.description', 'service_package_services.included_quantity',
-                'service_package_services.is_unlimited')->get()->groupBy('service_package_id');
-
-        $data = $packages->map(fn ($package) => [
+        // نحافظ على أسماء حقول الـAPI الحالية رغم تغيير طبقة الوصول للبيانات.
+        $data = $packages->map(fn (ServicePackage $package) => [
             'id' => $package->id,
             'code' => $package->code,
-            'name' => $package->name ?? $package->code,
-            'description' => $package->description,
+            'name' => $package->translations->first()?->name ?? $package->code,
+            'description' => $package->translations->first()?->description,
             'price' => $package->price,
             'currency_code' => $package->currency_code,
             'duration_months' => $package->duration_months,
             'billing_cycle' => [
-                'id' => $package->billing_cycle_id,
-                'code' => $package->billing_cycle_code,
-                'months' => $package->billing_cycle_months,
+                'id' => $package->billingCycle->id,
+                'code' => $package->billingCycle->code,
+                'months' => $package->billingCycle->months,
             ],
-            'services' => $included->get($package->id, collect())->values(),
+            'services' => $package->includedServices->map(fn ($included) => [
+                'service_package_id' => $package->id,
+                'id' => $included->service->id,
+                'code' => $included->service->code,
+                'name' => $included->service->translations->first()?->name,
+                'description' => $included->service->translations->first()?->description,
+                'included_quantity' => $included->included_quantity,
+                'is_unlimited' => $included->is_unlimited,
+            ])->values(),
         ]);
-
         return response()->json(['data' => $data]);
     }
 
@@ -66,28 +70,28 @@ class ResidentPackageController extends Controller
             ],
         ]);
 
+        // قفل العضوية يمنع إنشاء اشتراكين متزامنين لنفس الوحدة.
         return DB::transaction(function () use ($request, $data) {
-            $membership = DB::table('resident_homes')->where('id', $data['resident_home_id'])
+            $membership = ResidentHome::query()->where('id', $data['resident_home_id'])
                 ->where('user_id', $request->user()->id)->lockForUpdate()->first();
             abort_unless($membership, 404, 'Resident home not found.');
 
-            $current = DB::table('resident_subscriptions')
-                ->join('subscription_statuses', 'resident_subscriptions.status_id', '=', 'subscription_statuses.id')
+            $current = ResidentSubscription::query()
                 ->where('resident_subscriptions.resident_home_id', $membership->id)
                 ->where('resident_subscriptions.ends_at', '>', now())
-                ->whereIn('subscription_statuses.code', ['pending', 'active'])->exists();
+                ->whereHas('status', fn ($query) => $query->whereIn('code', ['pending', 'active']))->exists();
             abort_if($current, 409, __('This home already has an active or pending package.'));
 
-            $package = DB::table('service_packages')->where('id', $data['service_package_id'])
+            $package = ServicePackage::query()->where('id', $data['service_package_id'])
                 ->where('is_active', true)->first();
             abort_unless($package, 404);
 
             $statusCode = (float) $package->price === 0.0 ? 'active' : 'pending';
-            $statusId = DB::table('subscription_statuses')->where('code', $statusCode)->value('id');
+            $statusId = SubscriptionStatus::query()->where('code', $statusCode)->value('id');
             abort_unless($statusId, 500, 'Subscription statuses have not been seeded.');
             $starts = now();
             $ends = $starts->copy()->addMonths((int) $package->duration_months);
-            $subscriptionId = DB::table('resident_subscriptions')->insertGetId([
+            $subscriptionId = ResidentSubscription::query()->create([
                 'resident_home_id' => $membership->id,
                 'service_package_id' => $package->id,
                 'status_id' => $statusId,
@@ -98,10 +102,11 @@ class ResidentPackageController extends Controller
                 'ends_at' => $ends,
                 'created_at' => now(),
                 'updated_at' => now(),
-            ]);
+            ])->getKey();
 
-            foreach (DB::table('service_package_services')->where('service_package_id', $package->id)->get() as $service) {
-                DB::table('resident_subscription_services')->insert([
+            // ننسخ الحصص لحماية حقوق العميل عند تعديل الباقة الأصلية لاحقاً.
+            foreach ($package->includedServices as $service) {
+                ResidentSubscriptionService::query()->create([
                     'resident_subscription_id' => $subscriptionId,
                     'service_id' => $service->service_id,
                     'included_quantity' => $service->included_quantity,
@@ -113,7 +118,7 @@ class ResidentPackageController extends Controller
             }
 
             return response()->json([
-                'data' => DB::table('resident_subscriptions')->where('id', $subscriptionId)->first(),
+                'data' => ResidentSubscription::query()->where('id', $subscriptionId)->first(),
                 'payment_required' => (float) $package->price > 0,
             ], 201);
         });
@@ -121,7 +126,7 @@ class ResidentPackageController extends Controller
 
     public function cancel(Request $request, int $subscriptionId)
     {
-        $subscription = DB::table('resident_subscriptions')
+        $subscription = ResidentSubscription::query()
             ->join('resident_homes', 'resident_subscriptions.resident_home_id', '=', 'resident_homes.id')
             ->join('subscription_statuses', 'resident_subscriptions.status_id', '=', 'subscription_statuses.id')
             ->where('resident_subscriptions.id', $subscriptionId)
@@ -132,8 +137,8 @@ class ResidentPackageController extends Controller
         abort_unless($subscription->status_code === 'pending', 409,
             'An active package cancellation must be handled by support.');
 
-        $cancelledId = DB::table('subscription_statuses')->where('code', 'cancelled')->value('id');
-        DB::table('resident_subscriptions')->where('id', $subscriptionId)->update([
+        $cancelledId = SubscriptionStatus::query()->where('code', 'cancelled')->value('id');
+        ResidentSubscription::query()->where('id', $subscriptionId)->update([
             'status_id' => $cancelledId,
             'cancelled_at' => now(),
             'updated_at' => now(),

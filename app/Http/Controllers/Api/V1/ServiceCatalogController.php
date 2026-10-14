@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Models\Service;
 use Illuminate\Http\JsonResponse;
+/** عرض الخدمات النشطة وترجماتها مع تحميل العلاقات مسبقاً. */
 class ServiceCatalogController extends Controller {
  public function __invoke():JsonResponse {
   $locale=app()->getLocale();

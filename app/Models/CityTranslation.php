@@ -1,4 +1,33 @@
 <?php
+
 namespace App\Models;
+
 use Illuminate\Database\Eloquent\Model;
-class CityTranslation extends Model { protected $fillable=['city_id','locale','name']; public function city(){return $this->belongsTo(City::class);} }
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+/** يمثل بيانات city_translations وعلاقاتها بالمفاتيح الأجنبية في قاعدة البيانات. */
+class CityTranslation extends Model
+{
+    protected $table = 'city_translations';
+
+    /** الحقول المسموح حفظها؛ يجب تمرير البيانات المتحقق منها فقط من طبقة الطلب. */
+    protected $fillable = [
+        'city_id',
+        'locale',
+        'name',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'city_id' => 'integer',
+        ];
+    }
+
+    /** السجل المرتبط عبر city_id. */
+    public function city(): BelongsTo
+    {
+        return $this->belongsTo(City::class, 'city_id');
+    }
+
+}

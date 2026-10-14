@@ -2,18 +2,24 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Models\EmergencyRequest;
+use App\Models\EmergencyRequestStatus;
+use App\Models\EmergencyRequestUpdate;
+use App\Models\ResidentHome;
+
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
+/** طلبات الطوارئ المستقلة والتحقق من عضوية الساكن قبل الإنشاء أو الإلغاء. */
 class EmergencyRequestController extends Controller
 {
     public function index(Request $request)
     {
         $locale = app()->getLocale();
-        $page = DB::table('emergency_requests')
+        $page = EmergencyRequest::query()
             ->join('emergency_request_statuses', 'emergency_requests.status_id', '=', 'emergency_request_statuses.id')
             ->join('emergency_request_status_translations', function ($join) use ($locale) {
                 $join->on('emergency_request_statuses.id', '=', 'emergency_request_status_translations.emergency_request_status_id')
@@ -60,16 +66,16 @@ class EmergencyRequestController extends Controller
             'confirm_emergency' => ['required', 'accepted'],
         ]);
 
-        $membership = DB::table('resident_homes')
+        $membership = ResidentHome::query()
             ->where('id', $data['resident_home_id'])
             ->where('user_id', $request->user()->id)->first();
         abort_unless($membership, 404, 'Resident home not found.');
 
-        $status = DB::table('emergency_request_statuses')->where('code', 'received')->first();
+        $status = EmergencyRequestStatus::query()->where('code', 'received')->first();
         abort_unless($status, 500, 'Emergency request statuses have not been seeded.');
 
         $id = DB::transaction(function () use ($data, $membership, $request, $status) {
-            $id = DB::table('emergency_requests')->insertGetId([
+            $id = EmergencyRequest::query()->create([
                 'resident_id' => $request->user()->id,
                 'resident_home_id' => $membership->id,
                 'home_id' => $membership->home_id,
@@ -82,8 +88,8 @@ class EmergencyRequestController extends Controller
                 'requested_at' => now(),
                 'created_at' => now(),
                 'updated_at' => now(),
-            ]);
-            DB::table('emergency_request_updates')->insert([
+            ])->getKey();
+            EmergencyRequestUpdate::query()->create([
                 'emergency_request_id' => $id,
                 'status_id' => $status->id,
                 'updated_by' => $request->user()->id,
@@ -95,29 +101,29 @@ class EmergencyRequestController extends Controller
         });
 
         return response()->json([
-            'data' => DB::table('emergency_requests')->where('id', $id)->first(),
+            'data' => EmergencyRequest::query()->where('id', $id)->first(),
             'message' => __('Emergency request received'),
         ], 201);
     }
 
     public function cancel(Request $request, int $requestId)
     {
-        $emergency = DB::table('emergency_requests')
+        $emergency = EmergencyRequest::query()
             ->where('id', $requestId)
             ->where('resident_id', $request->user()->id)->first();
         abort_unless($emergency, 404);
 
-        $cancelled = DB::table('emergency_request_statuses')->where('code', 'cancelled')->first();
+        $cancelled = EmergencyRequestStatus::query()->where('code', 'cancelled')->first();
         abort_unless($cancelled, 500, 'Emergency request statuses have not been seeded.');
-        $received = DB::table('emergency_request_statuses')->where('id', $emergency->status_id)->value('code');
+        $received = EmergencyRequestStatus::query()->where('id', $emergency->status_id)->value('code');
         abort_unless($received === 'received', 409, 'A dispatched emergency request cannot be cancelled by the resident.');
 
         DB::transaction(function () use ($emergency, $cancelled, $request) {
-            DB::table('emergency_requests')->where('id', $emergency->id)->update([
+            EmergencyRequest::query()->where('id', $emergency->id)->update([
                 'status_id' => $cancelled->id,
                 'updated_at' => now(),
             ]);
-            DB::table('emergency_request_updates')->insert([
+            EmergencyRequestUpdate::query()->create([
                 'emergency_request_id' => $emergency->id,
                 'status_id' => $cancelled->id,
                 'updated_by' => $request->user()->id,

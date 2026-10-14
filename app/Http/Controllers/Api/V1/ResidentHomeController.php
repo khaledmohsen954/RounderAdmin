@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller; use App\Models\Home; use Illuminate\Http\JsonResponse; use Illuminate\Http\Request; use Illuminate\Support\Facades\DB; use Illuminate\Validation\Rule;
+/** ربط الحساب بوحدة وتحديد الوحدة الأساسية داخل معاملة. */
 class ResidentHomeController extends Controller {
  public function index(Request $request):JsonResponse {
   $homes=$request->user()->residentHomes()->with('city.translations')->get()->map(fn(Home $h)=>['id'=>$h->id,'name'=>$h->name,'unit_label'=>$h->pivot->unit_label,'is_primary'=>(bool)$h->pivot->is_primary,'address'=>$h->address,'property_code'=>$h->property_code]);

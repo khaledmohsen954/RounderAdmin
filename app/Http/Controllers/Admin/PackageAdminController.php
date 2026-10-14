@@ -2,17 +2,27 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\PackageBillingCycle;
+use App\Models\ResidentSubscription;
+use App\Models\Service;
+use App\Models\ServiceCategory;
+use App\Models\ServicePackage;
+use App\Models\ServicePackageService;
+use App\Models\ServicePackageTranslation;
+use App\Models\ServiceTranslation;
+
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
+/** إدارة كتالوج الخدمات والباقات وترجماتها وحصص الخدمات. */
 class PackageAdminController extends Controller
 {
     public function index()
     {
-        $services = DB::table('services')
+        $services = Service::query()
             ->join('service_categories', 'services.service_category_id', '=', 'service_categories.id')
             ->leftJoin('service_category_translations', function ($join) {
                 $join->on('service_categories.id', '=', 'service_category_translations.service_category_id')->where('service_category_translations.locale', '=', app()->getLocale());
@@ -23,23 +33,23 @@ class PackageAdminController extends Controller
             })->select('services.*', 'service_category_translations.name as category_name', 'service_translations.name')
             ->orderBy('service_categories.code')->orderBy('services.code')->get();
 
-        $categories = DB::table('service_categories')->join('service_category_translations', function ($join) {
+        $categories = ServiceCategory::query()->join('service_category_translations', function ($join) {
             $join->on('service_categories.id', '=', 'service_category_translations.service_category_id')
                 ->where('service_category_translations.locale', '=', app()->getLocale());
         })->where('service_categories.is_active', true)->select('service_categories.id', 'service_category_translations.name')->orderBy('name')->get();
 
-        $cycles = DB::table('package_billing_cycles')->orderBy('months')->get();
+        $cycles = PackageBillingCycle::query()->orderBy('months')->get();
 
-        $packages = DB::table('service_packages')
+        $packages = ServicePackage::query()
             ->join('package_billing_cycles', 'service_packages.billing_cycle_id', '=', 'package_billing_cycles.id')
             ->leftJoin('service_package_translations', function ($join) {
                 $join->on('service_packages.id', '=', 'service_package_translations.service_package_id')
                     ->where('service_package_translations.locale', '=', app()->getLocale());
             })->select('service_packages.*', 'package_billing_cycles.code as cycle_code', 'service_package_translations.name')
-            ->selectSub(DB::table('service_package_services')->selectRaw('COUNT(*)')->whereColumn('service_package_services.service_package_id', 'service_packages.id'), 'services_count')
+            ->selectSub(ServicePackageService::query()->selectRaw('COUNT(*)')->whereColumn('service_package_services.service_package_id', 'service_packages.id'), 'services_count')
             ->orderByDesc('service_packages.id')->paginate(20);
 
-        $subscriptions = DB::table('resident_subscriptions')
+        $subscriptions = ResidentSubscription::query()
             ->join('resident_homes', 'resident_subscriptions.resident_home_id', '=', 'resident_homes.id')
             ->join('users', 'resident_homes.user_id', '=', 'users.id')
             ->join('homes', 'resident_homes.home_id', '=', 'homes.id')
@@ -57,7 +67,7 @@ class PackageAdminController extends Controller
                 'service_package_translations.name as package_name', 'subscription_status_translations.name as status_name')
             ->orderByDesc('resident_subscriptions.created_at')->paginate(20, ['*'], 'subscriptions');
 
-        $packageServices = DB::table('service_package_services')
+        $packageServices = ServicePackageService::query()
             ->join('service_packages', 'service_package_services.service_package_id', '=', 'service_packages.id')
             ->join('services', 'service_package_services.service_id', '=', 'services.id')
             ->leftJoin('service_translations', function ($join) {
@@ -84,16 +94,16 @@ class PackageAdminController extends Controller
         ]);
 
         DB::transaction(function () use ($data) {
-            $serviceId = DB::table('services')->insertGetId([
+            $serviceId = Service::query()->create([
                 'service_category_id' => $data['service_category_id'],
                 'code' => Str::lower($data['code']),
                 'base_price' => $data['base_price'],
                 'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
-            ]);
+            ])->getKey();
             foreach (['ar', 'en', 'ur'] as $locale) {
-                DB::table('service_translations')->insert([
+                ServiceTranslation::query()->create([
                     'service_id' => $serviceId,
                     'locale' => $locale,
                     'name' => $data['name_' . $locale],
@@ -137,7 +147,7 @@ class PackageAdminController extends Controller
         }
 
         DB::transaction(function () use ($data) {
-            $packageId = DB::table('service_packages')->insertGetId([
+            $packageId = ServicePackage::query()->create([
                 'billing_cycle_id' => $data['billing_cycle_id'],
                 'code' => Str::lower($data['code']),
                 'price' => $data['price'],
@@ -146,9 +156,9 @@ class PackageAdminController extends Controller
                 'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
-            ]);
+            ])->getKey();
             foreach (['ar', 'en', 'ur'] as $locale) {
-                DB::table('service_package_translations')->insert([
+                ServicePackageTranslation::query()->create([
                     'service_package_id' => $packageId,
                     'locale' => $locale,
                     'name' => $data['name_' . $locale],
@@ -158,7 +168,7 @@ class PackageAdminController extends Controller
                 ]);
             }
             foreach ($data['services'] as $included) {
-                DB::table('service_package_services')->insert([
+                ServicePackageService::query()->create([
                     'service_package_id' => $packageId,
                     'service_id' => $included['service_id'],
                     'included_quantity' => $included['is_unlimited'] ? null : $included['included_quantity'],
@@ -174,10 +184,10 @@ class PackageAdminController extends Controller
 
     public function editService(int $serviceId)
     {
-        $service = DB::table('services')->where('id', $serviceId)->first();
+        $service = Service::query()->where('id', $serviceId)->first();
         abort_unless($service, 404);
-        $translations = DB::table('service_translations')->where('service_id', $serviceId)->get()->keyBy('locale');
-        $categories = DB::table('service_categories')->leftJoin('service_category_translations', function ($join) {
+        $translations = ServiceTranslation::query()->where('service_id', $serviceId)->get()->keyBy('locale');
+        $categories = ServiceCategory::query()->leftJoin('service_category_translations', function ($join) {
             $join->on('service_categories.id', '=', 'service_category_translations.service_category_id')
                 ->where('service_category_translations.locale', '=', app()->getLocale());
         })->select('service_categories.id', 'service_categories.code', 'service_category_translations.name')->get();
@@ -186,7 +196,7 @@ class PackageAdminController extends Controller
 
     public function updateService(Request $request, int $serviceId)
     {
-        abort_unless(DB::table('services')->where('id', $serviceId)->exists(), 404);
+        abort_unless(Service::query()->where('id', $serviceId)->exists(), 404);
         // Normalize before uniqueness validation so MySQL and SQLite behave consistently.
         $request->merge(['code' => Str::lower((string) $request->input('code'))]);
         $rules = [
@@ -202,14 +212,14 @@ class PackageAdminController extends Controller
         }
         $data = $request->validate($rules);
         DB::transaction(function () use ($serviceId, $data) {
-            abort_unless(DB::table('services')->where('id', $serviceId)->lockForUpdate()->first(), 404);
+            abort_unless(Service::query()->where('id', $serviceId)->lockForUpdate()->first(), 404);
             // Catalogue edits never rewrite prices already recorded on orders.
-            DB::table('services')->where('id', $serviceId)->update([
+            Service::query()->where('id', $serviceId)->update([
                 'service_category_id' => $data['service_category_id'], 'code' => $data['code'],
                 'base_price' => $data['base_price'], 'is_active' => $data['is_active'], 'updated_at' => now(),
             ]);
             foreach (['ar', 'en', 'ur'] as $locale) {
-                DB::table('service_translations')->updateOrInsert(
+                ServiceTranslation::query()->updateOrCreate(
                     ['service_id' => $serviceId, 'locale' => $locale],
                     ['name' => $data['name_'.$locale], 'description' => $data['description_'.$locale] ?? null,
                      'updated_at' => now()]

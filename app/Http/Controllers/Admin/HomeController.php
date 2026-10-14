@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller; use App\Models\City; use App\Models\Home; use Illuminate\Http\Request;
+/** إدارة المباني والمدن وربطها بالسكان. */
 class HomeController extends Controller {
  public function index(){ $homes=Home::with(['city.translations','residents'])->latest()->paginate(15);$cities=City::with('translations')->orderBy('code')->get();return view('admin.homes.index',compact('homes','cities')); }
  public function store(Request $request){

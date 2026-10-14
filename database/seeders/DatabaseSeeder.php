@@ -1,8 +1,18 @@
 <?php
 namespace Database\Seeders;
+use App\Models\EmergencyRequestStatus;
+use App\Models\EmergencyRequestStatusTranslation;
+use App\Models\EmergencyType;
+use App\Models\EmergencyTypeTranslation;
+use App\Models\PackageBillingCycle;
+use App\Models\ProviderCommissionStatus;
+use App\Models\ProviderContractStatus;
+use App\Models\SubscriptionStatus;
+use App\Models\SubscriptionStatusTranslation;
 use App\Models\{BookingStatus,BookingStatusTranslation,City,CityTranslation,PaymentStatus,Role,RoleTranslation,Service,ServiceCategory,ServiceCategoryTranslation,ServiceTranslation,User};
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+
+/** بيانات مرجعية قابلة لإعادة التشغيل؛ لا تنشئ حساب مدير إلا من إعدادات البيئة. */
 class DatabaseSeeder extends Seeder {
  public function run():void {
   foreach(['admin'=>['ar'=>'مدير النظام','en'=>'Administrator'],'resident'=>['ar'=>'ساكن','en'=>'Resident'],'provider'=>['ar'=>'مقدم خدمة','en'=>'Service provider']] as $code=>$names){
@@ -19,9 +29,9 @@ class DatabaseSeeder extends Seeder {
    'resolved'=>['ar'=>'تمت المعالجة','en'=>'Resolved','ur'=>'حل ہوگیا'],
    'cancelled'=>['ar'=>'ملغي','en'=>'Cancelled','ur'=>'منسوخ'],
   ] as $code=>$names){
-   $status=DB::table('emergency_request_statuses')->where('code',$code)->first();
-   $statusId=$status?->id ?? DB::table('emergency_request_statuses')->insertGetId(['code'=>$code,'created_at'=>now(),'updated_at'=>now()]);
-   foreach($names as $locale=>$name) DB::table('emergency_request_status_translations')->updateOrInsert(
+   $status=EmergencyRequestStatus::query()->where('code',$code)->first();
+   $statusId=$status?->id ?? EmergencyRequestStatus::query()->create(['code'=>$code,'created_at'=>now(),'updated_at'=>now()])->getKey();
+   foreach($names as $locale=>$name) EmergencyRequestStatusTranslation::query()->updateOrCreate(
     ['emergency_request_status_id'=>$statusId,'locale'=>$locale],['name'=>$name,'updated_at'=>now(),'created_at'=>now()]);
   }
   foreach([
@@ -33,23 +43,23 @@ class DatabaseSeeder extends Seeder {
    'elevator'=>['ar'=>'تعطل مصعد مع أشخاص بالداخل','en'=>'Elevator entrapment','ur'=>'لفٹ میں افراد پھنس گئے'],
    'security'=>['ar'=>'مشكلة أمنية عاجلة','en'=>'Urgent security issue','ur'=>'فوری سیکیورٹی مسئلہ'],
   ] as $code=>$names){
-   $type=DB::table('emergency_types')->where('code',$code)->first();
-   $typeId=$type?->id ?? DB::table('emergency_types')->insertGetId(['code'=>$code,'is_active'=>true,'created_at'=>now(),'updated_at'=>now()]);
-   foreach($names as $locale=>$name) DB::table('emergency_type_translations')->updateOrInsert(
+   $type=EmergencyType::query()->where('code',$code)->first();
+   $typeId=$type?->id ?? EmergencyType::query()->create(['code'=>$code,'is_active'=>true,'created_at'=>now(),'updated_at'=>now()])->getKey();
+   foreach($names as $locale=>$name) EmergencyTypeTranslation::query()->updateOrCreate(
     ['emergency_type_id'=>$typeId,'locale'=>$locale],['name'=>$name,'updated_at'=>now(),'created_at'=>now()]);
   }
   $city=City::firstOrCreate(['code'=>'cairo']);
   foreach(['ar'=>'القاهرة','en'=>'Cairo','ur'=>'قاہرہ'] as $locale=>$name) CityTranslation::updateOrCreate(['city_id'=>$city->id,'locale'=>$locale],['name'=>$name]);
   foreach(['monthly'=>1,'quarterly'=>3,'semiannual'=>6,'annual'=>12] as $code=>$months)
-   DB::table('package_billing_cycles')->updateOrInsert(['code'=>$code],['months'=>$months,'updated_at'=>now(),'created_at'=>now()]);
+   PackageBillingCycle::query()->updateOrCreate(['code'=>$code],['months'=>$months,'updated_at'=>now(),'created_at'=>now()]);
   foreach(['draft','active','expired','terminated'] as $code)
-   DB::table('provider_contract_statuses')->updateOrInsert(['code'=>$code],['updated_at'=>now(),'created_at'=>now()]);
+   ProviderContractStatus::query()->updateOrCreate(['code'=>$code],['updated_at'=>now(),'created_at'=>now()]);
   foreach(['pending','settled','reversed'] as $code)
-   DB::table('provider_commission_statuses')->updateOrInsert(['code'=>$code],['updated_at'=>now(),'created_at'=>now()]);
+   ProviderCommissionStatus::query()->updateOrCreate(['code'=>$code],['updated_at'=>now(),'created_at'=>now()]);
   foreach(['pending'=>['ar'=>'في انتظار التفعيل','en'=>'Pending','ur'=>'زیر التفعیل'],'active'=>['ar'=>'نشط','en'=>'Active','ur'=>'فعال'],'expired'=>['ar'=>'منتهي','en'=>'Expired','ur'=>'میعاد ختم'],'cancelled'=>['ar'=>'ملغي','en'=>'Cancelled','ur'=>'منسوخ']] as $code=>$names){
-   DB::table('subscription_statuses')->updateOrInsert(['code'=>$code],['updated_at'=>now(),'created_at'=>now()]);
-   $statusId=DB::table('subscription_statuses')->where('code',$code)->value('id');
-   foreach($names as $locale=>$name) DB::table('subscription_status_translations')->updateOrInsert(
+   SubscriptionStatus::query()->updateOrCreate(['code'=>$code],['updated_at'=>now(),'created_at'=>now()]);
+   $statusId=SubscriptionStatus::query()->where('code',$code)->value('id');
+   foreach($names as $locale=>$name) SubscriptionStatusTranslation::query()->updateOrCreate(
     ['subscription_status_id'=>$statusId,'locale'=>$locale],['name'=>$name,'updated_at'=>now(),'created_at'=>now()]);
   }
   $catalog=[

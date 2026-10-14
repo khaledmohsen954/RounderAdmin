@@ -2,6 +2,15 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\EmergencyProviderAssignment;
+use App\Models\EmergencyRequest;
+use App\Models\EmergencyRequestStatus;
+use App\Models\EmergencyRequestUpdate;
+use App\Models\ProviderCommissionEntry;
+use App\Models\ProviderCommissionStatus;
+use App\Models\ProviderContract;
+use App\Models\ProviderProfile;
+
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -9,12 +18,13 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
+/** إسناد ومتابعة الطوارئ وعقود المزود واحتساب عمولة الطوارئ. */
 class EmergencyAdminController extends Controller
 {
     public function index()
     {
         $locale = app()->getLocale();
-        $requests = DB::table('emergency_requests')
+        $requests = EmergencyRequest::query()
             ->join('users', 'emergency_requests.resident_id', '=', 'users.id')
             ->join('homes', 'emergency_requests.home_id', '=', 'homes.id')
             ->join('emergency_types', 'emergency_requests.emergency_type_id', '=', 'emergency_types.id')
@@ -37,10 +47,10 @@ class EmergencyAdminController extends Controller
                 'emergency_provider_assignments.provider_contract_id'
             )->orderByDesc('emergency_requests.requested_at')->paginate(25);
 
-        $providers = DB::table('provider_profiles')->join('users', 'provider_profiles.user_id', '=', 'users.id')
+        $providers = ProviderProfile::query()->join('users', 'provider_profiles.user_id', '=', 'users.id')
             ->where('provider_profiles.is_approved', true)->select('provider_profiles.id', 'provider_profiles.company_name', 'users.name')
             ->orderBy('provider_profiles.company_name')->get();
-        $statuses = DB::table('emergency_request_statuses')->join('emergency_request_status_translations', function ($join) use ($locale) {
+        $statuses = EmergencyRequestStatus::query()->join('emergency_request_status_translations', function ($join) use ($locale) {
             $join->on('emergency_request_statuses.id', '=', 'emergency_request_status_translations.emergency_request_status_id')
                 ->where('emergency_request_status_translations.locale', '=', $locale);
         })->select('emergency_request_statuses.id', 'emergency_request_statuses.code', 'emergency_request_status_translations.name')->get();
@@ -50,7 +60,7 @@ class EmergencyAdminController extends Controller
 
     public function update(Request $request, int $requestId)
     {
-        $emergency = DB::table('emergency_requests')->where('id', $requestId)->first();
+        $emergency = EmergencyRequest::query()->where('id', $requestId)->first();
         abort_unless($emergency, 404);
 
         $data = $request->validate([
@@ -59,18 +69,18 @@ class EmergencyAdminController extends Controller
             'gross_amount' => ['nullable', 'numeric', 'min:0', 'max:9999999999.99'],
             'note' => ['nullable', 'string', 'max:2000'],
         ]);
-        $status = DB::table('emergency_request_statuses')->where('id', $data['status_id'])->first();
-        $assignment = DB::table('emergency_provider_assignments')->where('emergency_request_id', $emergency->id)->first();
+        $status = EmergencyRequestStatus::query()->where('id', $data['status_id'])->first();
+        $assignment = EmergencyProviderAssignment::query()->where('emergency_request_id', $emergency->id)->first();
         $providerId = $data['provider_profile_id'] ?? $assignment?->provider_profile_id;
         $contract = null;
 
         if ($providerId) {
-            $provider = DB::table('provider_profiles')->where('id', $providerId)->where('is_approved', true)->first();
+            $provider = ProviderProfile::query()->where('id', $providerId)->where('is_approved', true)->first();
             abort_unless($provider, 422, __('Choose an approved provider.'));
             if ($assignment && (int) $assignment->provider_profile_id === (int) $providerId) {
-                $contract = DB::table('provider_contracts')->where('id', $assignment->provider_contract_id)->first();
+                $contract = ProviderContract::query()->where('id', $assignment->provider_contract_id)->first();
             } else {
-                $contract = DB::table('provider_contracts')
+                $contract = ProviderContract::query()
                     ->join('provider_contract_statuses', 'provider_contracts.status_id', '=', 'provider_contract_statuses.id')
                     ->where('provider_contracts.provider_profile_id', $providerId)
                     ->where('provider_contract_statuses.code', 'active')
@@ -91,7 +101,7 @@ class EmergencyAdminController extends Controller
 
         DB::transaction(function () use ($request, $requestId, $emergency, $data, $status, $providerId, $contract, $assignment) {
             if ($providerId && $contract) {
-                DB::table('emergency_provider_assignments')->updateOrInsert(
+                EmergencyProviderAssignment::query()->updateOrCreate(
                     ['emergency_request_id' => $requestId],
                     [
                         'provider_profile_id' => $providerId,
@@ -105,14 +115,14 @@ class EmergencyAdminController extends Controller
                     ]
                 );
             }
-            DB::table('emergency_requests')->where('id', $requestId)->update([
+            EmergencyRequest::query()->where('id', $requestId)->update([
                 'status_id' => $status->id,
                 'handled_by' => $request->user()->id,
                 'dispatched_at' => in_array($status->code, ['assigned', 'on_the_way', 'resolved'], true) ? ($emergency->dispatched_at ?? now()) : null,
                 'resolved_at' => $status->code === 'resolved' ? now() : null,
                 'updated_at' => now(),
             ]);
-            DB::table('emergency_request_updates')->insert([
+            EmergencyRequestUpdate::query()->create([
                 'emergency_request_id' => $requestId,
                 'status_id' => $status->id,
                 'updated_by' => $request->user()->id,
@@ -121,10 +131,10 @@ class EmergencyAdminController extends Controller
             ]);
 
             if ($status->code === 'resolved' && $providerId && $contract) {
-                $pendingId = DB::table('provider_commission_statuses')->where('code', 'pending')->value('id');
+                $pendingId = ProviderCommissionStatus::query()->where('code', 'pending')->value('id');
                 $gross = (float) $data['gross_amount'];
                 $rate = (float) $contract->emergency_commission_percent;
-                DB::table('provider_commission_entries')->updateOrInsert(
+                ProviderCommissionEntry::query()->updateOrCreate(
                     ['emergency_request_id' => $requestId],
                     [
                         'provider_profile_id' => $providerId,
