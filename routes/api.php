@@ -8,11 +8,13 @@ Route::prefix('v1')->group(function(){
  Route::middleware('auth:sanctum')->group(function(){
   Route::get('/me',[AuthController::class,'me']);
   Route::post('/auth/logout',[AuthController::class,'logout']);
-  Route::get('/resident/dashboard',ResidentDashboardController::class);
-  Route::get('/resident/homes',[ResidentHomeController::class,'index']);
-  Route::post('/resident/homes/link',[ResidentHomeController::class,'link'])->middleware('throttle:10,1');
-  Route::get('/resident/services',ServiceCatalogController::class);
-  Route::get('/resident/bookings',[BookingController::class,'index']);
-  Route::post('/resident/bookings',[BookingController::class,'store'])->middleware('throttle:20,1');
+  Route::middleware('resident')->prefix('resident')->group(function(){
+   Route::get('/dashboard',ResidentDashboardController::class);
+   Route::get('/homes',[ResidentHomeController::class,'index']);
+   Route::post('/homes/link',[ResidentHomeController::class,'link'])->middleware('throttle:10,1');
+   Route::get('/services',ServiceCatalogController::class);
+   Route::get('/bookings',[BookingController::class,'index']);
+   Route::post('/bookings',[BookingController::class,'store'])->middleware('throttle:20,1');
+  });
  });
 });
