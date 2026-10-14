@@ -1,6 +1,6 @@
 <?php
-use Illuminate\\Support\\Facades\\Route;
-use App\\Http\\Controllers\\Api\\V1\\{AuthController,BookingController,ResidentDashboardController};
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\V1\{AuthController,BookingController,ResidentDashboardController};
 Route::prefix('v1')->group(function(){
  Route::get('/health',fn()=>response()->json(['status'=>'ok','app'=>'Rounder']));
  Route::post('/auth/register',[AuthController::class,'register'])->middleware('throttle:5,1');
