@@ -39,6 +39,18 @@ class DatabaseSeeder extends Seeder {
   }
   $city=City::firstOrCreate(['code'=>'cairo']);
   foreach(['ar'=>'القاهرة','en'=>'Cairo','ur'=>'قاہرہ'] as $locale=>$name) CityTranslation::updateOrCreate(['city_id'=>$city->id,'locale'=>$locale],['name'=>$name]);
+  foreach(['monthly'=>1,'quarterly'=>3,'semiannual'=>6,'annual'=>12] as $code=>$months)
+   DB::table('package_billing_cycles')->updateOrInsert(['code'=>$code],['months'=>$months,'updated_at'=>now(),'created_at'=>now()]);
+  foreach(['draft','active','expired','terminated'] as $code)
+   DB::table('provider_contract_statuses')->updateOrInsert(['code'=>$code],['updated_at'=>now(),'created_at'=>now()]);
+  foreach(['pending','settled','reversed'] as $code)
+   DB::table('provider_commission_statuses')->updateOrInsert(['code'=>$code],['updated_at'=>now(),'created_at'=>now()]);
+  foreach(['pending'=>['ar'=>'في انتظار التفعيل','en'=>'Pending','ur'=>'زیر التفعیل'],'active'=>['ar'=>'نشط','en'=>'Active','ur'=>'فعال'],'expired'=>['ar'=>'منتهي','en'=>'Expired','ur'=>'میعاد ختم'],'cancelled'=>['ar'=>'ملغي','en'=>'Cancelled','ur'=>'منسوخ']] as $code=>$names){
+   DB::table('subscription_statuses')->updateOrInsert(['code'=>$code],['updated_at'=>now(),'created_at'=>now()]);
+   $statusId=DB::table('subscription_statuses')->where('code',$code)->value('id');
+   foreach($names as $locale=>$name) DB::table('subscription_status_translations')->updateOrInsert(
+    ['subscription_status_id'=>$statusId,'locale'=>$locale],['name'=>$name,'updated_at'=>now(),'created_at'=>now()]);
+  }
   $catalog=[
    'maintenance'=>['ar'=>'الصيانة','en'=>'Maintenance','ur'=>'مرمت','services'=>['plumbing'=>['ar'=>'إصلاح السباكة','en'=>'Plumbing repair','ur'=>'پلمبنگ کی مرمت','price'=>250],'electrical'=>['ar'=>'إصلاح الكهرباء','en'=>'Electrical repair','ur'=>'بجلی کی مرمت','price'=>300]]],
    'cleaning'=>['ar'=>'النظافة','en'=>'Cleaning','ur'=>'صفائی','services'=>['home_cleaning'=>['ar'=>'تنظيف المنزل','en'=>'Home cleaning','ur'=>'گھر کی صفائی','price'=>400]]],
