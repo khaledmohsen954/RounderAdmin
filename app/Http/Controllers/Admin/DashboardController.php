@@ -22,6 +22,13 @@ class DashboardController extends Controller
             'open_reports' => DB::table('facility_reports')->whereNull('resolved_at')->count(),
             'community_posts' => DB::table('community_posts')->where('is_hidden', false)->count(),
             'active_initiatives' => DB::table('initiatives')->where('is_published', true)->where('ends_at', '>=', now())->count(),
+            'pending_emergencies' => DB::table('emergency_requests')
+                ->join('emergency_request_statuses', 'emergency_requests.status_id', '=', 'emergency_request_statuses.id')
+                ->whereNotIn('emergency_request_statuses.code', ['resolved', 'cancelled'])->count(),
+            'active_subscriptions' => DB::table('resident_subscriptions')
+                ->join('subscription_statuses', 'resident_subscriptions.status_id', '=', 'subscription_statuses.id')
+                ->where('subscription_statuses.code', 'active')->where('resident_subscriptions.ends_at', '>', now())->count(),
+            'available_packages' => DB::table('service_packages')->where('is_active', true)->count(),
         ];
 
         $recent = Booking::with(['resident', 'service.translations', 'status.translations'])->latest()->limit(8)->get();
