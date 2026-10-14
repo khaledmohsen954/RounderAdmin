@@ -9,7 +9,7 @@
 <a href="{{ route('admin.homes.index') }}">⌂ &nbsp;{{ __('Homes') }}</a>
 <a class="active" href="{{ route('admin.providers.index') }}">⚒ &nbsp;{{ __('Providers and contracts') }}</a>
 <a href="{{ route('admin.packages.index') }}">◫ &nbsp;{{ __('Packages and services') }}</a>
-<a href="{{ route('admin.content.index') }}">◈ &nbsp;{{ __('Resident operations') }}</a>
+<a href="{{ route('admin.content.index') }}">◈ &nbsp;{{ __('Resident operations') }}</a><a href="{{ route('admin.emergencies.index') }}">🚨 &nbsp;{{ __('Emergency requests') }}</a><a href="{{ route('admin.service-orders.index') }}">▣ &nbsp;{{ __('Service orders') }}</a>
 </div></aside>
 <main class="col-md-9 col-xl-10 content">
 <div class="mb-4"><div class="small text-secondary">{{ __('Provider operations') }}</div><h1 class="h3 fw-bold">{{ __('Providers and contracts') }}</h1></div>
