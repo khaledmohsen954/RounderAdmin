@@ -11,6 +11,32 @@ class DatabaseSeeder extends Seeder {
    $status=BookingStatus::firstOrCreate(['code'=>$code]); foreach($names as $locale=>$name) BookingStatusTranslation::updateOrCreate(['booking_status_id'=>$status->id,'locale'=>$locale],['name'=>$name]);
   }
   foreach(['pending','paid','failed','refunded'] as $code) PaymentStatus::firstOrCreate(['code'=>$code]);
+  foreach([
+   'received'=>['ar'=>'تم الاستلام','en'=>'Received','ur'=>'موصول'],
+   'assigned'=>['ar'=>'تم تعيين فريق','en'=>'Team assigned','ur'=>'ٹیم مقرر'],
+   'on_the_way'=>['ar'=>'الفريق في الطريق','en'=>'Team on the way','ur'=>'ٹیم راستے میں'],
+   'resolved'=>['ar'=>'تمت المعالجة','en'=>'Resolved','ur'=>'حل ہوگیا'],
+   'cancelled'=>['ar'=>'ملغي','en'=>'Cancelled','ur'=>'منسوخ'],
+  ] as $code=>$names){
+   $status=DB::table('emergency_request_statuses')->where('code',$code)->first();
+   $statusId=$status?->id ?? DB::table('emergency_request_statuses')->insertGetId(['code'=>$code,'created_at'=>now(),'updated_at'=>now()]);
+   foreach($names as $locale=>$name) DB::table('emergency_request_status_translations')->updateOrInsert(
+    ['emergency_request_status_id'=>$statusId,'locale'=>$locale],['name'=>$name,'updated_at'=>now(),'created_at'=>now()]);
+  }
+  foreach([
+   'fire'=>['ar'=>'حريق أو دخان','en'=>'Fire or smoke','ur'=>'آگ یا دھواں'],
+   'medical'=>['ar'=>'حالة طبية عاجلة','en'=>'Urgent medical issue','ur'=>'فوری طبی مسئلہ'],
+   'gas_leak'=>['ar'=>'اشتباه تسريب غاز','en'=>'Suspected gas leak','ur'=>'گیس کے اخراج کا شبہ'],
+   'electrical_hazard'=>['ar'=>'خطر كهربائي','en'=>'Electrical hazard','ur'=>'بجلی کا خطرہ'],
+   'water_leak'=>['ar'=>'تسريب مياه شديد','en'=>'Major water leak','ur'=>'پانی کا شدید رساؤ'],
+   'elevator'=>['ar'=>'تعطل مصعد مع أشخاص بالداخل','en'=>'Elevator entrapment','ur'=>'لفٹ میں افراد پھنس گئے'],
+   'security'=>['ar'=>'مشكلة أمنية عاجلة','en'=>'Urgent security issue','ur'=>'فوری سیکیورٹی مسئلہ'],
+  ] as $code=>$names){
+   $type=DB::table('emergency_types')->where('code',$code)->first();
+   $typeId=$type?->id ?? DB::table('emergency_types')->insertGetId(['code'=>$code,'is_active'=>true,'created_at'=>now(),'updated_at'=>now()]);
+   foreach($names as $locale=>$name) DB::table('emergency_type_translations')->updateOrInsert(
+    ['emergency_type_id'=>$typeId,'locale'=>$locale],['name'=>$name,'updated_at'=>now(),'created_at'=>now()]);
+  }
   $city=City::firstOrCreate(['code'=>'cairo']);
   foreach(['ar'=>'القاهرة','en'=>'Cairo','ur'=>'قاہرہ'] as $locale=>$name) CityTranslation::updateOrCreate(['city_id'=>$city->id,'locale'=>$locale],['name'=>$name]);
   $catalog=[
