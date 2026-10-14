@@ -25,6 +25,7 @@ class EmergencyRequestController extends Controller
     /**
      * تمرير الطلب المتحقق منه وإرجاع استجابة HTTP فقط.
      * @param ApiEmergencyRequestIndexRequest $request
+     * @param int $requestId
      * @return \Illuminate\Http\JsonResponse
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
@@ -50,8 +51,8 @@ class EmergencyRequestController extends Controller
      * @return \Illuminate\Http\JsonResponse
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    public function cancel(ApiEmergencyRequestCancelRequest $request): \Illuminate\Http\JsonResponse
+    public function cancel(ApiEmergencyRequestCancelRequest $request, int $requestId): \Illuminate\Http\JsonResponse
     {
-        return response()->json($this->service->cancel($request->validated(), $request->user()), 200);
+        return response()->json($this->service->cancel($request->validated(), $request->user(), $requestId), 200);
     }
 }

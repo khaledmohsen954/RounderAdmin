@@ -24,6 +24,7 @@ class EmergencyAdminController extends Controller
     /**
      * تمرير الطلب المتحقق منه وإرجاع استجابة HTTP فقط.
      * @param AdminEmergencyAdminIndexRequest $request
+     * @param int $requestId
      * @return \Illuminate\Contracts\View\View
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
@@ -38,8 +39,8 @@ class EmergencyAdminController extends Controller
      * @return \Illuminate\Http\RedirectResponse
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    public function update(AdminEmergencyAdminUpdateRequest $request): \Illuminate\Http\RedirectResponse
+    public function update(AdminEmergencyAdminUpdateRequest $request, int $requestId): \Illuminate\Http\RedirectResponse
     {
-        return back()->with('status', $this->service->update($request->validated(), $request->user()));
+        return back()->with('status', $this->service->update($request->validated(), $request->user(), $requestId));
     }
 }

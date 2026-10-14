@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Modules\Bookings\Services;
+use App\Modules\Providers\Services\CommissionService;
+use App\Modules\Providers\Enums\CommissionSource;
 use App\Core\Exceptions\DomainViolation;
 use App\Core\Enums\FailureReason;
 use App\Modules\Providers\Enums\CommissionStatusCode;
@@ -24,6 +26,12 @@ use App\Modules\Bookings\Enums\Operation;
 /** قواعد عمل Bookings؛ تستقبل بيانات متحققاً منها دون الاعتماد على HTTP. */
 class AdminServiceOrderAdminService
 {
+    /**
+     * @param CommissionService $commissions
+     * @return void
+     */
+    public function __construct(private readonly CommissionService $commissions) {}
+
 
     /**
      * قراءة بيانات المجال مع الحفاظ على قيود الوصول.
@@ -162,23 +170,8 @@ class AdminServiceOrderAdminService
             ]);
 
             if ($targetStatus->code === BookingStatusCode::Completed->value && $providerId && $contract) {
-                $pendingId = ProviderCommissionStatus::query()->where('code', CommissionStatusCode::Pending->value)->value('id');
-                $gross = (float) $data['gross_amount'];
-                $rate = (float) $contract->service_commission_percent;
-                ProviderCommissionEntry::query()->updateOrCreate(
-                    ['booking_id' => $bookingId],
-                    [
-                        'provider_profile_id' => $providerId,
-                        'provider_contract_id' => $contract->id,
-                        'status_id' => $pendingId,
-                        'gross_amount' => $gross,
-                        'commission_percent_snapshot' => $rate,
-                        'commission_amount' => round($gross * $rate / 100, 2),
-                        'calculated_at' => now(),
-                        'updated_at' => now(),
-                        'created_at' => now(),
-                    ]
-                );
+                $this->commissions->record(CommissionSource::Booking, $bookingId, $contract,
+                    (int) $providerId, (float) $data['gross_amount'], $actor?->id);
             }
         });
 

@@ -10,4 +10,5 @@ enum Operation: string
     case AdminUserStore = 'AdminUserService.store';
     case AdminUserUpdate = 'AdminUserService.update';
     case AdminUserResetPassword = 'AdminUserService.resetPassword';
+    case CreateProviderAccount = 'provider-account.create';
 }

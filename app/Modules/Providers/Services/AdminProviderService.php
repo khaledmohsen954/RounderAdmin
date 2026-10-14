@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Modules\Providers\Services;
+use App\Modules\Identity\Services\ProviderAccountService;
 use App\Core\Exceptions\DomainViolation;
 use App\Core\Enums\FailureReason;
 use App\Modules\Providers\Enums\ContractStatusCode;
@@ -21,6 +22,12 @@ use App\Modules\Providers\Enums\Operation;
 /** قواعد عمل Providers؛ تستقبل بيانات متحققاً منها دون الاعتماد على HTTP. */
 class AdminProviderService
 {
+    /**
+     * @param ProviderAccountService $accounts
+     * @return void
+     */
+    public function __construct(private readonly ProviderAccountService $accounts) {}
+
 
     /**
      * قراءة بيانات المجال مع الحفاظ على قيود الوصول.
@@ -81,19 +88,7 @@ class AdminProviderService
         
 
         DB::transaction(function () use ($input, $actor, $data) {
-            $roleId = Role::query()->where('code', RoleCode::Provider->value)->value('id');
-            DomainViolation::unless($roleId, FailureReason::Configuration, 'Provider role is not configured.');
-
-            $userId = User::query()->create([
-                'role_id' => $roleId,
-                'name' => $data['name'],
-                'email' => $data['email'],
-                'phone' => $data['phone'],
-                'locale' => $data['locale'],
-                'password' => bcrypt($data['password']),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ])->getKey();
+            $userId = $this->accounts->create($data, $actor?->id)->getKey();
             $providerId = ProviderProfile::query()->create([
                 'user_id' => $userId,
                 'company_name' => $data['company_name'],

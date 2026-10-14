@@ -7,7 +7,9 @@ use Tests\TestCase;
 /** Prevent transport and domain boundaries from drifting during future changes. */
 class ModuleArchitectureTest extends TestCase
 {
-    /** @return void */
+    /**
+     * @return void
+     */
     public function test_controllers_only_handle_transport(): void
     {
         foreach (glob(app_path('Modules/*/Controllers/*/*.php')) as $file) {
@@ -17,7 +19,9 @@ class ModuleArchitectureTest extends TestCase
         }
     }
 
-    /** @return void */
+    /**
+     * @return void
+     */
     public function test_services_do_not_depend_on_http_requests_or_responses(): void
     {
         foreach (glob(app_path('Modules/*/Services/*.php')) as $file) {
@@ -27,7 +31,9 @@ class ModuleArchitectureTest extends TestCase
         }
     }
 
-    /** @return void */
+    /**
+     * @return void
+     */
     public function test_old_flat_domain_directories_are_removed(): void
     {
         $this->assertSame([], glob(app_path('Models/*.php')));

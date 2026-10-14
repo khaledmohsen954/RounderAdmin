@@ -7,9 +7,14 @@ use App\Modules\Identity\Services\AdminAuthService;
 /** نقل HTTP الخاص بمصادقة لوحة الإدارة. */
 class AuthController extends Controller
 {
-    /** @param AdminAuthService $service @return void */
+    /**
+     * @param AdminAuthService $service
+     * @return void
+     */
     public function __construct(private readonly AdminAuthService $service) {}
-    /** @return \Illuminate\Contracts\View\View */
+    /**
+     * @return \Illuminate\Contracts\View\View
+     */
     public function show(): \Illuminate\Contracts\View\View { return view('admin.login'); }
     /**
      * @param AdminLoginRequest $request

@@ -6,7 +6,10 @@ use App\Modules\Settings\Services\LocaleService;
 /** يدير جلسة اللغة ويفوض حفظ الحساب للخدمة. */
 class LocaleController extends Controller
 {
-    /** @param LocaleService $service @return void */
+    /**
+     * @param LocaleService $service
+     * @return void
+     */
     public function __construct(private readonly LocaleService $service) {}
     /**
      * @param UpdateLocaleRequest $request

@@ -24,6 +24,7 @@ class ApiEmergencyRequestService
      * قراءة بيانات المجال مع الحفاظ على قيود الوصول.
      * @param array $input
      * @param ?User $actor
+     * @param int $requestId
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
@@ -136,10 +137,10 @@ class ApiEmergencyRequestService
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    public function cancel(array $input, ?User $actor): mixed
+    public function cancel(array $input, ?User $actor, int $requestId): mixed
     {
-        return DB::transaction(function () use ($input, $actor) {
-            $result = $this->performCancel($input, $actor);
+        return DB::transaction(function () use ($input, $actor, $requestId) {
+            $result = $this->performCancel($input, $actor, $requestId);
             DB::afterCommit(fn () => event(new EmergenciesChanged(Operation::ApiEmergencyRequestCancel, $actor?->id)));
             return $result;
         });
@@ -149,10 +150,11 @@ class ApiEmergencyRequestService
      * قواعد العملية؛ المعاملة والتبليغ مسؤولية المدخل العام للخدمة.
      * @param array $input
      * @param ?User $actor
+     * @param int $requestId
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    private function performCancel(array $input, ?User $actor): mixed
+    private function performCancel(array $input, ?User $actor, int $requestId): mixed
     {
         $emergency = EmergencyRequest::query()
             ->where('id', $requestId)

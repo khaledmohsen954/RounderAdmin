@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Modules\Emergencies\Services;
+use App\Modules\Providers\Services\CommissionService;
+use App\Modules\Providers\Enums\CommissionSource;
 use App\Core\Exceptions\DomainViolation;
 use App\Core\Enums\FailureReason;
 use App\Modules\Providers\Enums\CommissionStatusCode;
@@ -25,11 +27,18 @@ use App\Modules\Emergencies\Enums\Operation;
 /** قواعد عمل Emergencies؛ تستقبل بيانات متحققاً منها دون الاعتماد على HTTP. */
 class AdminEmergencyAdminService
 {
+    /**
+     * @param CommissionService $commissions
+     * @return void
+     */
+    public function __construct(private readonly CommissionService $commissions) {}
+
 
     /**
      * قراءة بيانات المجال مع الحفاظ على قيود الوصول.
      * @param array $input
      * @param ?User $actor
+     * @param int $requestId
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
@@ -77,10 +86,10 @@ class AdminEmergencyAdminService
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    public function update(array $input, ?User $actor): mixed
+    public function update(array $input, ?User $actor, int $requestId): mixed
     {
-        return DB::transaction(function () use ($input, $actor) {
-            $result = $this->performUpdate($input, $actor);
+        return DB::transaction(function () use ($input, $actor, $requestId) {
+            $result = $this->performUpdate($input, $actor, $requestId);
             DB::afterCommit(fn () => event(new EmergenciesChanged(Operation::AdminEmergencyAdminUpdate, $actor?->id)));
             return $result;
         });
@@ -90,10 +99,11 @@ class AdminEmergencyAdminService
      * قواعد العملية؛ المعاملة والتبليغ مسؤولية المدخل العام للخدمة.
      * @param array $input
      * @param ?User $actor
+     * @param int $requestId
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    private function performUpdate(array $input, ?User $actor): mixed
+    private function performUpdate(array $input, ?User $actor, int $requestId): mixed
     {
         $data = $input;
 
@@ -163,23 +173,8 @@ class AdminEmergencyAdminService
             ]);
 
             if ($status->code === EmergencyStatusCode::Resolved->value && $providerId && $contract) {
-                $pendingId = ProviderCommissionStatus::query()->where('code', CommissionStatusCode::Pending->value)->value('id');
-                $gross = (float) $data['gross_amount'];
-                $rate = (float) $contract->emergency_commission_percent;
-                ProviderCommissionEntry::query()->updateOrCreate(
-                    ['emergency_request_id' => $requestId],
-                    [
-                        'provider_profile_id' => $providerId,
-                        'provider_contract_id' => $contract->id,
-                        'status_id' => $pendingId,
-                        'gross_amount' => $gross,
-                        'commission_percent_snapshot' => $rate,
-                        'commission_amount' => round($gross * $rate / 100, 2),
-                        'calculated_at' => now(),
-                        'updated_at' => now(),
-                        'created_at' => now(),
-                    ]
-                );
+                $this->commissions->record(CommissionSource::Emergency, $requestId, $contract,
+                    (int) $providerId, (float) $data['gross_amount'], $actor?->id);
             }
         });
 
