@@ -1,5 +1,9 @@
 # Rounder API & Admin Guide
 
+## Module boundaries
+
+Domain routes, FormRequests, controllers, services, models and enums live under `app/Modules/{Domain}`. Services exchange plain data and model identities; HTTP responses are built only by controllers. See [Modular Monolith guide](MODULAR_MONOLITH_AR.md).
+
 ## Account model
 A single `users` table serves both mobile and dashboard identities. Every account has a `role_id` foreign key to `roles`; seeded roles are `admin`, `resident` and `provider`. Passwords are passed to Laravel's `hashed` cast, so plaintext is not stored or displayed.
 
@@ -43,7 +47,7 @@ Arabic is the default locale and uses RTL Bootstrap. English uses LTR Bootstrap.
 
 Copy `.env.example` to `.env`, add MySQL credentials and set `ROUND_ADMIN_EMAIL` plus a strong `ROUND_ADMIN_PASSWORD`. Then run `composer install`, `php artisan key:generate`, `php artisan migrate --seed`, and `php artisan serve`. The seeder does not create an admin account unless both environment credentials are present.
 
-GitHub Actions validates Composer, boots the route table, migrates/seeds an in-memory SQLite database, and runs PHPUnit auth/validation coverage.
+GitHub Actions validates Composer, boots the route table, migrates/seeds an isolated MySQL 8.4 database, and runs PHPUnit workflow, architecture, ORM relation and post-commit event coverage.
 
 ## Figma follow-up
 

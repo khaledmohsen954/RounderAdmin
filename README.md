@@ -2,6 +2,17 @@
 
 Laravel 13 API and Bootstrap dashboard for the Rounder resident app.
 
+## Architecture
+
+Rounder is a **modular monolith**: one Laravel application and one MySQL database.
+Domain code lives in `app/Modules/{Domain}/` with Routes, Requests, Controllers,
+Services, Models, Enums, Events and Observers directories. Controllers only
+handle transport; FormRequests validate and authorize; services own transactions
+and dispatch events after commit. Shared actions and infrastructure live at
+the top level.
+
+See [Arabic architecture guide](docs/MODULAR_MONOLITH_AR.md).
+
 ## Local setup
 
 Requirements: PHP 8.3+, Composer and MySQL 8+.
@@ -37,7 +48,7 @@ Bootstrap pages cover session login, real database KPI totals, account administr
 
 ## Verification
 
-GitHub Actions validates Composer, boots the route table, runs migrations and seeders on SQLite, and runs the API registration/validation tests. See [Project Guide](docs/PROJECT_GUIDE.md) for schema, route, validation and editing details.
+GitHub Actions validates Composer, boots the route table, runs migrations and seeders on an isolated MySQL 8.4 database, checks PHP syntax, and runs workflow, architecture, relationship and post-commit event tests. See [Project Guide](docs/PROJECT_GUIDE.md) for schema, route, validation and editing details.
 
 
 ## Resident journeys and commerce

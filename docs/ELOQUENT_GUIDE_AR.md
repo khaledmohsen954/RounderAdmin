@@ -1,9 +1,13 @@
 # دليل Eloquent في Rounder
 
 ## أين تعدّل؟
-- `app/Models`: تعريف الجداول، الحقول المسموح حفظها، تحويل الأنواع والعلاقات.
-- `app/Http/Controllers/Admin`: إجراءات لوحة الإدارة والتحقق من المدخلات.
-- `app/Http/Controllers/Api/V1`: نقاط API الخاصة بتطبيق الساكن.
+- `app/Modules/{Domain}/Models`: تعريف الجداول، الحقول المسموح حفظها، تحويل الأنواع والعلاقات.
+- `app/Modules/{Domain}/Controllers/Admin`: نقل HTTP الخاص بلوحة الإدارة.
+- `app/Modules/{Domain}/Controllers/Api`: نقل HTTP الخاص بتطبيق الساكن.
+- `app/Modules/{Domain}/Requests`: FormRequests للتحقق والتفويض.
+- `app/Modules/{Domain}/Services`: الاستعلامات وقواعد العمل والمعاملات.
+- `app/Modules/{Domain}/Enums`: الخيارات الثابتة.
+- `app/Modules/{Domain}/Events`: أحداث تُطلق بعد commit.
 - `database/migrations`: بنية MySQL والمفاتيح الأجنبية؛ تستخدم Schema لأن دورها بناء الجداول.
 - `database/seeders`: تهيئة القيم المرجعية باستخدام Eloquent.
 - `tests/Feature`: التحقق من صلاحيات الوصول ومسارات العمل على MySQL.
@@ -18,7 +22,7 @@
 - ProviderCommissionEntry → providerProfile / providerContract / booking أو emergencyRequest / status.
 
 ## قواعد العمل
-1. لا تمرر `request()->all()` إلى create أو update. مرر البيانات بعد validate فقط، واستخرج مالك الطلب من الحساب أو عضوية الوحدة.
+1. لا تمرر `request()->all()` إلى create أو update. مرر ناتج FormRequest::validated() فقط، واستخرج مالك الطلب من الحساب أو عضوية الوحدة.
 2. سعر الطلب وprice_snapshot وحصص الاشتراك تُحفظ وقت الإنشاء. تعديل الكتالوج لا يعيد تسعير الطلبات القديمة.
 3. commission_percent_snapshot يثبت نسبة العمولة المستخدمة وقت احتساب القيد.
 4. أبقينا DB::transaction لتجميع التعديلات المرتبطة؛ المعاملة ليست بديلاً عن Eloquent بل تحمي عمليات النماذج من الحفظ الجزئي.
@@ -35,7 +39,7 @@ $package = ServicePackage::with('includedServices.service', 'translations')
     ->where('is_active', true)->findOrFail($packageId);
 
 // العضوية لا تُقرأ بمعرف غير مقيد بالمستخدم.
-$membership = $request->user()->memberships()->findOrFail($membershipId);
+$membership = $actor->memberships()->findOrFail($membershipId);
 ```
 
 ## التحقق

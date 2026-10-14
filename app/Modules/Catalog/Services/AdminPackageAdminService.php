@@ -51,6 +51,7 @@ class AdminPackageAdminService
 
         $cycles = PackageBillingCycle::query()->orderBy('months')->get();
 
+        // COUNT مرتبط بالباقة يتيح ترقيم الصفحات دون تحميل جميع عناصر الباقات.
         $packages = ServicePackage::query()
             ->join('package_billing_cycles', 'service_packages.billing_cycle_id', '=', 'package_billing_cycles.id')
             ->leftJoin('service_package_translations', function ($join) {

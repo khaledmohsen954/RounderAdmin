@@ -38,6 +38,7 @@ class AdminProviderService
      */
     public function index(array $input, ?User $actor): mixed
     {
+        // التجميع المرتبط يحسب العمولة في MySQL دون تحميل كل القيود إلى الذاكرة، وCOALESCE يعيد صفراً للمزود الجديد.
         $providers = ProviderProfile::query()
             ->join('users', 'provider_profiles.user_id', '=', 'users.id')
             ->leftJoin('provider_contracts', function ($join) {
