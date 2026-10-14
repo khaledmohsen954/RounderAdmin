@@ -1,6 +1,6 @@
 <?php
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\V1\{AuthController,BookingController,ResidentDashboardController};
+use App\Http\Controllers\Api\V1\{AuthController,BookingController,ResidentDashboardController,ServiceCatalogController};
 Route::prefix('v1')->group(function(){
  Route::get('/health',fn()=>response()->json(['status'=>'ok','app'=>'Rounder']));
  Route::post('/auth/register',[AuthController::class,'register'])->middleware('throttle:5,1');
@@ -9,6 +9,7 @@ Route::prefix('v1')->group(function(){
   Route::get('/me',[AuthController::class,'me']);
   Route::post('/auth/logout',[AuthController::class,'logout']);
   Route::get('/resident/dashboard',ResidentDashboardController::class);
+  Route::get('/resident/services',ServiceCatalogController::class);
   Route::get('/resident/bookings',[BookingController::class,'index']);
   Route::post('/resident/bookings',[BookingController::class,'store'])->middleware('throttle:20,1');
  });
