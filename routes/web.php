@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\{AboutController,AuthController,DashboardController,HomeController,LocaleController,PackageAdminController,ProviderController,ResidentContentController,UserController};
+use App\Http\Controllers\Admin\{AboutController,AuthController,DashboardController,EmergencyAdminController,HomeController,LocaleController,PackageAdminController,ProviderController,ResidentContentController,UserController};
 
 Route::post('/locale', [LocaleController::class, 'update'])->name('locale.update');
 Route::redirect('/login', '/admin/login')->name('login');
@@ -25,6 +25,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/packages/services', [PackageAdminController::class, 'storeService'])->name('packages.services.store');
         Route::post('/packages', [PackageAdminController::class, 'storePackage'])->name('packages.store');
         Route::get('/content', [ResidentContentController::class, 'index'])->name('content.index');
+        Route::get('/emergencies', [EmergencyAdminController::class, 'index'])->name('emergencies.index');
+        Route::put('/emergencies/{requestId}', [EmergencyAdminController::class, 'update'])->name('emergencies.update');
         Route::post('/content/announcements', [ResidentContentController::class, 'storeAnnouncement'])->name('content.announcements.store');
         Route::post('/content/initiatives', [ResidentContentController::class, 'storeInitiative'])->name('content.initiatives.store');
         Route::put('/content/facility-reports/{reportId}', [ResidentContentController::class, 'updateFacilityReport'])->name('content.reports.update');
