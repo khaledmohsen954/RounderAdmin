@@ -4,7 +4,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Booking; use App\Models\BookingStatus; use Illuminate\Http\Request; use Illuminate\Support\Facades\DB; use Illuminate\Validation\Rule;
 class BookingController extends Controller {
  public function index(Request $request){
-  return Booking::with(['home','service.translations','status.translations'])->where('resident_id',$request->user()->id)->latest()->paginate(min($request->integer('per_page',15),50));
+  $page=Booking::with(['home','service.translations','status.translations'])->where('resident_id',$request->user()->id)->latest()->paginate(min($request->integer('per_page',15),50));
+  $locale=app()->getLocale();
+  $items=$page->getCollection()->map(fn(Booking $booking)=>['id'=>$booking->id,'service_name'=>$booking->service->translations->firstWhere('locale',$locale)?->name ?? $booking->service->code,'status_name'=>$booking->status->translations->firstWhere('locale',$locale)?->name ?? $booking->status->code,'status_code'=>$booking->status->code,'scheduled_at'=>$booking->scheduled_at,'total_amount'=>$booking->total_amount])->values();
+  return response()->json(['data'=>$items,'meta'=>['current_page'=>$page->currentPage(),'last_page'=>$page->lastPage(),'per_page'=>$page->perPage(),'total'=>$page->total()]]);
  }
  public function store(Request $request){
   $data=$request->validate([
