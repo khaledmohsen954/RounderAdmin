@@ -6,7 +6,7 @@
 - `app/Http/Controllers/Api/V1`: نقاط API الخاصة بتطبيق الساكن.
 - `database/migrations`: بنية MySQL والمفاتيح الأجنبية؛ تستخدم Schema لأن دورها بناء الجداول.
 - `database/seeders`: تهيئة القيم المرجعية باستخدام Eloquent.
-- `tests/Feature`: التحقق من صلاحيات الوصول ومسارات العمل على MySQL وSQLite.
+- `tests/Feature`: التحقق من صلاحيات الوصول ومسارات العمل على MySQL.
 
 ## العلاقات الأساسية
 - User → memberships → ResidentHome → home. العضوية تخص مستخدماً ووحدة، وليست مجرد مبنى.
@@ -40,5 +40,8 @@ $membership = $request->user()->memberships()->findOrFail($membershipId);
 
 ## التحقق
 `vendor/bin/phpunit` يشغل اختبارات العمليات والصلاحيات.
-تعمل CI على MySQL وSQLite، وتتحقق من migrations وseed وBlade.
+تعمل CI على MySQL 8.4 بقاعدة مستقلة اسمها rounder_test، وتتحقق من migrations وseed وBlade.
 لا توجد migration هدامة ضمن إعادة تنظيم Eloquent، ولا تتضمن ربطاً جديداً للموبايل بالـAPI.
+
+## تشغيل الاختبارات محلياً على MySQL
+أنشئ قاعدة منفصلة باسم `rounder_test` وأعط حساب الاختبار صلاحية هذه القاعدة. إعداد PHPUnit يفرض اسم قاعدة الاختبار ولا يستخدم قاعدة `rounder` التشغيلية. اضبط DB_HOST وDB_PORT وDB_USERNAME وDB_PASSWORD لحساب الاختبار، ثم شغّل `vendor/bin/phpunit`. لا توجد حاجة إلى SQLite.
