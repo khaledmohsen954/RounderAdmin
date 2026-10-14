@@ -4,6 +4,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
  public function up():void {
+  Schema::create('personal_access_tokens',function(Blueprint $t){$t->id();$t->morphs('tokenable');$t->text('name');$t->string('token',64)->unique();$t->text('abilities')->nullable();$t->timestamp('last_used_at')->nullable();$t->timestamp('expires_at')->nullable();$t->timestamps();});
   Schema::create('roles',function(Blueprint $t){$t->id();$t->string('code',40)->unique();$t->timestamps();});
   Schema::create('role_translations',function(Blueprint $t){$t->id();$t->foreignId('role_id')->constrained()->cascadeOnDelete();$t->string('locale',5);$t->string('name');$t->unique(['role_id','locale']);$t->timestamps();});
   Schema::create('users',function(Blueprint $t){$t->id();$t->foreignId('role_id')->constrained()->restrictOnDelete();$t->string('name',120);$t->string('email')->unique();$t->string('phone',25)->nullable()->unique();$t->string('locale',5)->default('ar');$t->timestamp('email_verified_at')->nullable();$t->string('password');$t->rememberToken();$t->timestamps();});
@@ -24,6 +25,6 @@ return new class extends Migration {
   Schema::create('booking_status_history',function(Blueprint $t){$t->id();$t->foreignId('booking_id')->constrained()->cascadeOnDelete();$t->foreignId('booking_status_id')->constrained()->restrictOnDelete();$t->foreignId('changed_by')->nullable()->constrained('users')->nullOnDelete();$t->text('note')->nullable();$t->timestamp('created_at')->useCurrent();});
  }
  public function down():void {
-  foreach(['booking_status_history','payments','payment_statuses','bookings','provider_profiles','service_translations','services','service_category_translations','service_categories','booking_status_translations','booking_statuses','resident_homes','homes','city_translations','cities','users','role_translations','roles'] as $table) Schema::dropIfExists($table);
+  foreach(['booking_status_history','payments','payment_statuses','bookings','provider_profiles','service_translations','services','service_category_translations','service_categories','booking_status_translations','booking_statuses','resident_homes','homes','city_translations','cities','users','role_translations','roles','personal_access_tokens'] as $table) Schema::dropIfExists($table);
  }
 };
