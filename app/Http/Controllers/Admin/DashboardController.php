@@ -1,8 +1,8 @@
 <?php
-namespace App\\Http\\Controllers\\Admin;
-use App\\Http\\Controllers\\Controller;
-use App\\Models\\Booking; use App\\Models\\Payment; use App\\Models\\ProviderProfile; use App\\Models\\User;
-use Illuminate\\Support\\Facades\\DB;
+namespace App\Http\Controllers\Admin;
+use App\Http\Controllers\Controller;
+use App\Models\Booking; use App\Models\Payment; use App\Models\ProviderProfile; use App\Models\User;
+use Illuminate\Support\Facades\DB;
 class DashboardController extends Controller {
  public function __invoke(){
   $stats=[
