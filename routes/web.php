@@ -2,6 +2,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\{AboutController,AuthController,DashboardController,LocaleController,UserController,HomeController};
 Route::post('/locale',[LocaleController::class,'update'])->name('locale.update');
+Route::redirect('/login','/admin/login')->name('login');
 Route::prefix('admin')->name('admin.')->group(function(){
  Route::middleware('guest')->group(function(){Route::get('/login',[AuthController::class,'show'])->name('login');Route::post('/login',[AuthController::class,'login'])->middleware('throttle:8,1')->name('login.submit');});
  Route::middleware(['auth','admin'])->group(function(){
