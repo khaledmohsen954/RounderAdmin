@@ -156,7 +156,7 @@ class AdminPackageAdminService
                 ...$attributes,
                 'service_category_id' => $data['service_category_id'],
                 'code' => Str::lower($data['code']),
-                'is_active' => true,
+                'is_active' => $data['is_active'] ?? true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ])->getKey();
@@ -385,5 +385,14 @@ class AdminPackageAdminService
             DB::afterCommit(fn () => event(new CatalogChanged(Operation::AdminPackageAdminUpdatePackage, $actor?->id)));
             return __('Package updated successfully.');
         });
+    }
+    /**
+     * اختيارات الفورم من قاعدة البيانات لضمان استخدام معرّفات الفئات.
+     * @return array<string, mixed>
+     */
+    public function serviceForm(): array
+    {
+        $categories = ServiceCategory::with('translations')->where('is_active', true)->get();
+        return compact('categories');
     }
 }

@@ -8,9 +8,20 @@
 @forelse($homes as $home)<tr><td>{{ $home->id }}</td><td>{{ $home->name }}</td><td>{{ $home->city->translations->firstWhere('locale',app()->getLocale())?->name ?? $home->city->code }}</td><td><code>{{ $home->property_code }}</code></td><td>{{ $home->address }}</td><td>{{ $home->residents->count() }}</td></tr>@empty<tr><td colspan="6" class="text-center text-secondary py-4">{{ __('No homes found') }}</td></tr>@endforelse</tbody></table>{{ $homes->links() }}</div></main></div></div>
 <div class="modal fade" id="createHome" tabindex="-1"><div class="modal-dialog"><form method="post" action="{{ route('admin.homes.store') }}" class="modal-content">@csrf<div class="modal-header"><h2 class="modal-title fs-5">{{ __('Add home') }}</h2></div><div class="modal-body">
 <label class="form-label">{{ __('Home name') }}</label><input name="name" class="form-control" maxlength="120" required>
-<label class="form-label mt-3">{{ __('City') }}</label><select name="city_id" class="form-select" required>@foreach($cities as $city)<option value="{{ $city->id }}">{{ $city->translations->firstWhere('locale',app()->getLocale())?->name ?? $city->code }}</option>@endforeach</select>
+<label for="city-search" class="form-label mt-3">{{ __('Search Saudi cities') }}</label><input id="city-search" type="search" class="form-control mb-2" placeholder="{{ __('Search Saudi cities') }}">
+<label for="home-city" class="form-label">{{ __('City') }}</label><select id="home-city" name="city_id" class="form-select" required><option value="">{{ __('Choose city') }}</option>@foreach($cities as $city)<option value="{{ $city->id }}" @selected(old('city_id')==$city->id)>{{ $city->translations->firstWhere('locale',app()->getLocale())?->name ?? $city->code }}</option>@endforeach</select>
 <label class="form-label mt-3">{{ __('Property code') }}</label><input name="property_code" class="form-control" pattern="[A-Za-z0-9_-]{5,60}" maxlength="60" required>
 <label class="form-label mt-3">{{ __('Address') }}</label><input name="address" class="form-control" maxlength="255" required>
 <div class="row mt-2"><div class="col"><label class="form-label">{{ __('Property health') }}</label><input type="number" name="health_percent" class="form-control" min="0" max="100" value="100" required></div><div class="col"><label class="form-label">{{ __('Association balance') }}</label><input type="number" name="association_balance" class="form-control" min="0" step="0.01" value="0" required></div></div>
 </div><div class="modal-footer"><button class="btn btn-primary">{{ __('Save') }}</button></div></form></div></div>
+@push('scripts')
+<script>
+document.getElementById('city-search').addEventListener('input', function () {
+    const query = this.value.trim().toLocaleLowerCase();
+    for (const option of document.getElementById('home-city').options) {
+        option.hidden = option.value !== '' && !option.text.toLocaleLowerCase().includes(query);
+    }
+});
+</script>
+@endpush
 @endsection

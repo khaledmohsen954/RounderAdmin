@@ -102,4 +102,12 @@ class PackageAdminController extends Controller
     {
         return redirect()->route('admin.packages.index')->with('status', $this->service->updatePackage($request->validated(), $request->user(), $packageId));
     }
+    /**
+     * @param AdminPackageAdminIndexRequest $request
+     * @return \Illuminate\Contracts\View\View
+     */
+    public function createService(AdminPackageAdminIndexRequest $request): \Illuminate\Contracts\View\View
+    {
+        return view('admin.services.create', $this->service->serviceForm());
+    }
 }

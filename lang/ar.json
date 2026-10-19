@@ -246,5 +246,22 @@
     "feature.included": "مشمول",
     "feature.excluded": "غير مشمول",
     "feature.addon": "برسوم إضافية",
-    "Add comparison definitions from the catalog page first.": "أضف تعريفات بنود المقارنة من صفحة الكتالوج أولاً."
+    "Add comparison definitions from the catalog page first.": "أضف تعريفات بنود المقارنة من صفحة الكتالوج أولاً.",
+    "Add provider": "إضافة مقدم خدمة",
+    "Actions": "الإجراءات",
+    "Edit company": "تعديل الشركة",
+    "Provider updated successfully.": "تم تحديث بيانات مقدم الخدمة بنجاح.",
+    "Company edits do not change contract terms or accrued commissions.": "تعديل بيانات الشركة لا يغير شروط العقود أو العمولات المستحقة.",
+    "Text formatting": "تنسيق النص",
+    "Bold": "عريض",
+    "Italic": "مائل",
+    "Underline": "تسطير",
+    "Bullet list": "قائمة نقطية",
+    "Numbered list": "قائمة مرقمة",
+    "Heading": "عنوان",
+    "Paragraph": "فقرة",
+    "Clear formatting": "إزالة التنسيق",
+    "Contract formatting is saved with the provider.": "يُحفظ تنسيق شروط العقد مع بيانات مقدم الخدمة.",
+    "Search Saudi cities": "ابحث عن مدينة سعودية",
+    "Choose city": "اختر المدينة"
 }

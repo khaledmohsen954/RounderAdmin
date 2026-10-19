@@ -1,7 +1,7 @@
 name: Laravel checks
 on:
   push:
-    branches: [main, refactor/domain-modules, feature/dynamic-catalog]
+    branches: [main, refactor/domain-modules, feature/dynamic-catalog, feature/provider-forms]
   pull_request:
     branches: [main]
 jobs:

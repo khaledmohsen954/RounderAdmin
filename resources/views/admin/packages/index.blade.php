@@ -17,20 +17,7 @@
 @if($errors->any())<div class="alert alert-danger"><ul class="mb-0">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
 
 @include('admin.packages.partials.feature-definitions')
-<div class="panel p-3 p-lg-4 mb-4"><h2 class="h5 fw-bold">{{ __('Create service') }}</h2>
-<form method="post" enctype="multipart/form-data" action="{{ route('admin.packages.services.store') }}">@csrf
-<div class="row g-3">
-<div class="col-md-3"><label class="form-label">{{ __('Category') }}</label><select name="service_category_id" class="form-select" required><option value="">{{ __('Choose category') }}</option>@foreach($categories as $category)<option value="{{ $category->id }}">{{ $category->name }}</option>@endforeach</select></div>
-<div class="col-md-3"><label class="form-label">{{ __('Service code') }}</label><input name="code" class="form-control" required maxlength="60" pattern="[A-Za-z0-9_-]+"></div>
-<div class="col-md-3"><label class="form-label">{{ __('Customer price before discount') }}</label><input name="base_price" class="form-control" type="number" step=".01" min="0" required></div>
-<div class="col-md-3 d-flex align-items-end"><button class="btn btn-primary w-100">{{ __('Save service') }}</button></div>
-@include('admin.packages.partials.pricing', ['item' => null, 'priceField' => 'base_price'])
-@foreach(['ar'=>'العربية','en'=>'English','ur'=>'اردو'] as $locale=>$label)
-<div class="col-md-4"><label class="form-label">{{ __('Service name') }} · {{ $label }}</label><input name="name_{{ $locale }}" class="form-control" required maxlength="160"></div>
-<div class="col-md-4"><label class="form-label">{{ __('Description') }} · {{ $label }}</label><textarea name="description_{{ $locale }}" class="form-control" rows="2" maxlength="5000"></textarea></div>
-@endforeach
-</div></form>
-</div>
+<a class="btn btn-primary mb-4" href="{{ route('admin.services.create') }}">{{ __('Create service') }}</a>
 
 <div class="panel p-3 p-lg-4 mb-4"><h2 class="h5 fw-bold">{{ __('Create customer package') }}</h2>
 <form method="post" enctype="multipart/form-data" action="{{ route('admin.packages.store') }}" id="package-form">@csrf

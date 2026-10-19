@@ -4,5 +4,6 @@ namespace App\Modules\Providers\Enums;
 enum Operation: string
 {
     case AdminProviderStore = 'AdminProviderService.store';
+    case AdminProviderUpdate = 'AdminProviderService.update';
     case RecordCommission = 'commission.record';
 }

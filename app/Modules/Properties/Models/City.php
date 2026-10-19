@@ -14,7 +14,7 @@ class City extends Model
 
     /** الحقول المسموح حفظها؛ يجب تمرير البيانات المتحقق منها فقط من طبقة الطلب. */
     protected $fillable = [
-        'code',
+        'code', 'country_code', 'source_city_id', 'is_active',
     ];
 
     /**
@@ -35,4 +35,19 @@ class City extends Model
         return $this->hasMany(Home::class, 'city_id');
     }
 
+    /** @return array<string, string> */
+    protected function casts(): array
+    {
+        return ['is_active'=>'boolean', 'source_city_id'=>'integer',
+            'country_code'=>\App\Modules\Properties\Enums\CountryCode::class];
+    }
+    /**
+     * المدن المتاحة للعقارات الجديدة في السوق السعودي.
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeAvailable(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    {
+        return $query->where('country_code', \App\Modules\Properties\Enums\CountryCode::SaudiArabia->value)->where('is_active', true);
+    }
 }

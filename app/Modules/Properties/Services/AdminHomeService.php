@@ -22,7 +22,7 @@ class AdminHomeService
      */
     public function index(array $input, ?User $actor): mixed
     {
-        $homes=Home::with(['city.translations','residents'])->latest()->paginate(15);$cities=City::with('translations')->orderBy('code')->get();return compact('homes','cities');
+        $homes=Home::with(['city.translations','residents'])->latest()->paginate(15);$cities=City::available()->with('translations')->get()->sortBy(fn ($city) => $city->translations->firstWhere('locale', app()->getLocale())?->name ?? $city->code);return compact('homes','cities');
     }
 
     /**

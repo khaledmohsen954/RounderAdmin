@@ -199,5 +199,22 @@
     "discount.percentage": "Percentage",
     "feature.included": "Included",
     "feature.excluded": "Not included",
-    "feature.addon": "Additional fee"
+    "feature.addon": "Additional fee",
+    "Add provider": "Add provider",
+    "Actions": "Actions",
+    "Edit company": "Edit company",
+    "Provider updated successfully.": "Provider updated successfully.",
+    "Company edits do not change contract terms or accrued commissions.": "Company edits do not change contract terms or accrued commissions.",
+    "Text formatting": "Text formatting",
+    "Bold": "Bold",
+    "Italic": "Italic",
+    "Underline": "Underline",
+    "Bullet list": "Bullet list",
+    "Numbered list": "Numbered list",
+    "Heading": "Heading",
+    "Paragraph": "Paragraph",
+    "Clear formatting": "Clear formatting",
+    "Contract formatting is saved with the provider.": "Contract formatting is saved with the provider.",
+    "Search Saudi cities": "Search Saudi cities",
+    "Choose city": "Choose city"
 }

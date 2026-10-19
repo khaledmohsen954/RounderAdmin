@@ -40,6 +40,39 @@ class ProviderController extends Controller
      */
     public function store(AdminProviderStoreRequest $request): \Illuminate\Http\RedirectResponse
     {
-        return back()->with('status', $this->service->store($request->validated(), $request->user()));
+        return redirect()->route('admin.providers.index')->with('status', $this->service->store($request->validated(), $request->user()));
+    }
+    /**
+     * عرض صفحة الإضافة دون تحميل جدول الشركات.
+     * @param AdminProviderIndexRequest $request
+     * @return \Illuminate\Contracts\View\View
+     */
+    public function create(AdminProviderIndexRequest $request): \Illuminate\Contracts\View\View
+    {
+        return view('admin.providers.create');
+    }
+
+    /**
+     * @param AdminProviderIndexRequest $request
+     * @param \App\Modules\Providers\Models\ProviderProfile $provider
+     * @return \Illuminate\Contracts\View\View
+     * @throws \Throwable
+     */
+    public function edit(AdminProviderIndexRequest $request, \App\Modules\Providers\Models\ProviderProfile $provider): \Illuminate\Contracts\View\View
+    {
+        return view('admin.providers.edit', $this->service->edit($provider->getKey()));
+    }
+
+    /**
+     * @param \App\Modules\Providers\Requests\AdminProviderUpdateRequest $request
+     * @param \App\Modules\Providers\Models\ProviderProfile $provider
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \Throwable
+     */
+    public function update(\App\Modules\Providers\Requests\AdminProviderUpdateRequest $request, \App\Modules\Providers\Models\ProviderProfile $provider): \Illuminate\Http\RedirectResponse
+    {
+        return redirect()->route('admin.providers.index')->with('status',
+            $this->service->update($provider->getKey(), $request->validated(), $request->user()));
     }
 }
+

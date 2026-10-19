@@ -26,7 +26,7 @@ class AdminProviderService
      * @param ProviderAccountService $accounts
      * @return void
      */
-    public function __construct(private readonly ProviderAccountService $accounts) {}
+    public function __construct(private readonly ProviderAccountService $accounts, private readonly \App\Services\RichTextSanitizer $richText) {}
 
 
     /**
@@ -109,12 +109,43 @@ class AdminProviderService
                 'emergency_commission_percent' => $data['emergency_commission_percent'],
                 'starts_on' => $data['starts_on'],
                 'ends_on' => $data['ends_on'] ?? null,
-                'terms' => $data['terms'] ?? null,
+                'terms' => $this->richText->clean($data['terms'] ?? null),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
         });
 
         return __('Provider and contract created successfully.');
+    }
+    /**
+     * @param int $providerId
+     * @return array<string, mixed>
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
+    public function edit(int $providerId): array
+    {
+        return ['provider' => ProviderProfile::with('user')->findOrFail($providerId)];
+    }
+
+    /**
+     * حفظ الشركة والحساب كوحدة واحدة؛ لا يعيد تسعير العقود أو العمولات المسجلة.
+     * @param int $providerId
+     * @param array<string, mixed> $input
+     * @param User|null $actor
+     * @return string
+     * @throws \Throwable
+     */
+    public function update(int $providerId, array $input, ?User $actor): string
+    {
+        return DB::transaction(function () use ($providerId, $input, $actor) {
+            $provider = ProviderProfile::lockForUpdate()->findOrFail($providerId);
+            $this->accounts->updateContact($provider->user_id, $input);
+            $provider->update([
+                'company_name' => $input['company_name'],
+                'is_approved' => $input['is_approved'],
+            ]);
+            DB::afterCommit(fn () => event(new ProvidersChanged(Operation::AdminProviderUpdate, $actor?->id)));
+            return __('Provider updated successfully.');
+        });
     }
 }
