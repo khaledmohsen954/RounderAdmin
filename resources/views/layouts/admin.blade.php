@@ -27,11 +27,15 @@ body,button,input,select,textarea{font-family:"Tajawal",system-ui,sans-serif}
 .dashboard-intro{padding:1.25rem 0}.dashboard-intro h1{font-weight:800}
 @media(max-width:575.98px){.kpi-card{min-height:132px}.kpi-value{font-size:1.8rem}}
 .topbar{position:sticky;top:0;z-index:1030}.menu-group summary{cursor:pointer;color:#d9e9e6;font-size:.8rem}.menu-group a{font-size:.9rem;padding-inline-start:1.5rem}.menu-group i{width:1.2rem;text-align:center}
+.notification-dropdown{width:min(360px,calc(100vw - 24px))}#notification-list{max-height:380px;overflow-y:auto;overflow-wrap:anywhere}@media(max-width:575.98px){.topbar .notification-dropdown{position:fixed!important;top:70px!important;inset-inline-end:12px!important;inset-inline-start:auto!important;transform:none!important}}
 </style></head>
 <body>
 <nav class="navbar topbar px-3 px-lg-4">@if(auth()->user() instanceof \App\Modules\Identity\Models\Admin)<button class="btn btn-outline-secondary d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#admin-menu" aria-controls="admin-menu" aria-label="{{ __('Open menu') }}">☰</button>@endif
 <a class="navbar-brand brand" href="{{ route('admin.dashboard') }}">rounder <span class="small fw-normal text-secondary">{{ __('Rounder admin') }}</span></a>
 <div class="d-flex align-items-center gap-2">
+@if(auth()->user() instanceof \App\Modules\Identity\Models\Admin)
+@include('admin.partials.notifications')
+@endif
 <form method="post" action="{{ route('locale.update') }}">@csrf<select name="locale" class="form-select form-select-sm" onchange="this.form.submit()" aria-label="{{ __('Language') }}"><option value="ar" @selected(app()->getLocale()==='ar')>{{ __('Arabic') }}</option><option value="en" @selected(app()->getLocale()==='en')>{{ __('English') }}</option></select></form>
 @if(auth()->check())<span class="small d-none d-md-inline">{{ auth()->user()->name }}</span><form method="post" action="{{ route('admin.logout') }}">@csrf<button class="btn btn-sm btn-outline-secondary">{{ __('Sign out') }}</button></form>@endif
 </div></nav>

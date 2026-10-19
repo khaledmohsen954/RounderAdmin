@@ -15,5 +15,9 @@ class AppServiceProvider extends ServiceProvider {
  * @return mixed
  * @throws \Throwable
  */
- public function boot():void { Paginator::useBootstrapFive(); \Illuminate\Support\Facades\Blade::if('adminCan', fn (string $route, string $method = 'GET') => app(\App\Modules\Access\Services\AdminPermissionService::class)->allowsRoute(auth()->user(), $route, $method)); }
+ public function boot():void { Paginator::useBootstrapFive();
+ foreach ([\App\Modules\Emergencies\Models\EmergencyRequest::class,\App\Modules\Properties\Models\Home::class,\App\Modules\Bookings\Models\Booking::class,\App\Modules\Providers\Models\ProviderProfile::class] as $model) {
+     $model::observe(\App\Modules\Notifications\Observers\AdminActivityObserver::class);
+ }
+ \Illuminate\Support\Facades\Blade::if('adminCan', fn (string $route, string $method = 'GET') => app(\App\Modules\Access\Services\AdminPermissionService::class)->allowsRoute(auth()->user(), $route, $method)); }
 }

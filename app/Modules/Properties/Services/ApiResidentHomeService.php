@@ -39,6 +39,9 @@ class ApiResidentHomeService
     {
         return DB::transaction(function () use ($input, $actor) {
             $result = $this->performLink($input, $actor);
+            // Pivot attach bypasses model observers; record the successful resident/property link explicitly.
+            app(\App\Modules\Notifications\Services\AdminAlertService::class)->record(
+                \App\Modules\Notifications\Enums\AlertType::ResidentLinked, $result['data']['home_id']);
             DB::afterCommit(fn () => event(new PropertiesChanged(Operation::ApiResidentHomeLink, $actor?->id)));
             return $result;
         });

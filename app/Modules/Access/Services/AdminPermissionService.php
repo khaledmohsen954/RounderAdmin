@@ -30,7 +30,7 @@ final class AdminPermissionService
     public function allowsRoute(mixed $actor, string $route, string $method): bool
     {
         if (!$actor instanceof Admin || !$actor->is_active) return false;
-        if ($route === 'admin.logout') return true;
+        if (in_array($route, ['admin.logout','admin.notifications.index','admin.notifications.read','admin.notifications.read-all'], true)) return true;
         $section = match (true) {
             $route === 'admin.dashboard' => DashboardSection::Dashboard,
             $route === 'admin.about' => DashboardSection::About,

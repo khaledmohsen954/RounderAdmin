@@ -12,6 +12,11 @@ try {
   await page.locator('input[name=password]').fill('StrongBrowserPassword123!');
   await Promise.all([page.waitForURL('**/admin/dashboard'),page.locator('form[action$="/admin/login"] button[type=submit], form[action$="/admin/login"] button').first().click()]);
   await page.locator('.kpi-card').first().waitFor();
+  await page.locator('#notification-bell').click();
+  await page.locator('.notification-dropdown').waitFor({state:'visible'});
+  await page.waitForFunction(()=>!document.querySelector('#notification-list').textContent.includes('جارٍ'));
+  assert.equal(await page.locator('#notification-list').textContent().then(t=>t.includes('تعذر')),false);
+  await page.locator('#notification-bell').click();
   assert.ok(await page.locator('.kpi-card').count()>=10);
   await mkdir('tests/browser-artifacts',{recursive:true});
   await page.screenshot({path:'tests/browser-artifacts/dashboard-desktop.png',fullPage:true});
