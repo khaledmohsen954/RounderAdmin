@@ -55,7 +55,9 @@ class AdminNotificationsTest extends TestCase {
     /** @return void */
     public function test_property_creation_observer_records_once_and_rolls_back_with_property(): void {
         $this->seed();
-        $home=\App\Modules\Properties\Models\Home::firstOrFail();
+        $home=\App\Modules\Properties\Models\Home::create([
+            'name'=>'Notification fixture','city_id'=>\App\Modules\Properties\Models\City::available()->value('id'),
+            'address'=>'Saudi Arabia','property_code'=>'NOTIFICATION-BASE','health_percent'=>100,'association_balance'=>'0.00']);
         $count=AdminAlert::where('type',AlertType::Property)->count();
         DB::beginTransaction();
         $copy=$home->replicate(); $copy->property_code='NOTIFICATION-TEST'; $copy->save();
