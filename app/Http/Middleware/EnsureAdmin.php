@@ -1,17 +1,16 @@
 <?php
 namespace App\Http\Middleware;
-use Closure; use Illuminate\Http\Request;
-/** طبقة مشتركة لتطبيق إعدادات وصلاحيات الطلبات عبر المجالات. */
-class EnsureAdmin {
- /**
- * تطبيق سياسة مشتركة قبل استكمال دورة التطبيق.
- * @param Request $request
- * @param Closure $next
- * @return mixed
- * @throws \Throwable
- */
- public function handle(Request $request, Closure $next) {
-  abort_unless($request->user()?->role?->code===\App\Modules\Identity\Enums\RoleCode::Admin->value,403);
-  return $next($request);
- }
+use Closure;
+use Illuminate\Http\Request;
+use App\Modules\Access\Services\AdminPermissionService;
+/** حماية الخادم لكل قسم وفعل، حتى عند إرسال طلب مباشر خارج الواجهة. */
+class EnsureAdmin
+{
+    /** @param Request $request @param Closure $next @return mixed */
+    public function handle(Request $request, Closure $next): mixed
+    {
+        abort_unless(app(AdminPermissionService::class)->allowsRoute(
+            $request->user(), (string) $request->route()?->getName(), $request->method()), 403);
+        return $next($request);
+    }
 }

@@ -4,7 +4,7 @@ namespace App\Modules\Identity\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Modules\Identity\Services\AdminUserService;
-use App\Modules\Identity\Models\User;
+use App\Modules\Identity\Models\Admin as User;
 use App\Modules\Identity\Requests\AdminUserIndexRequest;
 use App\Modules\Identity\Requests\AdminUserStoreRequest;
 use App\Modules\Identity\Requests\AdminUserUpdateRequest;
@@ -42,7 +42,7 @@ class UserController extends Controller
      */
     public function store(AdminUserStoreRequest $request): \Illuminate\Http\RedirectResponse
     {
-        return back()->with('status', $this->service->store($request->validated(), $request->user()));
+        return redirect()->route('admin.users.index')->with('status', $this->service->store($request->validated(), $request->user()));
     }
 
     /**
@@ -54,7 +54,7 @@ class UserController extends Controller
      */
     public function update(AdminUserUpdateRequest $request, User $user): \Illuminate\Http\RedirectResponse
     {
-        return back()->with('status', $this->service->update($request->validated(), $request->user(), $user));
+        return redirect()->route('admin.users.index')->with('status', $this->service->update($request->validated(), $request->user(), $user));
     }
 
     /**
@@ -66,6 +66,22 @@ class UserController extends Controller
      */
     public function resetPassword(AdminUserResetPasswordRequest $request, User $user): \Illuminate\Http\RedirectResponse
     {
-        return back()->with('status', $this->service->resetPassword($request->validated(), $request->user(), $user));
+        return redirect()->route('admin.users.index')->with('status', $this->service->resetPassword($request->validated(), $request->user(), $user));
+    }
+    /** @param AdminUserIndexRequest $request @return \Illuminate\Contracts\View\View */
+    public function create(AdminUserIndexRequest $request): \Illuminate\Contracts\View\View
+    {
+        return view('admin.users.form',$this->service->form($request->user()));
+    }
+    /** @param AdminUserIndexRequest $request @param User $user @return \Illuminate\Contracts\View\View */
+    public function edit(AdminUserIndexRequest $request, User $user): \Illuminate\Contracts\View\View
+    {
+        return view('admin.users.form',$this->service->form($request->user(),$user));
+    }
+    /** @param AdminUserIndexRequest $request @param User $user @return \Illuminate\Http\RedirectResponse @throws \Throwable */
+    public function destroy(AdminUserIndexRequest $request, User $user): \Illuminate\Http\RedirectResponse
+    {
+        $this->service->delete($request->user(),$user);
+        return redirect()->route('admin.users.index')->with('status',__('Deleted successfully.'));
     }
 }

@@ -13,7 +13,7 @@ class LocaleService
      * @return string
      * @throws \Throwable عند فشل الحفظ.
      */
-    public function update(array $input, ?User $actor): string
+    public function update(array $input, User|\App\Modules\Identity\Models\Admin|null $actor): string
     {
         return DB::transaction(function () use ($input, $actor) {
             $actor?->update(['locale' => $input['locale']]);

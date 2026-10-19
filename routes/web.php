@@ -6,5 +6,5 @@ foreach (glob(app_path('Modules/*/Routes/web.php')) as $moduleRoutes) {
     require $moduleRoutes;
 }
 Route::redirect('/login', '/admin/login')->name('login');
-Route::redirect('/admin', '/admin/dashboard')->middleware(['auth', 'admin']);
+Route::redirect('/admin', '/admin/dashboard')->middleware(['auth']);
 Route::redirect('/', '/admin/login');

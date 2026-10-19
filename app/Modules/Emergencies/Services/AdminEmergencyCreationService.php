@@ -25,11 +25,11 @@ class AdminEmergencyCreationService
     /**
      * قراءة بيانات المجال مع الحفاظ على قيود الوصول.
      * @param array $input
-     * @param ?User $actor
+     * @param User|\App\Modules\Identity\Models\Admin|null $actor
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    public function emergencyForm(array $input, ?User $actor): mixed
+    public function emergencyForm(array $input, User|\App\Modules\Identity\Models\Admin|null $actor): mixed
     {
         return $this->form(true);
     }
@@ -37,11 +37,11 @@ class AdminEmergencyCreationService
     /**
      * تنفيذ التغيير داخل معاملة؛ الحدث لا يخرج إلا بعد نجاح الحفظ.
      * @param array $input
-     * @param ?User $actor
+     * @param User|\App\Modules\Identity\Models\Admin|null $actor
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    public function storeEmergency(array $input, ?User $actor): mixed
+    public function storeEmergency(array $input, User|\App\Modules\Identity\Models\Admin|null $actor): mixed
     {
         return DB::transaction(function () use ($input, $actor) {
             $result = $this->performStoreEmergency($input, $actor);
@@ -53,11 +53,11 @@ class AdminEmergencyCreationService
     /**
      * قواعد العملية؛ المعاملة والتبليغ مسؤولية المدخل العام للخدمة.
      * @param array $input
-     * @param ?User $actor
+     * @param User|\App\Modules\Identity\Models\Admin|null $actor
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    private function performStoreEmergency(array $input, ?User $actor): mixed
+    private function performStoreEmergency(array $input, User|\App\Modules\Identity\Models\Admin|null $actor): mixed
     {
         $data = $input;
 
@@ -75,7 +75,7 @@ class AdminEmergencyCreationService
             ])->getKey();
             EmergencyRequestUpdate::query()->create([
                 'emergency_request_id' => $id, 'status_id' => $status->id,
-                'updated_by' => $actor->id, 'note' => 'Created by administrator', 'created_at' => now(),
+                ...\App\Core\AdminActor::attributes($actor, 'updated_by'), 'note' => 'Created by administrator', 'created_at' => now(),
             ]);
         });
         return __('Emergency request received');
@@ -95,7 +95,7 @@ class AdminEmergencyCreationService
             ->join('homes', 'resident_homes.home_id', '=', 'homes.id')
             ->where('roles.code', RoleCode::Resident->value)
             ->select('resident_homes.id', 'resident_homes.unit_label', 'users.name as resident_name',
-                'homes.name as home_name')->orderBy('users.name')->get();
+                'homes.name as home_name', 'users.phone as contact_phone')->orderBy('users.name')->get();
         $table = $emergency ? 'emergency_types' : 'services';
         $translations = $emergency ? 'emergency_type_translations' : 'service_translations';
         $foreign = $emergency ? 'emergency_type_id' : 'service_id';

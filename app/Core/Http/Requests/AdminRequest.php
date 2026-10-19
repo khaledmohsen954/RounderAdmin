@@ -14,6 +14,6 @@ abstract class AdminRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()?->role?->code === RoleCode::Admin->value;
+        return $this->user() instanceof \App\Modules\Identity\Models\Admin && $this->user()->is_active;
     }
 }

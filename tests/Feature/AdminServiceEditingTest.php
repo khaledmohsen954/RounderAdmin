@@ -7,10 +7,10 @@ use Tests\TestCase;
 class AdminServiceEditingTest extends TestCase
 {
     use RefreshDatabase;
-    private function admin(): User
+    private function admin(): \App\Modules\Identity\Models\Admin
     {
         $this->seed();
-        return User::create(['name'=>'Catalogue admin','email'=>'catalogue@example.test',
+        return \App\Modules\Identity\Models\Admin::create(['is_super_admin'=>true,'is_active'=>true,'name'=>'Catalogue admin','email'=>'catalogue@example.test',
             'password'=>'TestPassword123!', 'locale'=>'ar',
             'role_id'=>DB::table('roles')->where('code','admin')->value('id')]);
     }

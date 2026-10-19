@@ -36,11 +36,11 @@ class AdminServiceOrderAdminService
     /**
      * قراءة بيانات المجال مع الحفاظ على قيود الوصول.
      * @param array $input
-     * @param ?User $actor
+     * @param User|\App\Modules\Identity\Models\Admin|null $actor
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    public function index(array $input, ?User $actor): mixed
+    public function index(array $input, User|\App\Modules\Identity\Models\Admin|null $actor): mixed
     {
         $locale = app()->getLocale();
         $orders = Booking::query()
@@ -78,12 +78,12 @@ class AdminServiceOrderAdminService
     /**
      * تنفيذ التغيير داخل معاملة؛ الحدث لا يخرج إلا بعد نجاح الحفظ.
      * @param array $input
-     * @param ?User $actor
+     * @param User|\App\Modules\Identity\Models\Admin|null $actor
      * @param int $bookingId
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    public function update(array $input, ?User $actor, int $bookingId): mixed
+    public function update(array $input, User|\App\Modules\Identity\Models\Admin|null $actor, int $bookingId): mixed
     {
         return DB::transaction(function () use ($input, $actor, $bookingId) {
             $result = $this->performUpdate($input, $actor, $bookingId);
@@ -95,12 +95,12 @@ class AdminServiceOrderAdminService
     /**
      * قواعد العملية؛ المعاملة والتبليغ مسؤولية المدخل العام للخدمة.
      * @param array $input
-     * @param ?User $actor
+     * @param User|\App\Modules\Identity\Models\Admin|null $actor
      * @param int $bookingId
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    private function performUpdate(array $input, ?User $actor, int $bookingId): mixed
+    private function performUpdate(array $input, User|\App\Modules\Identity\Models\Admin|null $actor, int $bookingId): mixed
     {
         $data = $input;
 
@@ -143,7 +143,7 @@ class AdminServiceOrderAdminService
                     [
                         'provider_profile_id' => $providerId,
                         'provider_contract_id' => $contract->id,
-                        'assigned_by' => $actor->id,
+                        ...\App\Core\AdminActor::attributes($actor, 'assigned_by'),
                         'assigned_at' => $assignment?->assigned_at ?? now(),
                         'completed_at' => $targetStatus->code === BookingStatusCode::Completed->value ? now() : null,
                         'provider_note' => $data['note'] ?? null,
@@ -164,7 +164,7 @@ class AdminServiceOrderAdminService
             BookingStatusHistory::query()->create([
                 'booking_id' => $bookingId,
                 'booking_status_id' => $targetStatus->id,
-                'changed_by' => $actor->id,
+                ...\App\Core\AdminActor::attributes($actor, 'changed_by'),
                 'note' => $data['note'] ?? null,
                 'created_at' => now(),
             ]);

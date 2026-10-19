@@ -9,7 +9,7 @@ class AdminLoginRequest extends PublicRequest
      */
     public function rules(): array
     {
-        return ['email' => ['required','email:rfc,dns','max:254'],
+        return ['email' => ['required','email:rfc','max:254'],
             'password' => ['required','string','max:200'], 'remember' => ['sometimes','boolean']];
     }
 }

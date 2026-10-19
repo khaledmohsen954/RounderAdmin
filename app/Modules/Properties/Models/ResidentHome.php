@@ -26,6 +26,7 @@ class ResidentHome extends Model
         'user_id',
         'home_id',
         'unit_label',
+        'home_unit_id',
         'is_primary',
     ];
 
@@ -38,6 +39,7 @@ class ResidentHome extends Model
         return [
             'user_id' => 'integer',
             'home_id' => 'integer',
+            'home_unit_id' => 'integer',
             'is_primary' => 'boolean',
         ];
     }
@@ -141,4 +143,6 @@ class ResidentHome extends Model
         return $this->hasMany(ResidentSubscription::class, 'resident_home_id');
     }
 
+    /** @return BelongsTo */
+    public function unit(): BelongsTo { return $this->belongsTo(HomeUnit::class, 'home_unit_id'); }
 }

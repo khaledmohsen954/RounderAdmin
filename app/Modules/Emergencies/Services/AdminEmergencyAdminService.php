@@ -37,12 +37,12 @@ class AdminEmergencyAdminService
     /**
      * قراءة بيانات المجال مع الحفاظ على قيود الوصول.
      * @param array $input
-     * @param ?User $actor
+     * @param User|\App\Modules\Identity\Models\Admin|null $actor
      * @param int $requestId
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    public function index(array $input, ?User $actor): mixed
+    public function index(array $input, User|\App\Modules\Identity\Models\Admin|null $actor): mixed
     {
         $locale = app()->getLocale();
         $requests = EmergencyRequest::query()
@@ -82,11 +82,11 @@ class AdminEmergencyAdminService
     /**
      * تنفيذ التغيير داخل معاملة؛ الحدث لا يخرج إلا بعد نجاح الحفظ.
      * @param array $input
-     * @param ?User $actor
+     * @param User|\App\Modules\Identity\Models\Admin|null $actor
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    public function update(array $input, ?User $actor, int $requestId): mixed
+    public function update(array $input, User|\App\Modules\Identity\Models\Admin|null $actor, int $requestId): mixed
     {
         return DB::transaction(function () use ($input, $actor, $requestId) {
             $result = $this->performUpdate($input, $actor, $requestId);
@@ -98,12 +98,12 @@ class AdminEmergencyAdminService
     /**
      * قواعد العملية؛ المعاملة والتبليغ مسؤولية المدخل العام للخدمة.
      * @param array $input
-     * @param ?User $actor
+     * @param User|\App\Modules\Identity\Models\Admin|null $actor
      * @param int $requestId
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    private function performUpdate(array $input, ?User $actor, int $requestId): mixed
+    private function performUpdate(array $input, User|\App\Modules\Identity\Models\Admin|null $actor, int $requestId): mixed
     {
         $data = $input;
 
@@ -148,7 +148,7 @@ class AdminEmergencyAdminService
                     [
                         'provider_profile_id' => $providerId,
                         'provider_contract_id' => $contract->id,
-                        'assigned_by' => $actor->id,
+                        ...\App\Core\AdminActor::attributes($actor, 'assigned_by'),
                         'assigned_at' => $assignment?->assigned_at ?? now(),
                         'completed_at' => $status->code === EmergencyStatusCode::Resolved->value ? now() : null,
                         'provider_note' => $data['note'] ?? null,
@@ -159,7 +159,7 @@ class AdminEmergencyAdminService
             }
             EmergencyRequest::query()->where('id', $requestId)->update([
                 'status_id' => $status->id,
-                'handled_by' => $actor->id,
+                ...\App\Core\AdminActor::attributes($actor, 'handled_by'),
                 'dispatched_at' => in_array($status->code, [EmergencyStatusCode::Assigned->value, EmergencyStatusCode::OnTheWay->value, EmergencyStatusCode::Resolved->value], true) ? ($emergency->dispatched_at ?? now()) : null,
                 'resolved_at' => $status->code === EmergencyStatusCode::Resolved->value ? now() : null,
                 'updated_at' => now(),
@@ -167,7 +167,7 @@ class AdminEmergencyAdminService
             EmergencyRequestUpdate::query()->create([
                 'emergency_request_id' => $requestId,
                 'status_id' => $status->id,
-                'updated_by' => $actor->id,
+                ...\App\Core\AdminActor::attributes($actor, 'updated_by'),
                 'note' => $data['note'] ?? null,
                 'created_at' => now(),
             ]);

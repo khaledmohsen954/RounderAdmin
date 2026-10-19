@@ -24,11 +24,11 @@ class AdminDashboardService
     /**
      * قراءة بيانات المجال مع الحفاظ على قيود الوصول.
      * @param array $input
-     * @param ?User $actor
+     * @param User|\App\Modules\Identity\Models\Admin|null $actor
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    public function __invoke(array $input, ?User $actor): mixed
+    public function __invoke(array $input, User|\App\Modules\Identity\Models\Admin|null $actor): mixed
     {
         // المؤشرات محسوبة من السجلات الفعلية؛ العمولة المعكوسة لا تدخل في الإجمالي.
         $stats = [

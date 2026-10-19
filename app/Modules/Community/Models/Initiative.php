@@ -18,6 +18,7 @@ class Initiative extends Model
     protected $fillable = [
         'home_id',
         'created_by',
+        'admin_created_by',
         'reference',
         'title',
         'description',
@@ -79,4 +80,9 @@ class Initiative extends Model
         return $this->hasMany(InitiativeTranslation::class, 'initiative_id');
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo */
+    public function adminActor(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(\App\Modules\Identity\Models\Admin::class, 'admin_created_by');
+    }
 }

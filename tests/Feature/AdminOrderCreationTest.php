@@ -10,7 +10,7 @@ class AdminOrderCreationTest extends TestCase
 {
     use RefreshDatabase;
 
-    private User $admin;
+    private \App\Modules\Identity\Models\Admin $admin;
     private User $resident;
     private int $membership;
     private int $service;
@@ -19,7 +19,7 @@ class AdminOrderCreationTest extends TestCase
     {
         parent::setUp();
         $this->seed();
-        $this->admin = $this->user('admin', 'admin@test.example');
+        $this->admin = \App\Modules\Identity\Models\Admin::create(['name'=>'Admin','email'=>'admin@test.example','password'=>'TestPassword123!','locale'=>'ar','is_active'=>true,'is_super_admin'=>true]);
         $this->resident = $this->user('resident', 'resident@test.example');
         $home = DB::table('homes')->insertGetId([
             'city_id' => DB::table('cities')->value('id'), 'name' => 'Test building',
@@ -58,7 +58,7 @@ class AdminOrderCreationTest extends TestCase
         $this->assertEquals($this->resident->id, $order->resident_id);
         $this->assertEquals($this->membership, $order->resident_home_id);
         $this->assertEquals(DB::table('services')->where('id', $this->service)->value('base_price'), $order->total_amount);
-        $this->assertDatabaseHas('booking_status_history', ['booking_id' => $order->id, 'changed_by' => $this->admin->id]);
+        $this->assertDatabaseHas('booking_status_history', ['booking_id' => $order->id, 'admin_changed_by' => $this->admin->id]);
     }
 
     public function test_invalid_service_and_past_date_do_not_create_orders(): void
@@ -81,7 +81,7 @@ class AdminOrderCreationTest extends TestCase
         ])->assertRedirect(route('admin.emergencies.index'));
         $this->assertDatabaseCount('bookings', 0);
         $this->assertDatabaseHas('emergency_requests', ['resident_id' => $this->resident->id, 'resident_home_id' => $this->membership]);
-        $this->assertDatabaseHas('emergency_request_updates', ['updated_by' => $this->admin->id]);
+        $this->assertDatabaseHas('emergency_request_updates', ['admin_updated_by' => $this->admin->id]);
     }
 
     public function test_non_admin_cannot_create_requests(): void

@@ -20,6 +20,7 @@ class BookingStatusHistory extends Model
         'booking_id',
         'booking_status_id',
         'changed_by',
+        'admin_changed_by',
         'note',
         'created_at',
     ];
@@ -65,4 +66,9 @@ class BookingStatusHistory extends Model
         return $this->belongsTo(User::class, 'changed_by');
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo */
+    public function adminActor(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(\App\Modules\Identity\Models\Admin::class, 'admin_changed_by');
+    }
 }

@@ -18,10 +18,10 @@ class CatalogPricingTest extends TestCase
     use RefreshDatabase;
 
     /** @return User */
-    private function admin(): User
+    private function admin(): \App\Modules\Identity\Models\Admin
     {
         $this->seed();
-        return User::create(['name'=>'Catalog admin','email'=>'discount-admin@example.test',
+        return \App\Modules\Identity\Models\Admin::create(['is_super_admin'=>true,'is_active'=>true,'name'=>'Catalog admin','email'=>'discount-admin@example.test',
             'password'=>'StrongPassword123!','locale'=>'en','role_id'=>Role::where('code','admin')->value('id')]);
     }
 

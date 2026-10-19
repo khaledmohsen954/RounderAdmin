@@ -20,7 +20,7 @@ class ServiceCreationIntegrationTest extends TestCase
     {
         $this->seed();
         Storage::fake('public');
-        $admin = User::create(['name'=>'Admin','email'=>'service-form@example.test','password'=>'StrongPassword123!',
+        $admin = \App\Modules\Identity\Models\Admin::create(['is_super_admin'=>true,'is_active'=>true,'name'=>'Admin','email'=>'service-form@example.test','password'=>'StrongPassword123!',
             'locale'=>'ar','role_id'=>Role::where('code','admin')->value('id')]);
         $this->actingAs($admin);
         foreach (['ar','en'] as $locale) {

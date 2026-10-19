@@ -25,11 +25,11 @@ class AdminOrderCreationService
     /**
      * قراءة بيانات المجال مع الحفاظ على قيود الوصول.
      * @param array $input
-     * @param ?User $actor
+     * @param User|\App\Modules\Identity\Models\Admin|null $actor
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    public function serviceForm(array $input, ?User $actor): mixed
+    public function serviceForm(array $input, User|\App\Modules\Identity\Models\Admin|null $actor): mixed
     {
         return $this->form(false);
     }
@@ -37,11 +37,11 @@ class AdminOrderCreationService
     /**
      * تنفيذ التغيير داخل معاملة؛ الحدث لا يخرج إلا بعد نجاح الحفظ.
      * @param array $input
-     * @param ?User $actor
+     * @param User|\App\Modules\Identity\Models\Admin|null $actor
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    public function storeService(array $input, ?User $actor): mixed
+    public function storeService(array $input, User|\App\Modules\Identity\Models\Admin|null $actor): mixed
     {
         return DB::transaction(function () use ($input, $actor) {
             $result = $this->performStoreService($input, $actor);
@@ -53,11 +53,11 @@ class AdminOrderCreationService
     /**
      * قواعد العملية؛ المعاملة والتبليغ مسؤولية المدخل العام للخدمة.
      * @param array $input
-     * @param ?User $actor
+     * @param User|\App\Modules\Identity\Models\Admin|null $actor
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    private function performStoreService(array $input, ?User $actor): mixed
+    private function performStoreService(array $input, User|\App\Modules\Identity\Models\Admin|null $actor): mixed
     {
         $data = $input;
 
@@ -79,7 +79,7 @@ class AdminOrderCreationService
             ])->getKey();
             BookingStatusHistory::query()->create([
                 'booking_id' => $id, 'booking_status_id' => $status->id,
-                'changed_by' => $actor->id, 'note' => 'Created by administrator', 'created_at' => now(),
+                ...\App\Core\AdminActor::attributes($actor, 'changed_by'), 'note' => 'Created by administrator', 'created_at' => now(),
             ]);
         });
         return __('Service order created successfully.');

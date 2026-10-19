@@ -21,12 +21,12 @@ class AdminFacilityAdminService
     /**
      * تنفيذ التغيير داخل معاملة؛ الحدث لا يخرج إلا بعد نجاح الحفظ.
      * @param array $input
-     * @param ?User $actor
+     * @param User|\App\Modules\Identity\Models\Admin|null $actor
      * @param int $reportId
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    public function updateFacilityReport(array $input, ?User $actor, int $reportId): mixed
+    public function updateFacilityReport(array $input, User|\App\Modules\Identity\Models\Admin|null $actor, int $reportId): mixed
     {
         return DB::transaction(function () use ($input, $actor, $reportId) {
             $result = $this->performUpdateFacilityReport($input, $actor, $reportId);
@@ -38,12 +38,12 @@ class AdminFacilityAdminService
     /**
      * قواعد العملية؛ المعاملة والتبليغ مسؤولية المدخل العام للخدمة.
      * @param array $input
-     * @param ?User $actor
+     * @param User|\App\Modules\Identity\Models\Admin|null $actor
      * @param int $reportId
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    private function performUpdateFacilityReport(array $input, ?User $actor, int $reportId): mixed
+    private function performUpdateFacilityReport(array $input, User|\App\Modules\Identity\Models\Admin|null $actor, int $reportId): mixed
     {
         $data = $input;
 
@@ -61,7 +61,7 @@ class AdminFacilityAdminService
             FacilityReportUpdate::query()->create([
                 'facility_report_id' => $report->id,
                 'status_id' => $data['status_id'],
-                'updated_by' => $actor->id,
+                ...\App\Core\AdminActor::attributes($actor, 'updated_by'),
                 'note' => $data['note'] ?? null,
                 'created_at' => now(),
             ]);

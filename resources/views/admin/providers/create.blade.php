@@ -2,10 +2,10 @@
 @section('title', __('Add provider').' · Rounder')
 @section('body')
 <main class="container py-4">
-<a class="btn btn-outline-secondary mb-3" href="{{ route('admin.providers.index') }}">{{ __('Providers and contracts') }}</a>
+@adminCan('admin.providers.index')<a class="btn btn-outline-secondary mb-3" href="{{ route('admin.providers.index') }}">{{ __('Providers and contracts') }}</a>@endadminCan
 @if($errors->any())<div class="alert alert-danger"><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
 <div class="panel p-3 p-lg-4 mb-4"><h2 class="h5 fw-bold">{{ __('Register service provider') }}</h2>
-<form method="post" action="{{ route('admin.providers.store') }}">@csrf
+@adminCan('admin.providers.store','POST')<form method="post" action="{{ route('admin.providers.store') }}">@csrf
 <div class="row g-3">
 <div class="col-md-4"><label class="form-label">{{ __('Contact name') }}</label><input class="form-control" name="name" required minlength="2" maxlength="120" value="{{ old('name') }}"></div>
 <div class="col-md-4"><label class="form-label">{{ __('Email address') }}</label><input type="email" class="form-control" name="email" required maxlength="254" value="{{ old('email') }}"></div>
@@ -21,7 +21,7 @@
 <div class="col-md-3"><label class="form-label">{{ __('Contract ends on') }}</label><input type="date" class="form-control" name="ends_on" value="{{ old('ends_on') }}"></div>
 <div class="col-12">@include('admin.providers.partials.terms-editor')</div>
 <div class="col-12 d-flex justify-content-end"><button class="btn btn-primary px-4">{{ __('Register provider and contract') }}</button></div>
-</div></form></div>
+</div></form>@endadminCan</div>
 
 </main>
 @endsection

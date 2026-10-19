@@ -2,10 +2,10 @@
 @section('title', __('Edit package').' · Rounder')
 @section('body')
 <main class="container py-4">
-<a class="btn btn-outline-secondary mb-3" href="{{ route('admin.packages.index') }}">{{ __('Packages and services') }}</a>
+@adminCan('admin.packages.index')<a class="btn btn-outline-secondary mb-3" href="{{ route('admin.packages.index') }}">{{ __('Packages and services') }}</a>@endadminCan
 <div class="panel p-4"><h1 class="h3">{{ __('Edit package') }}</h1>
 @if($errors->any())<div class="alert alert-danger"><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
-<form method="post" enctype="multipart/form-data" action="{{ route('admin.packages.update', $package->id) }}">
+@adminCan('admin.packages.update','PUT')<form method="post" enctype="multipart/form-data" action="{{ route('admin.packages.update', $package->id) }}">
 @csrf @method('PUT')
 <div class="row g-3">
 <div class="col-md-4"><label class="form-label">{{ __('Package code') }}</label><input name="code" class="form-control" value="{{ old('code',$package->code) }}" required maxlength="60"></div>
@@ -23,5 +23,5 @@
 @include('admin.packages.partials.comparison-values')
 @include('admin.packages.partials.included-services')
 <div class="mt-4"><button class="btn btn-primary">{{ __('Save package') }}</button></div>
-</form></div></main>
+</form>@endadminCan</div></main>
 @endsection

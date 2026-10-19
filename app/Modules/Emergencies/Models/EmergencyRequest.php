@@ -32,6 +32,7 @@ class EmergencyRequest extends Model
         'dispatched_at',
         'resolved_at',
         'handled_by',
+        'admin_handled_by',
     ];
 
     /**
@@ -143,4 +144,9 @@ class EmergencyRequest extends Model
         return $this->hasOne(EmergencyProviderAssignment::class, 'emergency_request_id');
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo */
+    public function adminActor(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(\App\Modules\Identity\Models\Admin::class, 'admin_handled_by');
+    }
 }

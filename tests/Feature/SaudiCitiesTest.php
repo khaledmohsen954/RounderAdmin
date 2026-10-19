@@ -21,15 +21,15 @@ class SaudiCitiesTest extends TestCase
         app(SaudiCityImportService::class)->import();
         $this->assertSame($riyadh->id,City::where('source_city_id',3)->value('id'));
         $this->assertSame(4582,City::count());
-        $admin = User::create(['name'=>'Admin','email'=>'cities-admin@example.test','password'=>'StrongPassword123!',
+        $admin = \App\Modules\Identity\Models\Admin::create(['is_super_admin'=>true,'is_active'=>true,'name'=>'Admin','email'=>'cities-admin@example.test','password'=>'StrongPassword123!',
             'locale'=>'ar','role_id'=>Role::where('code','admin')->value('id')]);
         $input = ['city_id'=>$riyadh->id,'name'=>'Riyadh Home','address'=>'Riyadh address',
-            'property_code'=>'SA-HOME','health_percent'=>100,'association_balance'=>0];
-        $this->actingAs($admin)->post('/admin/homes',$input)->assertSessionHasNoErrors();
+            'property_code'=>'SA-HOME','health_percent'=>100,'association_balance'=>0,'floors_count'=>2,'units'=>[['unit_number'=>'1','floor_number'=>1,'area_sqm'=>100,'rooms_count'=>3]]];
+        $this->actingAs($admin)->post('/admin/realestate',$input)->assertSessionHasNoErrors();
         $this->assertDatabaseHas('homes',['city_id'=>$riyadh->id,'property_code'=>'SA-HOME']);
         $input['city_id']=$legacy->id;
         $input['property_code']='EG-HOME';
-        $this->post('/admin/homes',$input)->assertSessionHasErrors('city_id');
+        $this->post('/admin/realestate',$input)->assertSessionHasErrors('city_id');
         $resident = User::create(['name'=>'Resident','email'=>'cities-resident@example.test','password'=>'StrongPassword123!',
             'locale'=>'ar','role_id'=>Role::where('code','resident')->value('id')]);
         Sanctum::actingAs($resident);

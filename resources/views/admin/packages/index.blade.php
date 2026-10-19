@@ -2,25 +2,17 @@
 @section('title', __('Packages and services').' · Rounder')
 @section('body')
 <div class="container-fluid"><div class="row g-3 p-3 p-lg-4">
-<aside class="col-md-3 col-xl-2"><div class="sidebar p-3">
-<div class="text-white-50 small px-3 py-2">{{ __('Overview') }}</div>
-<a href="{{ route('admin.dashboard') }}">▦ &nbsp;{{ __('Dashboard') }}</a>
-<a href="{{ route('admin.users.index') }}">♙ &nbsp;{{ __('Users') }}</a>
-<a href="{{ route('admin.homes.index') }}">⌂ &nbsp;{{ __('Homes') }}</a>
-<a href="{{ route('admin.providers.index') }}">⚒ &nbsp;{{ __('Providers and contracts') }}</a>
-<a class="active" href="{{ route('admin.packages.index') }}">◫ &nbsp;{{ __('Packages and services') }}</a>
-<a href="{{ route('admin.content.index') }}">◈ &nbsp;{{ __('Resident operations') }}</a><a href="{{ route('admin.emergencies.index') }}">🚨 &nbsp;{{ __('Emergency requests') }}</a><a href="{{ route('admin.service-orders.index') }}">▣ &nbsp;{{ __('Service orders') }}</a>
-</div></aside>
-<main class="col-md-9 col-xl-10 content">
+
+<main class="col-12 content">
 <div class="mb-4"><div class="small text-secondary">{{ __('Catalog management') }}</div><h1 class="h3 fw-bold">{{ __('Packages and services') }}</h1></div>
 @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
 @if($errors->any())<div class="alert alert-danger"><ul class="mb-0">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
 
 @include('admin.packages.partials.feature-definitions')
-<a class="btn btn-primary mb-4" href="{{ route('admin.services.create') }}">{{ __('Create service') }}</a>
+@adminCan('admin.services.create')<a class="btn btn-primary mb-4" href="{{ route('admin.services.create') }}">{{ __('Create service') }}</a>@endadminCan
 
 <div class="panel p-3 p-lg-4 mb-4"><h2 class="h5 fw-bold">{{ __('Create customer package') }}</h2>
-<form method="post" enctype="multipart/form-data" action="{{ route('admin.packages.store') }}" id="package-form">@csrf
+@adminCan('admin.packages.store','POST')<form method="post" enctype="multipart/form-data" action="{{ route('admin.packages.store') }}" id="package-form">@csrf
 <div class="row g-3">
 <div class="col-md-3"><label class="form-label">{{ __('Package code') }}</label><input name="code" class="form-control" required maxlength="60" pattern="[A-Za-z0-9_-]+"></div>
 <div class="col-md-3"><label class="form-label">{{ __('Billing cycle') }}</label><select name="billing_cycle_id" class="form-select" required><option value="">{{ __('Choose cycle') }}</option>@foreach($cycles as $cycle)<option value="{{ $cycle->id }}">{{ __($cycle->code === 'semiannual' ? 'Semiannual' : ucfirst($cycle->code)) }} · {{ $cycle->months }} {{ __('months') }}</option>@endforeach</select></div>
@@ -43,17 +35,17 @@
 <div class="col-md-3"><label class="form-label">{{ __('Usage limit') }}</label><select data-name="is_unlimited" class="form-select"><option value="0">{{ __('Limited quantity') }}</option><option value="1">{{ __('Unlimited') }}</option></select></div>
 <div class="col-md-1"><button type="button" class="btn btn-outline-danger remove-service-row" aria-label="{{ __('Remove') }}">×</button></div>
 </div></template>
-</form>
+</form>@endadminCan
 </div>
 
 <div class="panel p-3 p-lg-4 mb-4"><h2 class="h5 fw-bold">{{ __('Available services') }}</h2><div class="table-responsive"><table class="table align-middle"><thead><tr><th>#</th><th>{{ __('Service') }}</th><th>{{ __('Category') }}</th><th>{{ __('Base price') }}</th><th>{{ __('Status') }}</th></tr></thead><tbody>
 @forelse($services as $service)<tr><td>{{ $service->id }}</td><td>{{ $service->name ?? $service->code }}<div class="small text-secondary">{{ $service->code }}</div></td><td>{{ $service->category_name ?? '' }}</td><td>@if($service->image_path)<img class="rounded me-2" width="48" height="48" style="object-fit:cover" src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($service->image_path) }}" alt="{{ __('Product image') }}">@endif
-@if($service->price_before_discount > $service->base_price)<del class="small text-secondary">{{ number_format($service->price_before_discount,2) }}</del> @endif{{ number_format($service->base_price,2) }} {{ __('SAR') }}</td><td>{{ $service->is_active ? __('Active') : __('Inactive') }} <a class="btn btn-sm btn-outline-primary" href="{{ route('admin.packages.services.edit', $service->id) }}">{{ __('Edit') }}</a></td></tr>@empty<tr><td colspan="5">{{ __('No services found') }}</td></tr>@endforelse
+@if($service->price_before_discount > $service->base_price)<del class="small text-secondary">{{ number_format($service->price_before_discount,2) }}</del> @endif{{ number_format($service->base_price,2) }} {{ __('SAR') }}</td><td>{{ $service->is_active ? __('Active') : __('Inactive') }} @adminCan('admin.packages.services.edit')<a class="btn btn-sm btn-outline-primary" href="{{ route('admin.packages.services.edit', $service->id) }}">{{ __('Edit') }}</a>@endadminCan</td></tr>@empty<tr><td colspan="5">{{ __('No services found') }}</td></tr>@endforelse
 </tbody></table></div></div>
 
 <div class="panel p-3 p-lg-4"><h2 class="h5 fw-bold">{{ __('Customer packages') }}</h2><div class="table-responsive"><table class="table align-middle"><thead><tr><th>#</th><th>{{ __('Package') }}</th><th>{{ __('Cycle') }}</th><th>{{ __('Price') }}</th><th>{{ __('Services included') }}</th><th>{{ __('Duration') }}</th><th>{{ __('Status') }}</th></tr></thead><tbody>
 @forelse($packages as $package)<tr><td>{{ $package->id }}</td><td>{{ $package->name ?? $package->code }}<div class="small text-secondary">{{ $package->code }}</div></td><td>{{ __($package->cycle_code === 'semiannual' ? 'Semiannual' : ucfirst($package->cycle_code)) }}</td><td>@if($package->image_path)<img class="rounded me-2" width="48" height="48" style="object-fit:cover" src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($package->image_path) }}" alt="{{ __('Product image') }}">@endif
-@if($package->price_before_discount > $package->price)<del class="small text-secondary">{{ number_format($package->price_before_discount,2) }}</del> @endif{{ number_format($package->price,2) }} {{ $package->currency_code }}</td><td><strong>{{ $package->services_count }}</strong><div class="small text-secondary">@foreach($packageServices->get($package->id,collect()) as $included){{ $included->service_name ?? $included->service_code }} ({{ $included->is_unlimited ? __('Unlimited') : $included->included_quantity }})@if(!$loop->last), @endif @endforeach</div></td><td>{{ $package->duration_months }} {{ __('months') }}</td><td>{{ $package->is_active ? __('Active') : __('Inactive') }} <a class="btn btn-sm btn-outline-primary" href="{{ route('admin.packages.edit', $package->id) }}">{{ __('Edit') }}</a></td></tr>
+@if($package->price_before_discount > $package->price)<del class="small text-secondary">{{ number_format($package->price_before_discount,2) }}</del> @endif{{ number_format($package->price,2) }} {{ $package->currency_code }}</td><td><strong>{{ $package->services_count }}</strong><div class="small text-secondary">@foreach($packageServices->get($package->id,collect()) as $included){{ $included->service_name ?? $included->service_code }} ({{ $included->is_unlimited ? __('Unlimited') : $included->included_quantity }})@if(!$loop->last), @endif @endforeach</div></td><td>{{ $package->duration_months }} {{ __('months') }}</td><td>{{ $package->is_active ? __('Active') : __('Inactive') }} @adminCan('admin.packages.edit')<a class="btn btn-sm btn-outline-primary" href="{{ route('admin.packages.edit', $package->id) }}">{{ __('Edit') }}</a>@endadminCan</td></tr>
 @empty<tr><td colspan="7">{{ __('No packages found') }}</td>@endforelse
 </tbody></table>{{ $packages->links() }}</div></div>
 <div class="panel p-3 p-lg-4 mt-4"><h2 class="h5 fw-bold">{{ __('Customer subscriptions') }}</h2><div class="table-responsive"><table class="table align-middle"><thead><tr><th>#</th><th>{{ __('Resident') }}</th><th>{{ __('Home') }}</th><th>{{ __('Package') }}</th><th>{{ __('Status') }}</th><th>{{ __('Price') }}</th><th>{{ __('Start date') }}</th><th>{{ __('End date') }}</th></tr></thead><tbody>

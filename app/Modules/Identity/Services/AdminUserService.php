@@ -1,132 +1,91 @@
 <?php
-
 namespace App\Modules\Identity\Services;
-use App\Core\Exceptions\DomainViolation;
-use App\Core\Enums\FailureReason;
-
-use App\Modules\Identity\Models\Role;
-use App\Modules\Identity\Models\User;
-
-use Illuminate\Support\Facades\DB;
+use App\Modules\Identity\Models\Admin;
+use App\Modules\Access\Models\PermissionSet;
 use App\Modules\Identity\Events\IdentityChanged;
 use App\Modules\Identity\Enums\Operation;
-
-/** قواعد عمل Identity؛ تستقبل بيانات متحققاً منها دون الاعتماد على HTTP. */
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
+/** إدارة الحسابات الإدارية حصراً؛ الحسابات التشغيلية تبقى في users. */
 class AdminUserService
 {
-
-    /**
-     * قراءة بيانات المجال مع الحفاظ على قيود الوصول.
-     * @param array $input
-     * @param ?User $actor
-     * @return mixed
-     * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
-     */
-    public function index(array $input, ?User $actor): mixed
+    /** @param array<string,mixed> $input @param Admin|null $actor @return array<string,mixed> */
+    public function index(array $input, ?Admin $actor): array
     {
-        $users=User::with('role.translations')->when((isset($input['q']) && $input['q'] !== ''),fn($q)=>$q->where(fn($w)=>$w->where('name','like','%'.($input['q'] ?? '').'%')->orWhere('email','like','%'.($input['q'] ?? '').'%')->orWhere('phone','like','%'.($input['q'] ?? '').'%')))
-   ->when((isset($input['role']) && $input['role'] !== ''),fn($q)=>$q->whereHas('role',fn($r)=>$r->where('code',($input['role'] ?? ''))))->latest()->paginate(15)->withQueryString();
-  $roles=Role::with('translations')->orderBy('code')->get();
-  return compact('users','roles');
+        $users = Admin::with('permissionSet')->when(!empty($input['q']), fn ($q) =>
+            $q->where(fn ($w) => $w->where('name','like','%'.$input['q'].'%')->orWhere('email','like','%'.$input['q'].'%')->orWhere('phone','like','%'.$input['q'].'%')))
+            ->latest()->paginate(15)->withQueryString();
+        return compact('users');
     }
-
-    /**
-     * تنفيذ التغيير داخل معاملة؛ الحدث لا يخرج إلا بعد نجاح الحفظ.
-     * @param array $input
-     * @param ?User $actor
-     * @return mixed
-     * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
-     */
-    public function store(array $input, ?User $actor): mixed
+    /** @param Admin $actor @param Admin|null $user @return array<string,mixed> */
+    public function form(Admin $actor, ?Admin $user = null): array
     {
-        return DB::transaction(function () use ($input, $actor) {
-            $result = $this->performStore($input, $actor);
-            DB::afterCommit(fn () => event(new IdentityChanged(Operation::AdminUserStore, $actor?->id)));
-            return $result;
+        $sets = PermissionSet::all()->filter(fn ($set) => $actor->is_super_admin ||
+            !array_diff($set->permissions ?? [],$actor->permissionSet?->permissions ?? []));
+        return ['user'=>$user ?? new Admin,'sets'=>$sets];
+    }
+    /** @param array<string,mixed> $input @param Admin $actor @return string @throws \Throwable */
+    public function store(array $input, Admin $actor): string
+    {
+        return DB::transaction(function () use ($input,$actor) {
+            $this->assertAssignable($actor,(int)$input['permission_set_id']);
+            Admin::create($input + ['is_super_admin'=>false]);
+            DB::afterCommit(fn () => event(new IdentityChanged(Operation::AdminUserStore,$actor->id)));
+            return __('User created successfully.');
         });
     }
-
-    /**
-     * قواعد العملية؛ المعاملة والتبليغ مسؤولية المدخل العام للخدمة.
-     * @param array $input
-     * @param ?User $actor
-     * @return mixed
-     * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
-     */
-    private function performStore(array $input, ?User $actor): mixed
+    /** @param array<string,mixed> $input @param Admin $actor @param Admin $user @return string @throws \Throwable */
+    public function update(array $input, Admin $actor, Admin $user): string
     {
-        $data = $input;
-
-  
-  User::create($data);
-  return __('User created successfully.');
-    }
-
-    /**
-     * تنفيذ التغيير داخل معاملة؛ الحدث لا يخرج إلا بعد نجاح الحفظ.
-     * @param array $input
-     * @param ?User $actor
-     * @param User $user
-     * @return mixed
-     * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
-     */
-    public function update(array $input, ?User $actor, User $user): mixed
-    {
-        return DB::transaction(function () use ($input, $actor, $user) {
-            $result = $this->performUpdate($input, $actor, $user);
-            DB::afterCommit(fn () => event(new IdentityChanged(Operation::AdminUserUpdate, $actor?->id)));
-            return $result;
+        return DB::transaction(function () use ($input,$actor,$user) {
+            $locked = Admin::lockForUpdate()->findOrFail($user->id);
+            $this->assertManageable($actor,$locked);
+            $this->assertAssignable($actor,(int)$input['permission_set_id']);
+            $locked->update($input);
+            DB::afterCommit(fn () => event(new IdentityChanged(Operation::AdminUserUpdate,$actor->id)));
+            return __('User updated successfully.');
         });
     }
-
-    /**
-     * قواعد العملية؛ المعاملة والتبليغ مسؤولية المدخل العام للخدمة.
-     * @param array $input
-     * @param ?User $actor
-     * @param User $user
-     * @return mixed
-     * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
-     */
-    private function performUpdate(array $input, ?User $actor, User $user): mixed
+    /** @param array<string,mixed> $input @param Admin $actor @param Admin $user @return string @throws \Throwable */
+    public function resetPassword(array $input, Admin $actor, Admin $user): string
     {
-        $data = $input;
-
-  
-  DomainViolation::rejectIf($actor->is($user), FailureReason::InvalidInput, __('You cannot change your own account here.'));
-  $user->update($data); return __('User updated successfully.');
-    }
-
-    /**
-     * تنفيذ التغيير داخل معاملة؛ الحدث لا يخرج إلا بعد نجاح الحفظ.
-     * @param array $input
-     * @param ?User $actor
-     * @param User $user
-     * @return mixed
-     * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
-     */
-    public function resetPassword(array $input, ?User $actor, User $user): mixed
-    {
-        return DB::transaction(function () use ($input, $actor, $user) {
-            $result = $this->performResetPassword($input, $actor, $user);
-            DB::afterCommit(fn () => event(new IdentityChanged(Operation::AdminUserResetPassword, $actor?->id)));
-            return $result;
+        return DB::transaction(function () use ($input,$actor,$user) {
+            $locked = Admin::lockForUpdate()->findOrFail($user->id);
+            $this->assertManageable($actor,$locked);
+            $locked->forceFill(['password'=>$input['password'],'remember_token'=>Str::random(60)])->save();
+            DB::afterCommit(fn () => event(new IdentityChanged(Operation::AdminUserResetPassword,$actor->id)));
+            return __('Password updated successfully.');
         });
     }
-
-    /**
-     * قواعد العملية؛ المعاملة والتبليغ مسؤولية المدخل العام للخدمة.
-     * @param array $input
-     * @param ?User $actor
-     * @param User $user
-     * @return mixed
-     * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
-     */
-    private function performResetPassword(array $input, ?User $actor, User $user): mixed
+    /** @param Admin $actor @param Admin $user @return void @throws \Throwable */
+    public function delete(Admin $actor, Admin $user): void
     {
-        $data = $input;
-
-  
-  $user->update(['password'=>$data['password']]); $user->tokens()->delete();
-  return __('Password updated and active app sessions revoked.');
+        DB::transaction(function () use ($actor,$user) {
+            $locked = Admin::lockForUpdate()->findOrFail($user->id);
+            $this->assertManageable($actor,$locked);
+            // المراجع المالية والتاريخية محمية بمفاتيح RESTRICT؛ لا تُحذف سجلات الأعمال بالتبعية.
+            try { $locked->delete(); }
+            catch (\Illuminate\Database\QueryException $error) {
+                if (($error->errorInfo[1] ?? null) !== 1451) throw $error;
+                throw ValidationException::withMessages(['delete'=>__('This record is in use and cannot be deleted.')]);
+            }
+        });
+    }
+    /** @param Admin $actor @param Admin $target @return void @throws ValidationException */
+    private function assertManageable(Admin $actor, Admin $target): void
+    {
+        if ($actor->is($target) || $target->is_super_admin ||
+            (!$actor->is_super_admin && array_diff($target->permissionSet?->permissions ?? [],$actor->permissionSet?->permissions ?? []))) {
+            throw ValidationException::withMessages(['user'=>__('Cannot change your own or a higher privileged account.')]);
+        }
+    }
+    /** @param Admin $actor @param int $id @return void @throws ValidationException */
+    private function assertAssignable(Admin $actor, int $id): void
+    {
+        $set = PermissionSet::lockForUpdate()->findOrFail($id);
+        if (!$actor->is_super_admin && array_diff($set->permissions ?? [],$actor->permissionSet?->permissions ?? [])) {
+            throw ValidationException::withMessages(['permission_set_id'=>__('Cannot grant permissions you do not have.')]);
+        }
     }
 }

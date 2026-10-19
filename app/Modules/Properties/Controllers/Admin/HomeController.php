@@ -29,7 +29,7 @@ class HomeController extends Controller
      */
     public function index(AdminHomeIndexRequest $request): \Illuminate\Contracts\View\View
     {
-        return view('admin.homes.index', $this->service->index($request->validated(), $request->user()));
+        return view('admin.realestate.index', $this->service->index($request->validated(), $request->user()));
     }
 
     /**
@@ -40,6 +40,22 @@ class HomeController extends Controller
      */
     public function store(AdminHomeStoreRequest $request): \Illuminate\Http\RedirectResponse
     {
-        return back()->with('status', $this->service->store($request->validated(), $request->user()));
+        return redirect()->route('admin.realestate.index')->with('status', $this->service->store($request->validated(), $request->user()));
+    }
+    /** @param AdminHomeIndexRequest $request @return \Illuminate\Contracts\View\View */
+    public function create(AdminHomeIndexRequest $request): \Illuminate\Contracts\View\View { return view('admin.realestate.form',$this->service->form()); }
+    /** @param AdminHomeIndexRequest $request @param int $homeId @return \Illuminate\Contracts\View\View */
+    public function edit(AdminHomeIndexRequest $request, int $homeId): \Illuminate\Contracts\View\View { return view('admin.realestate.form',$this->service->form($homeId)); }
+    /** @param \App\Modules\Properties\Requests\AdminHomeUpdateRequest $request @param int $homeId @return \Illuminate\Http\RedirectResponse @throws \Throwable */
+    public function update(\App\Modules\Properties\Requests\AdminHomeUpdateRequest $request, int $homeId): \Illuminate\Http\RedirectResponse
+    {
+        $this->service->update($homeId,$request->validated(),$request->user());
+        return redirect()->route('admin.realestate.index')->with('status',__('Saved successfully.'));
+    }
+    /** @param AdminHomeIndexRequest $request @param int $homeId @return \Illuminate\Http\RedirectResponse @throws \Throwable */
+    public function destroy(AdminHomeIndexRequest $request, int $homeId): \Illuminate\Http\RedirectResponse
+    {
+        $this->service->delete($homeId);
+        return redirect()->route('admin.realestate.index')->with('status',__('Deleted successfully.'));
     }
 }

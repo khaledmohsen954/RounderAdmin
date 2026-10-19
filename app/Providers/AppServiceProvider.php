@@ -15,5 +15,5 @@ class AppServiceProvider extends ServiceProvider {
  * @return mixed
  * @throws \Throwable
  */
- public function boot():void { Paginator::useBootstrapFive(); }
+ public function boot():void { Paginator::useBootstrapFive(); \Illuminate\Support\Facades\Blade::if('adminCan', fn (string $route, string $method = 'GET') => app(\App\Modules\Access\Services\AdminPermissionService::class)->allowsRoute(auth()->user(), $route, $method)); }
 }

@@ -1,27 +1,14 @@
 @extends('layouts.admin')
-@section('title',__('Homes').' · Rounder')
+@section('title', __('Homes').' · Rounder')
 @section('body')
-<div class="container-fluid"><div class="row g-3 p-3 p-lg-4"><aside class="col-md-3 col-xl-2"><div class="sidebar p-3"><a href="{{ route('admin.dashboard') }}">▦ &nbsp;{{ __('Dashboard') }}</a><a href="{{ route('admin.users.index') }}">♙ &nbsp;{{ __('Users') }}</a><a class="active" href="{{ route('admin.homes.index') }}">⌂ &nbsp;{{ __('Homes') }}</a><a href="{{ route('admin.about') }}">ⓘ &nbsp;{{ __('About Rounder') }}</a></div></aside>
-<main class="col-md-9 col-xl-10 content"><div class="d-flex justify-content-between align-items-center mb-4"><div><h1 class="h3 fw-bold">{{ __('Homes') }}</h1><p class="text-secondary mb-0">{{ __('Create homes and share their property code with residents.') }}</p></div><button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createHome">{{ __('Add home') }}</button></div>
-@if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
-<div class="panel p-3 table-responsive"><table class="table align-middle mb-0"><thead><tr><th>#</th><th>{{ __('Home') }}</th><th>{{ __('City') }}</th><th>{{ __('Property code') }}</th><th>{{ __('Address') }}</th><th>{{ __('Residents') }}</th></tr></thead><tbody>
-@forelse($homes as $home)<tr><td>{{ $home->id }}</td><td>{{ $home->name }}</td><td>{{ $home->city->translations->firstWhere('locale',app()->getLocale())?->name ?? $home->city->code }}</td><td><code>{{ $home->property_code }}</code></td><td>{{ $home->address }}</td><td>{{ $home->residents->count() }}</td></tr>@empty<tr><td colspan="6" class="text-center text-secondary py-4">{{ __('No homes found') }}</td></tr>@endforelse</tbody></table>{{ $homes->links() }}</div></main></div></div>
-<div class="modal fade" id="createHome" tabindex="-1"><div class="modal-dialog"><form method="post" action="{{ route('admin.homes.store') }}" class="modal-content">@csrf<div class="modal-header"><h2 class="modal-title fs-5">{{ __('Add home') }}</h2></div><div class="modal-body">
-<label class="form-label">{{ __('Home name') }}</label><input name="name" class="form-control" maxlength="120" required>
-<label for="city-search" class="form-label mt-3">{{ __('Search Saudi cities') }}</label><input id="city-search" type="search" class="form-control mb-2" placeholder="{{ __('Search Saudi cities') }}">
-<label for="home-city" class="form-label">{{ __('City') }}</label><select id="home-city" name="city_id" class="form-select" required><option value="">{{ __('Choose city') }}</option>@foreach($cities as $city)<option value="{{ $city->id }}" @selected(old('city_id')==$city->id)>{{ $city->translations->firstWhere('locale',app()->getLocale())?->name ?? $city->code }}</option>@endforeach</select>
-<label class="form-label mt-3">{{ __('Property code') }}</label><input name="property_code" class="form-control" pattern="[A-Za-z0-9_-]{5,60}" maxlength="60" required>
-<label class="form-label mt-3">{{ __('Address') }}</label><input name="address" class="form-control" maxlength="255" required>
-<div class="row mt-2"><div class="col"><label class="form-label">{{ __('Property health') }}</label><input type="number" name="health_percent" class="form-control" min="0" max="100" value="100" required></div><div class="col"><label class="form-label">{{ __('Association balance') }}</label><input type="number" name="association_balance" class="form-control" min="0" step="0.01" value="0" required></div></div>
-</div><div class="modal-footer"><button class="btn btn-primary">{{ __('Save') }}</button></div></form></div></div>
-@push('scripts')
-<script>
-document.getElementById('city-search').addEventListener('input', function () {
-    const query = this.value.trim().toLocaleLowerCase();
-    for (const option of document.getElementById('home-city').options) {
-        option.hidden = option.value !== '' && !option.text.toLocaleLowerCase().includes(query);
-    }
-});
-</script>
-@endpush
+<main class="container py-4"><h1 class="h3 mb-4">{{ __('Homes') }}</h1>
+@include('admin.partials.feedback')
+@adminCan('admin.realestate.create')<a class="btn btn-primary mb-3" href="{{ route('admin.realestate.create') }}">{{ __('Add home') }}</a>@endadminCan
+<div class="panel p-3 table-responsive"><table class="table align-middle"><thead><tr><th>#</th><th>{{ __('Home') }}</th><th>{{ __('City') }}</th><th>{{ __('Floors count') }}</th><th>{{ __('Apartments') }}</th><th>{{ __('Residents') }}</th><th>{{ __('Actions') }}</th></tr></thead><tbody>
+@forelse($homes as $home)<tr><td>{{ $home->id }}</td><td>{{ $home->name }}<div class="small text-secondary">{{ $home->property_code }}</div></td><td>{{ $home->city->translations->firstWhere('locale',app()->getLocale())?->name ?? $home->city->code }}</td><td>{{ $home->floors_count ?? '—' }}</td><td>{{ $home->units_count }}</td><td>{{ $home->residents_count }}</td><td>
+@adminCan('admin.realestate.edit')<a class="btn btn-sm btn-outline-primary" href="{{ route('admin.realestate.edit',$home->id) }}">{{ __('Edit') }}</a>@endadminCan
+@include('admin.partials.delete-button',['action'=>route('admin.realestate.destroy',$home->id)])
+</td></tr>@empty<tr><td colspan="7">{{ __('No homes found') }}</td></tr>@endforelse
+</tbody></table>{{ $homes->links() }}</div>
+</main>
 @endsection

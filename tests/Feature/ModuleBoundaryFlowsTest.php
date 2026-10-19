@@ -19,7 +19,7 @@ class ModuleBoundaryFlowsTest extends TestCase
     public function test_provider_accounts_and_commissions_follow_their_domain_services(): void
     {
         $this->seed();
-        $admin = User::create(['name'=>'Admin','email'=>'module-admin@example.test',
+        $admin = \App\Modules\Identity\Models\Admin::create(['is_super_admin'=>true,'is_active'=>true,'name'=>'Admin','email'=>'module-admin@example.test',
             'password'=>'StrongPassword123!','role_id'=>Role::where('code','admin')->value('id'),'locale'=>'en']);
         $resident = User::create(['name'=>'Resident','email'=>'module-resident@example.test',
             'password'=>'StrongPassword123!','role_id'=>Role::where('code','resident')->value('id'),'locale'=>'en']);

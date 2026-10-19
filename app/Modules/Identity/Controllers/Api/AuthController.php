@@ -31,7 +31,7 @@ class AuthController extends Controller
      */
     public function register(ApiAuthRegisterRequest $request): \Illuminate\Http\JsonResponse
     {
-        return response()->json($this->service->register($request->validated(), $request->user()), 201);
+        return response()->json($this->service->register($request->validated(), null), 201);
     }
 
     /**
@@ -42,7 +42,7 @@ class AuthController extends Controller
      */
     public function login(ApiAuthLoginRequest $request): \Illuminate\Http\JsonResponse
     {
-        return response()->json($this->service->login($request->validated(), $request->user()), 200);
+        return response()->json($this->service->login($request->validated(), null), 200);
     }
 
     /**

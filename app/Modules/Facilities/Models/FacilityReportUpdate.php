@@ -21,6 +21,7 @@ class FacilityReportUpdate extends Model
         'facility_report_id',
         'status_id',
         'updated_by',
+        'admin_updated_by',
         'note',
         'created_at',
     ];
@@ -66,4 +67,9 @@ class FacilityReportUpdate extends Model
         return $this->belongsTo(User::class, 'updated_by');
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo */
+    public function adminActor(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(\App\Modules\Identity\Models\Admin::class, 'admin_updated_by');
+    }
 }

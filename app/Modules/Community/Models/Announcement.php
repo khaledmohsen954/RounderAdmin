@@ -18,6 +18,7 @@ class Announcement extends Model
     protected $fillable = [
         'home_id',
         'created_by',
+        'admin_created_by',
         'reference',
         'published_at',
         'expires_at',
@@ -66,4 +67,9 @@ class Announcement extends Model
         return $this->hasMany(AnnouncementTranslation::class, 'announcement_id');
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo */
+    public function adminActor(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(\App\Modules\Identity\Models\Admin::class, 'admin_created_by');
+    }
 }

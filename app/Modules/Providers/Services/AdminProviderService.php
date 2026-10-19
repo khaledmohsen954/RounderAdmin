@@ -32,11 +32,11 @@ class AdminProviderService
     /**
      * قراءة بيانات المجال مع الحفاظ على قيود الوصول.
      * @param array $input
-     * @param ?User $actor
+     * @param User|\App\Modules\Identity\Models\Admin|null $actor
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    public function index(array $input, ?User $actor): mixed
+    public function index(array $input, User|\App\Modules\Identity\Models\Admin|null $actor): mixed
     {
         // التجميع المرتبط يحسب العمولة في MySQL دون تحميل كل القيود إلى الذاكرة، وCOALESCE يعيد صفراً للمزود الجديد.
         $providers = ProviderProfile::query()
@@ -62,11 +62,11 @@ class AdminProviderService
     /**
      * تنفيذ التغيير داخل معاملة؛ الحدث لا يخرج إلا بعد نجاح الحفظ.
      * @param array $input
-     * @param ?User $actor
+     * @param User|\App\Modules\Identity\Models\Admin|null $actor
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    public function store(array $input, ?User $actor): mixed
+    public function store(array $input, User|\App\Modules\Identity\Models\Admin|null $actor): mixed
     {
         return DB::transaction(function () use ($input, $actor) {
             $result = $this->performStore($input, $actor);
@@ -78,11 +78,11 @@ class AdminProviderService
     /**
      * قواعد العملية؛ المعاملة والتبليغ مسؤولية المدخل العام للخدمة.
      * @param array $input
-     * @param ?User $actor
+     * @param User|\App\Modules\Identity\Models\Admin|null $actor
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    private function performStore(array $input, ?User $actor): mixed
+    private function performStore(array $input, User|\App\Modules\Identity\Models\Admin|null $actor): mixed
     {
         $data = $input;
 
@@ -135,7 +135,7 @@ class AdminProviderService
      * @return string
      * @throws \Throwable
      */
-    public function update(int $providerId, array $input, ?User $actor): string
+    public function update(int $providerId, array $input, User|\App\Modules\Identity\Models\Admin|null $actor): string
     {
         return DB::transaction(function () use ($providerId, $input, $actor) {
             $provider = ProviderProfile::lockForUpdate()->findOrFail($providerId);

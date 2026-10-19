@@ -20,6 +20,7 @@ class EmergencyProviderAssignment extends Model
         'provider_profile_id',
         'provider_contract_id',
         'assigned_by',
+        'admin_assigned_by',
         'assigned_at',
         'accepted_at',
         'completed_at',
@@ -79,4 +80,9 @@ class EmergencyProviderAssignment extends Model
         return $this->belongsTo(User::class, 'assigned_by');
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo */
+    public function adminActor(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(\App\Modules\Identity\Models\Admin::class, 'admin_assigned_by');
+    }
 }

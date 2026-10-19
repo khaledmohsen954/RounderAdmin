@@ -15,10 +15,10 @@ class ProviderFormsTest extends TestCase
     use RefreshDatabase;
 
     /** @return User */
-    private function admin(): User
+    private function admin(): \App\Modules\Identity\Models\Admin
     {
         $this->seed();
-        return User::create(['name'=>'Admin', 'email'=>'provider-admin@example.test',
+        return \App\Modules\Identity\Models\Admin::create(['is_super_admin'=>true,'is_active'=>true,'name'=>'Admin', 'email'=>'provider-admin@example.test',
             'password'=>'StrongPassword123!', 'locale'=>'ar',
             'role_id'=>Role::where('code','admin')->value('id')]);
     }

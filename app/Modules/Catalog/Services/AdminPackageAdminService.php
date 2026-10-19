@@ -56,11 +56,11 @@ class AdminPackageAdminService
     /**
      * قراءة بيانات المجال مع الحفاظ على قيود الوصول.
      * @param array $input
-     * @param ?User $actor
+     * @param User|\App\Modules\Identity\Models\Admin|null $actor
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    public function index(array $input, ?User $actor): mixed
+    public function index(array $input, User|\App\Modules\Identity\Models\Admin|null $actor): mixed
     {
         $services = Service::query()
             ->join('service_categories', 'services.service_category_id', '=', 'service_categories.id')
@@ -123,11 +123,11 @@ class AdminPackageAdminService
     /**
      * تنفيذ التغيير داخل معاملة؛ الحدث لا يخرج إلا بعد نجاح الحفظ.
      * @param array $input
-     * @param ?User $actor
+     * @param User|\App\Modules\Identity\Models\Admin|null $actor
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    public function storeService(array $input, ?User $actor): mixed
+    public function storeService(array $input, User|\App\Modules\Identity\Models\Admin|null $actor): mixed
     {
         return DB::transaction(function () use ($input, $actor) {
             $result = $this->performStoreService($input, $actor);
@@ -139,11 +139,11 @@ class AdminPackageAdminService
     /**
      * قواعد العملية؛ المعاملة والتبليغ مسؤولية المدخل العام للخدمة.
      * @param array $input
-     * @param ?User $actor
+     * @param User|\App\Modules\Identity\Models\Admin|null $actor
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    private function performStoreService(array $input, ?User $actor): mixed
+    private function performStoreService(array $input, User|\App\Modules\Identity\Models\Admin|null $actor): mixed
     {
         $data = $input;
 
@@ -178,11 +178,11 @@ class AdminPackageAdminService
     /**
      * تنفيذ التغيير داخل معاملة؛ الحدث لا يخرج إلا بعد نجاح الحفظ.
      * @param array $input
-     * @param ?User $actor
+     * @param User|\App\Modules\Identity\Models\Admin|null $actor
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    public function storePackage(array $input, ?User $actor): mixed
+    public function storePackage(array $input, User|\App\Modules\Identity\Models\Admin|null $actor): mixed
     {
         return DB::transaction(function () use ($input, $actor) {
             $result = $this->performStorePackage($input, $actor);
@@ -194,11 +194,11 @@ class AdminPackageAdminService
     /**
      * قواعد العملية؛ المعاملة والتبليغ مسؤولية المدخل العام للخدمة.
      * @param array $input
-     * @param ?User $actor
+     * @param User|\App\Modules\Identity\Models\Admin|null $actor
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    private function performStorePackage(array $input, ?User $actor): mixed
+    private function performStorePackage(array $input, User|\App\Modules\Identity\Models\Admin|null $actor): mixed
     {
         $data = $input;
 
@@ -254,12 +254,12 @@ class AdminPackageAdminService
     /**
      * قراءة بيانات المجال مع الحفاظ على قيود الوصول.
      * @param array $input
-     * @param ?User $actor
+     * @param User|\App\Modules\Identity\Models\Admin|null $actor
      * @param int $serviceId
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    public function editService(array $input, ?User $actor, int $serviceId): mixed
+    public function editService(array $input, User|\App\Modules\Identity\Models\Admin|null $actor, int $serviceId): mixed
     {
         $service = Service::query()->where('id', $serviceId)->first();
         DomainViolation::unless($service, FailureReason::NotFound);
@@ -274,12 +274,12 @@ class AdminPackageAdminService
     /**
      * تنفيذ التغيير داخل معاملة؛ الحدث لا يخرج إلا بعد نجاح الحفظ.
      * @param array $input
-     * @param ?User $actor
+     * @param User|\App\Modules\Identity\Models\Admin|null $actor
      * @param int $serviceId
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    public function updateService(array $input, ?User $actor, int $serviceId): mixed
+    public function updateService(array $input, User|\App\Modules\Identity\Models\Admin|null $actor, int $serviceId): mixed
     {
         return DB::transaction(function () use ($input, $actor, $serviceId) {
             $result = $this->performUpdateService($input, $actor, $serviceId);
@@ -291,12 +291,12 @@ class AdminPackageAdminService
     /**
      * قواعد العملية؛ المعاملة والتبليغ مسؤولية المدخل العام للخدمة.
      * @param array $input
-     * @param ?User $actor
+     * @param User|\App\Modules\Identity\Models\Admin|null $actor
      * @param int $serviceId
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    private function performUpdateService(array $input, ?User $actor, int $serviceId): mixed
+    private function performUpdateService(array $input, User|\App\Modules\Identity\Models\Admin|null $actor, int $serviceId): mixed
     {
         $data = $input;
 
@@ -331,7 +331,7 @@ class AdminPackageAdminService
      * @return array
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public function editPackage(array $input, ?User $actor, int $packageId): array
+    public function editPackage(array $input, User|\App\Modules\Identity\Models\Admin|null $actor, int $packageId): array
     {
         $package = ServicePackage::with(['translations', 'includedServices'])->findOrFail($packageId);
         $translations = $package->translations->keyBy('locale');
@@ -350,7 +350,7 @@ class AdminPackageAdminService
      * @return string
      * @throws \Throwable
      */
-    public function updatePackage(array $input, ?User $actor, int $packageId): string
+    public function updatePackage(array $input, User|\App\Modules\Identity\Models\Admin|null $actor, int $packageId): string
     {
         return DB::transaction(function () use ($input, $actor, $packageId) {
             $package = ServicePackage::whereKey($packageId)->lockForUpdate()->firstOrFail();

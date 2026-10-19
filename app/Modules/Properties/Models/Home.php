@@ -24,6 +24,7 @@ class Home extends Model
     /** الحقول المسموح حفظها؛ يجب تمرير البيانات المتحقق منها فقط من طبقة الطلب. */
     protected $fillable = [
         'city_id',
+        'floors_count',
         'name',
         'address',
         'property_code',
@@ -39,6 +40,7 @@ class Home extends Model
     {
         return [
             'city_id' => 'integer',
+            'floors_count' => 'integer',
             'health_percent' => 'integer',
             'association_balance' => 'decimal:2',
         ];
@@ -134,4 +136,6 @@ class Home extends Model
         return $this->belongsToMany(User::class, 'resident_homes')
             ->withPivot(['unit_label', 'is_primary'])->withTimestamps();
     }
+    /** @return HasMany */
+    public function units(): HasMany { return $this->hasMany(HomeUnit::class); }
 }

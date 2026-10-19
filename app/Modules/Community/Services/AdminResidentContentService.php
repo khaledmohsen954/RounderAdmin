@@ -24,11 +24,11 @@ class AdminResidentContentService
     /**
      * قراءة بيانات المجال مع الحفاظ على قيود الوصول.
      * @param array $input
-     * @param ?User $actor
+     * @param User|\App\Modules\Identity\Models\Admin|null $actor
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    public function index(array $input, ?User $actor): mixed
+    public function index(array $input, User|\App\Modules\Identity\Models\Admin|null $actor): mixed
     {
         return [
             'homes' => Home::query()->orderBy('name')->get(),
@@ -56,11 +56,11 @@ class AdminResidentContentService
     /**
      * تنفيذ التغيير داخل معاملة؛ الحدث لا يخرج إلا بعد نجاح الحفظ.
      * @param array $input
-     * @param ?User $actor
+     * @param User|\App\Modules\Identity\Models\Admin|null $actor
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    public function storeAnnouncement(array $input, ?User $actor): mixed
+    public function storeAnnouncement(array $input, User|\App\Modules\Identity\Models\Admin|null $actor): mixed
     {
         return DB::transaction(function () use ($input, $actor) {
             $result = $this->performStoreAnnouncement($input, $actor);
@@ -72,11 +72,11 @@ class AdminResidentContentService
     /**
      * قواعد العملية؛ المعاملة والتبليغ مسؤولية المدخل العام للخدمة.
      * @param array $input
-     * @param ?User $actor
+     * @param User|\App\Modules\Identity\Models\Admin|null $actor
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    private function performStoreAnnouncement(array $input, ?User $actor): mixed
+    private function performStoreAnnouncement(array $input, User|\App\Modules\Identity\Models\Admin|null $actor): mixed
     {
         $data = $input;
 
@@ -85,7 +85,7 @@ class AdminResidentContentService
         $id = DB::transaction(function () use ($input, $actor, $data) {
             $id = Announcement::query()->create([
                 'home_id' => $data['home_id'] ?? null,
-                'created_by' => $actor->id,
+                ...\App\Core\AdminActor::attributes($actor, 'created_by'),
                 'reference' => 'AN-' . Str::upper(Str::random(12)),
                 'published_at' => $data['published'] ? now() : null,
                 'expires_at' => $data['expires_at'] ?? null,
@@ -113,11 +113,11 @@ class AdminResidentContentService
     /**
      * تنفيذ التغيير داخل معاملة؛ الحدث لا يخرج إلا بعد نجاح الحفظ.
      * @param array $input
-     * @param ?User $actor
+     * @param User|\App\Modules\Identity\Models\Admin|null $actor
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    public function storeInitiative(array $input, ?User $actor): mixed
+    public function storeInitiative(array $input, User|\App\Modules\Identity\Models\Admin|null $actor): mixed
     {
         return DB::transaction(function () use ($input, $actor) {
             $result = $this->performStoreInitiative($input, $actor);
@@ -129,11 +129,11 @@ class AdminResidentContentService
     /**
      * قواعد العملية؛ المعاملة والتبليغ مسؤولية المدخل العام للخدمة.
      * @param array $input
-     * @param ?User $actor
+     * @param User|\App\Modules\Identity\Models\Admin|null $actor
      * @return mixed
      * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
-    private function performStoreInitiative(array $input, ?User $actor): mixed
+    private function performStoreInitiative(array $input, User|\App\Modules\Identity\Models\Admin|null $actor): mixed
     {
         $data = $input;
 
@@ -142,7 +142,7 @@ class AdminResidentContentService
         $id = DB::transaction(function () use ($input, $actor, $data) {
             $id = Initiative::query()->create([
                 'home_id' => $data['home_id'],
-                'created_by' => $actor->id,
+                ...\App\Core\AdminActor::attributes($actor, 'created_by'),
                 'reference' => 'IN-' . Str::upper(Str::random(12)),
                 'title' => $data['title_ar'],
                 'description' => $data['description_ar'],

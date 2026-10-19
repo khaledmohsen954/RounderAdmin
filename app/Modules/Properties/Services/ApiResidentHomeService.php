@@ -57,11 +57,15 @@ class ApiResidentHomeService
 
   
   $user=$actor;$home=Home::where('property_code',$data['property_code'])->firstOrFail();
+  $unit = $home->units()->where('unit_number',$data['unit_label'])->first();
+  if ($home->units()->exists() && !$unit) {
+   throw \Illuminate\Validation\ValidationException::withMessages(['unit_label'=>__('Select a valid apartment in this property.')]);
+  }
   $already=$user->residentHomes()->where('homes.id',$home->id)->wherePivot('unit_label',$data['unit_label'])->exists();
   DomainViolation::rejectIf($already, FailureReason::Conflict, __('Residence is already linked to this account.'));
-  DB::transaction(function()use($user,$home,$data){
+  DB::transaction(function()use($user,$home,$data,$unit){
    $user->residentHomes()->newPivotStatement()->where('user_id',$user->id)->update(['is_primary'=>false]);
-   $user->residentHomes()->attach($home->id,['unit_label'=>$data['unit_label'],'is_primary'=>true]);
+   $user->residentHomes()->attach($home->id,['unit_label'=>$data['unit_label'],'home_unit_id'=>$unit?->id,'is_primary'=>true]);
   });
   return ['message'=>__('Residence linked successfully.'),'data'=>['home_id'=>$home->id,'name'=>$home->name,'unit_label'=>$data['unit_label']]];
     }

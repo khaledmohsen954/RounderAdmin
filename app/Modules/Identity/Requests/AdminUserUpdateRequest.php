@@ -1,22 +1,16 @@
 <?php
-
 namespace App\Modules\Identity\Requests;
-use App\Core\Enums\SupportedLocale;
-
-use App\Core\Http\Requests\AdminRequest;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Str;
-
-/** التحقق من مدخلات UserController::update قبل تشغيل الخدمة. */
-class AdminUserUpdateRequest extends AdminRequest
+/** إعادة استخدام قواعد الإنشاء مع استثناء السجل الحالي وعدم تغيير كلمة المرور هنا. */
+class AdminUserUpdateRequest extends AdminUserStoreRequest
 {
-    /**
-     * قواعد المدخلات؛ صلاحيات الدور موروثة من قاعدة الطلب.
-     * @return array<string, mixed>
-     * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
-     */
+    /** @return array<string,mixed> */
     public function rules(): array
     {
-        return ['name'=>['sometimes','required','string','min:2','max:120'],'email'=>['sometimes','required','email:rfc,dns','max:254',Rule::unique('users','email')->ignore($this->route('user')->id)],'phone'=>['sometimes','nullable','regex:/^\+[1-9][0-9]{7,14}$/',Rule::unique('users','phone')->ignore($this->route('user')->id)],'role_id'=>['sometimes','required','integer','exists:roles,id'],'locale'=>['sometimes','required',Rule::enum(SupportedLocale::class)]];
+        $rules = parent::rules();
+        unset($rules['password']);
+        $rules['email'] = ['required','email:rfc','max:254',Rule::unique('admins','email')->ignore($this->route('user')->id)];
+        $rules['phone'] = ['nullable','regex:/^\+[1-9][0-9]{7,14}$/',Rule::unique('admins','phone')->ignore($this->route('user')->id)];
+        return $rules;
     }
 }

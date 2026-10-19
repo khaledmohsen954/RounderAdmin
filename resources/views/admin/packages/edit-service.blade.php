@@ -2,11 +2,11 @@
 @section('title', __('Edit service').' · Rounder')
 @section('body')
 <main class="container py-4">
-<a class="btn btn-outline-secondary mb-3" href="{{ route('admin.packages.index') }}">{{ __('Packages and services') }}</a>
+@adminCan('admin.packages.index')<a class="btn btn-outline-secondary mb-3" href="{{ route('admin.packages.index') }}">{{ __('Packages and services') }}</a>@endadminCan
 <div class="panel p-4">
 <h1 class="h3">{{ __('Edit service') }}</h1>
 @if($errors->any())<div class="alert alert-danger"><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
-<form method="post" enctype="multipart/form-data" action="{{ route('admin.packages.services.update', $service->id) }}">
+@adminCan('admin.packages.services.update','PUT')<form method="post" enctype="multipart/form-data" action="{{ route('admin.packages.services.update', $service->id) }}">
 @csrf @method('PUT')
 <div class="row g-3">
 <div class="col-md-4"><label for="category" class="form-label">{{ __('Category') }}</label><select id="category" name="service_category_id" class="form-select" required>@foreach($categories as $category)<option value="{{ $category->id }}" @selected(old('service_category_id',$service->service_category_id)==$category->id)>{{ $category->name ?? $category->code }}</option>@endforeach</select></div>
@@ -21,5 +21,5 @@
 </div>
 <p class="text-secondary mt-3">{{ __('Service changes apply to new orders. Existing order prices stay unchanged.') }}</p>
 <button class="btn btn-primary mt-2">{{ __('Save service') }}</button>
-</form></div></main>
+</form>@endadminCan</div></main>
 @endsection
