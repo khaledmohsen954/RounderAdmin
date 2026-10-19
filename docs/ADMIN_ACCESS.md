@@ -7,3 +7,6 @@
 - `/admin/permissions` manages Arabic/English named permission groups with view/create/update/delete checkboxes per dashboard section. The backend checks every route and rejects unknown sections by default.
 - Non-super administrators cannot grant privileges they do not hold or modify their own permission group. Protected accounts cannot be changed/deleted through the administrative user form.
 - Apply migrations with `php artisan migrate --force`. Never use migrate:fresh on a populated deployment.
+
+## Unified sections
+Permission checks cover dashboard, about, administrators, providers, realestate, services, packages, comparison features, subscriptions, resident operations, service orders, emergencies and permission groups. Middleware and Blade menus use the same resolver. Default post-login navigation chooses a section the account can view. Mobile API authentication is bearer-token-only and cannot reuse an administrator browser session.

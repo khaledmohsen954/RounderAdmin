@@ -51,4 +51,9 @@ try {
   await page.locator('#admin-menu.show').waitFor({state:'hidden'});
   await page.screenshot({path:'tests/browser-artifacts/dashboard-mobile.png',fullPage:true});
   assert.deepEqual(errors,[],'Browser JavaScript errors');
+} catch(error) {
+  await mkdir('tests/browser-artifacts',{recursive:true});
+  await page.screenshot({path:'tests/browser-artifacts/failure.png',fullPage:true});
+  console.error('Failed browser URL:',page.url());
+  throw error;
 } finally {await browser.close();}
