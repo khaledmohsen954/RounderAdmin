@@ -55,7 +55,7 @@ class HomeController extends Controller
     /** @param AdminHomeIndexRequest $request @param int $homeId @return \Illuminate\Http\RedirectResponse @throws \Throwable */
     public function destroy(AdminHomeIndexRequest $request, int $homeId): \Illuminate\Http\RedirectResponse
     {
-        $this->service->delete($homeId);
+        $this->service->delete($homeId,$request->user()->id);
         return redirect()->route('admin.realestate.index')->with('status',__('Deleted successfully.'));
     }
 }

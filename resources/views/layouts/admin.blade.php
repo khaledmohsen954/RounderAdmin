@@ -111,9 +111,11 @@ body,button,input,select,textarea{font-family:"Tajawal",system-ui,sans-serif}
     let pendingForm = null;
     const node = document.getElementById('delete-confirmation');
     const modal = bootstrap.Modal.getOrCreateInstance(node);
-    document.addEventListener('submit', event => {
-        if (!event.target.matches('.delete-record-form')) return;
-        event.preventDefault(); pendingForm = event.target; modal.show();
+    document.addEventListener('click', event => {
+        const button = event.target.closest('[data-confirm-delete]');
+        if (!button) return;
+        pendingForm = button.closest('.delete-record-form');
+        if (pendingForm) modal.show();
     });
     document.getElementById('confirm-delete').addEventListener('click', function () {
         if (!pendingForm) return;

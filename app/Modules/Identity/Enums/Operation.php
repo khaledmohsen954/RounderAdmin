@@ -7,6 +7,7 @@ enum Operation: string
     case ApiAuthLogin = 'ApiAuthService.login';
     case ApiAuthLogout = 'ApiAuthService.logout';
     case ApiProfileUpdateProfile = 'ApiProfileService.updateProfile';
+    case AdminUserDelete = 'AdminUserService.delete';
     case AdminUserStore = 'AdminUserService.store';
     case AdminUserUpdate = 'AdminUserService.update';
     case AdminUserResetPassword = 'AdminUserService.resetPassword';

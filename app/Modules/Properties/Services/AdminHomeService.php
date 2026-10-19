@@ -54,18 +54,19 @@ class AdminHomeService
                 }
                 $removed->delete();
             }
-            DB::afterCommit(fn () => event(new PropertiesChanged(Operation::AdminHomeStore,$actor->id)));
+            DB::afterCommit(fn () => event(new PropertiesChanged($id ? Operation::AdminHomeUpdate : Operation::AdminHomeStore,$actor->id)));
         });
     }
     /** @param int $id @return void @throws \Throwable */
-    public function delete(int $id): void
+    public function delete(int $id, int $adminId): void
     {
-        DB::transaction(function () use ($id) {
+        DB::transaction(function () use ($id,$adminId) {
             $home = Home::lockForUpdate()->findOrFail($id);
             foreach (['residentHomes','bookings','associationAccounts','facilityReports','announcements','communityPosts','initiatives','emergencyRequests'] as $relation) {
                 if ($home->$relation()->exists()) throw ValidationException::withMessages(['delete'=>__('This record is in use and cannot be deleted.')]);
             }
             $home->delete();
+            DB::afterCommit(fn () => event(new PropertiesChanged(Operation::AdminHomeDelete,$adminId)));
         });
     }
 }

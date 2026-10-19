@@ -17,7 +17,8 @@
 <select class="form-select form-select-sm provider-select" name="provider_profile_id"><option value="">{{ __('Choose provider') }}</option>@foreach($providers as $provider)<option value="{{ $provider->id }}" @selected($order->provider_profile_id===$provider->id)>{{ $provider->company_name }} · {{ $provider->name }}</option>@endforeach</select>
 <select class="form-select form-select-sm order-status" name="booking_status_id" required>@foreach($statuses as $status)<option value="{{ $status->id }}" data-code="{{ $status->code }}" @selected($order->status_code===$status->code)>{{ $status->name }}</option>@endforeach</select>
 <input type="number" step=".01" min="0" max="9999999999.99" name="gross_amount" class="form-control form-control-sm gross-amount" placeholder="{{ __('Final amount for commission') }}">
-<input name="note" maxlength="2000" class="form-control form-control-sm" placeholder="{{ __('Internal note') }}"><button class="btn btn-sm btn-primary">{{ __('Save order update') }}</button></form>@endadminCan@adminCan('admin.service-orders.destroy','DELETE')@include('admin.partials.delete-button',['action'=>route('admin.service-orders.destroy',$order->id)])@endadminCan</td></tr>
+<input name="note" maxlength="2000" class="form-control form-control-sm" placeholder="{{ __('Internal note') }}"><button class="btn btn-sm btn-primary">{{ __('Save order update') }}</button></form>@endadminCan
+@adminCan('admin.service-orders.destroy','DELETE')@include('admin.partials.delete-button',['action'=>route('admin.service-orders.destroy',$order->id)])@endadminCan</td></tr>
 @empty<tr><td colspan="5" class="text-center text-secondary">{{ __('No service orders found') }}</td></tr>@endforelse
 </tbody></table>{{ $orders->links() }}</div></div>
 </main></div></div>

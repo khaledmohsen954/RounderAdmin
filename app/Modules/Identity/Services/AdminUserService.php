@@ -65,7 +65,9 @@ class AdminUserService
             $locked = Admin::lockForUpdate()->findOrFail($user->id);
             $this->assertManageable($actor,$locked);
             // المراجع المالية والتاريخية محمية بمفاتيح RESTRICT؛ لا تُحذف سجلات الأعمال بالتبعية.
-            try { $locked->delete(); }
+            try { $locked->delete();
+                DB::afterCommit(fn () => event(new IdentityChanged(Operation::AdminUserDelete,$actor->id)));
+            }
             catch (\Illuminate\Database\QueryException $error) {
                 if (($error->errorInfo[1] ?? null) !== 1451) throw $error;
                 throw ValidationException::withMessages(['delete'=>__('This record is in use and cannot be deleted.')]);

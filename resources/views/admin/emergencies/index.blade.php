@@ -21,7 +21,8 @@
 <input type="number" step=".01" min="0" max="9999999999.99" name="gross_amount" class="form-control form-control-sm gross-amount" placeholder="{{ __('Final amount for commission') }}">
 <input name="note" maxlength="2000" class="form-control form-control-sm" placeholder="{{ __('Internal note') }}">
 <button class="btn btn-sm btn-primary">{{ __('Save dispatch update') }}</button>
-</form>@endadminCan@adminCan('admin.emergencies.destroy','DELETE')@include('admin.partials.delete-button',['action'=>route('admin.emergencies.destroy',$item->id)])@endadminCan</td></tr>
+</form>@endadminCan
+@adminCan('admin.emergencies.destroy','DELETE')@include('admin.partials.delete-button',['action'=>route('admin.emergencies.destroy',$item->id)])@endadminCan</td></tr>
 @empty<tr><td colspan="6" class="text-center text-secondary">{{ __('No emergency requests found') }}</td></tr>@endforelse
 </tbody></table>{{ $requests->links() }}</div></div>
 </main></div></div>
