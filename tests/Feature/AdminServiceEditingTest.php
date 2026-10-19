@@ -25,7 +25,7 @@ class AdminServiceEditingTest extends TestCase
         $service=DB::table('services')->first();
         $this->actingAs($admin)->get("/admin/packages/services/{$service->id}/edit")->assertOk();
         $this->put("/admin/packages/services/{$service->id}",$this->payload($service))
-            ->assertRedirect(route('admin.packages.index'))->assertSessionHasNoErrors();
+            ->assertRedirect(route('admin.services.index'))->assertSessionHasNoErrors();
         $this->assertDatabaseHas('services',['id'=>$service->id,'base_price'=>250,'is_active'=>false]);
         $this->assertDatabaseHas('service_translations',['service_id'=>$service->id,'locale'=>'en','name'=>'Updated service']);
     }

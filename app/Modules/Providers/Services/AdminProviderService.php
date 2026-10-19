@@ -124,7 +124,8 @@ class AdminProviderService
      */
     public function edit(int $providerId): array
     {
-        return ['provider' => ProviderProfile::with('user')->findOrFail($providerId)];
+        $provider = ProviderProfile::with('user')->findOrFail($providerId);
+        return ['provider'=>$provider,'contract'=>$provider->contracts()->latest('id')->first()];
     }
 
     /**
@@ -144,6 +145,18 @@ class AdminProviderService
                 'company_name' => $input['company_name'],
                 'is_approved' => $input['is_approved'],
             ]);
+            if (!empty($input['contract_id'])) {
+                $contract = $provider->contracts()->lockForUpdate()->findOrFail($input['contract_id']);
+                if ($input['is_approved'] && $contract->status?->code === ContractStatusCode::Draft->value) {
+                    $contract->status_id = ProviderContractStatus::where('code',ContractStatusCode::Active->value)->firstOrFail()->id;
+                }
+                $contract->update([
+                    'service_commission_percent'=>$input['service_commission_percent'],
+                    'emergency_commission_percent'=>$input['emergency_commission_percent'],
+                    'starts_on'=>$input['starts_on'],'ends_on'=>$input['ends_on'] ?? null,
+                    'terms'=>$this->richText->clean($input['terms'] ?? null),
+                ]);
+            }
             DB::afterCommit(fn () => event(new ProvidersChanged(Operation::AdminProviderUpdate, $actor?->id)));
             return __('Provider updated successfully.');
         });

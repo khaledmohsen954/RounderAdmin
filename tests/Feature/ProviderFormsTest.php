@@ -73,7 +73,9 @@ class ProviderFormsTest extends TestCase
         $data = $this->payload();
         $this->actingAs($admin)->post('/admin/providers',$data)->assertSessionHasNoErrors();
         $provider = ProviderProfile::where('company_name',$data['company_name'])->firstOrFail();
-        $data['email'] = $admin->email;
+        $other = User::create(['name'=>'Other provider','email'=>'other-provider@example.test','password'=>'StrongPassword123!',
+            'role_id'=>Role::where('code','provider')->value('id'),'locale'=>'ar']);
+        $data['email'] = $other->email;
         $data['company_name'] = 'Must not save';
         $this->put('/admin/providers/'.$provider->id,$data)->assertSessionHasErrors('email');
         $this->assertDatabaseMissing('provider_profiles',['company_name'=>'Must not save']);

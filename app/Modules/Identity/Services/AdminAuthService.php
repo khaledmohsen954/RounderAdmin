@@ -25,4 +25,15 @@ class AdminAuthService
      * @return void
      */
     public function logout(): void { Auth::logout(); }
+    /** اختيار صفحة يستطيع الحساب فتحها بعد تسجيل الدخول. @return string */
+    public function landingRoute(): string
+    {
+        $access=app(\App\Modules\Access\Services\AdminPermissionService::class);
+        foreach (['admin.dashboard','admin.providers.index','admin.realestate.index','admin.services.index',
+            'admin.packages.index','admin.package-features.index','admin.subscriptions.index','admin.content.index',
+            'admin.service-orders.index','admin.emergencies.index','admin.users.index','admin.permissions.index','admin.about'] as $route) {
+            if ($access->allowsRoute(Auth::user(),$route,'GET')) return $route;
+        }
+        return 'admin.dashboard';
+    }
 }

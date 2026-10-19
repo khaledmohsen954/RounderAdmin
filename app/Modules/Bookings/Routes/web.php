@@ -9,3 +9,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('/service-orders', [\App\Modules\Bookings\Controllers\Admin\ServiceOrderAdminController::class, 'index'])->name('service-orders.index');
     Route::put('/service-orders/{bookingId}', [\App\Modules\Bookings\Controllers\Admin\ServiceOrderAdminController::class, 'update'])->name('service-orders.update');
 });
+
+Route::prefix('admin')->name('admin.')->middleware(['auth','admin'])->group(function () {
+    Route::delete('/service-orders/{id}', [\App\Modules\Bookings\Controllers\Admin\DeletionController::class, 'booking'])->whereNumber('id')->name('service-orders.destroy');
+});

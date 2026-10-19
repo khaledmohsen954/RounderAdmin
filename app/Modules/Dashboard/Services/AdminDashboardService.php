@@ -50,7 +50,14 @@ class AdminDashboardService
             'available_packages' => ServicePackage::query()->where('is_active', true)->count(),
         ];
 
-        $recent = Booking::with(['resident', 'service.translations', 'status.translations'])->latest()->limit(8)->get();
+        $access = app(\App\Modules\Access\Services\AdminPermissionService::class);
+        foreach (['residents'=>'users','providers'=>'providers','bookings'=>'orders','pending_bookings'=>'orders',
+            'revenue'=>'orders','linked_homes'=>'realestate','open_reports'=>'content','community_posts'=>'content',
+            'active_initiatives'=>'content','pending_emergencies'=>'emergencies','active_subscriptions'=>'subscriptions',
+            'available_packages'=>'packages','commission_total'=>'providers'] as $key=>$section) {
+            if (!$access->allows($actor,$section.'.view')) unset($stats[$key]);
+        }
+        $recent = $access->allows($actor,'orders.view') ? Booking::with(['resident', 'service.translations', 'status.translations'])->latest()->limit(8)->get() : collect();
         return compact('stats', 'recent');
     }
 }

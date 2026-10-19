@@ -9,3 +9,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('/emergencies', [\App\Modules\Emergencies\Controllers\Admin\EmergencyAdminController::class, 'index'])->name('emergencies.index');
     Route::put('/emergencies/{requestId}', [\App\Modules\Emergencies\Controllers\Admin\EmergencyAdminController::class, 'update'])->name('emergencies.update');
 });
+
+Route::prefix('admin')->name('admin.')->middleware(['auth','admin'])->group(function () {
+    Route::delete('/emergencies/{id}', [\App\Modules\Emergencies\Controllers\Admin\DeletionController::class, 'emergency'])->whereNumber('id')->name('emergencies.destroy');
+});

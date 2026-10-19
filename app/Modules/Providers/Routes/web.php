@@ -10,3 +10,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('/providers/{provider}/edit', [\App\Modules\Providers\Controllers\Admin\ProviderController::class, 'edit'])->whereNumber('provider')->name('providers.edit');
     Route::put('/providers/{provider}', [\App\Modules\Providers\Controllers\Admin\ProviderController::class, 'update'])->whereNumber('provider')->name('providers.update');
 });
+
+Route::prefix('admin')->name('admin.')->middleware(['auth','admin'])->group(function () {
+    Route::delete('/providers/{id}', [\App\Modules\Providers\Controllers\Admin\DeletionController::class, 'provider'])->whereNumber('id')->name('providers.destroy');
+});

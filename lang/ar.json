@@ -304,5 +304,7 @@
     "Add a resident linked to a property before creating a request.": "أضف ساكنًا مرتبطًا بعقار أولًا قبل إنشاء الطلب.",
     "No active request types are available.": "لا توجد أنواع طلبات نشطة.",
     "Open menu": "فتح القائمة",
-    "Close menu": "إغلاق القائمة"
+    "Close menu": "إغلاق القائمة",
+    "Requests": "الطلبات",
+    "Contract edits apply to future calculations. Accrued commissions stay unchanged.": "تعديلات العقد تُطبق على الحسابات القادمة، ولا تغيّر العمولات المستحقة سابقًا."
 }

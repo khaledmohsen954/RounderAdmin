@@ -25,7 +25,7 @@ class AuthController extends Controller
     {
         $this->service->login($request->validated());
         $request->session()->regenerate();
-        return redirect()->intended(route('admin.dashboard'));
+        return redirect()->intended(route($this->service->landingRoute()));
     }
     /**
      * @param AdminSessionRequest $request

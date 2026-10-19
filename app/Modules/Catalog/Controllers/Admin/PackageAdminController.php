@@ -78,7 +78,7 @@ class PackageAdminController extends Controller
      */
     public function updateService(AdminPackageAdminUpdateServiceRequest $request, int $serviceId): \Illuminate\Http\RedirectResponse
     {
-        return redirect()->route('admin.packages.index')->with('status', $this->service->updateService($request->validated(), $request->user(), $serviceId));
+        return redirect()->route('admin.services.index')->with('status', $this->service->updateService($request->validated(), $request->user(), $serviceId));
     }
 
     /**
@@ -109,5 +109,30 @@ class PackageAdminController extends Controller
     public function createService(AdminPackageAdminIndexRequest $request): \Illuminate\Contracts\View\View
     {
         return view('admin.services.create', $this->service->serviceForm());
+    }
+    /** @param AdminPackageAdminIndexRequest $request @return \Illuminate\Contracts\View\View */
+    public function services(AdminPackageAdminIndexRequest $request): \Illuminate\Contracts\View\View
+    {
+        return view('admin.services.index',$this->service->index($request->validated(),$request->user()));
+    }
+    /** @param AdminPackageAdminIndexRequest $request @return \Illuminate\Contracts\View\View */
+    public function createPackage(AdminPackageAdminIndexRequest $request): \Illuminate\Contracts\View\View
+    {
+        return view('admin.packages.create',$this->service->index($request->validated(),$request->user()));
+    }
+    /** @param AdminPackageAdminIndexRequest $request @return \Illuminate\Contracts\View\View */
+    public function definitions(AdminPackageAdminIndexRequest $request): \Illuminate\Contracts\View\View
+    {
+        return view('admin.package-features.index',$this->service->index($request->validated(),$request->user()));
+    }
+    /** @param AdminPackageAdminIndexRequest $request @return \Illuminate\Contracts\View\View */
+    public function createDefinition(AdminPackageAdminIndexRequest $request): \Illuminate\Contracts\View\View
+    {
+        return view('admin.package-features.create');
+    }
+    /** @param AdminPackageAdminIndexRequest $request @return \Illuminate\Contracts\View\View */
+    public function subscriptions(AdminPackageAdminIndexRequest $request): \Illuminate\Contracts\View\View
+    {
+        return view('admin.subscriptions.index',$this->service->index($request->validated(),$request->user()));
     }
 }

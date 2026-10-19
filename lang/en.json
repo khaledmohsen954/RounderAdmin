@@ -257,5 +257,7 @@
     "Add a resident linked to a property before creating a request.": "Add a resident linked to a property before creating a request.",
     "No active request types are available.": "No active request types are available.",
     "Open menu": "Open menu",
-    "Close menu": "Close menu"
+    "Close menu": "Close menu",
+    "Requests": "Requests",
+    "Contract edits apply to future calculations. Accrued commissions stay unchanged.": "Contract edits apply to future calculations. Accrued commissions stay unchanged."
 }

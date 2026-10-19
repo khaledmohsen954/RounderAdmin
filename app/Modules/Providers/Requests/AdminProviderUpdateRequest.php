@@ -23,6 +23,12 @@ class AdminProviderUpdateRequest extends AdminRequest
             'locale' => ['required', Rule::enum(SupportedLocale::class)],
             'company_name' => ['required', 'string', 'min:2', 'max:160'],
             'is_approved' => ['required', 'boolean'],
+            'contract_id'=>['nullable','integer'],
+            'service_commission_percent'=>['required_with:contract_id','numeric','between:0,100','decimal:0,2'],
+            'emergency_commission_percent'=>['required_with:contract_id','numeric','between:0,100','decimal:0,2'],
+            'starts_on'=>['required_with:contract_id','date'],
+            'ends_on'=>['nullable','date','after_or_equal:starts_on'],
+            'terms'=>['nullable','string','max:10000'],
         ];
     }
 }

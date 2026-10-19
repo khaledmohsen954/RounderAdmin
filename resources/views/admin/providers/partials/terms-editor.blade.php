@@ -1,6 +1,6 @@
 {{-- يبقى textarea متاحاً عند تعطيل JavaScript؛ الخادم هو المسؤول عن تنقية HTML. --}}
 <label for="terms" class="form-label" id="terms-label">{{ __('Contract terms') }}</label>
-<textarea id="terms" class="form-control" name="terms" maxlength="10000" rows="6">{{ old('terms') }}</textarea>
+<textarea id="terms" class="form-control" name="terms" maxlength="10000" rows="6">{{ old('terms',$terms ?? '') }}</textarea>
 <div id="terms-toolbar" class="btn-toolbar gap-2 mb-2" role="toolbar" aria-label="{{ __('Text formatting') }}" hidden>
 @foreach(['bold'=>'Bold','italic'=>'Italic','underline'=>'Underline','insertUnorderedList'=>'Bullet list','insertOrderedList'=>'Numbered list'] as $command=>$label)
 <button type="button" class="btn btn-sm btn-outline-secondary" data-command="{{ $command }}">{{ __($label) }}</button>

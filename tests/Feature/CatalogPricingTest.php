@@ -152,7 +152,7 @@ class CatalogPricingTest extends TestCase
             'value_ar'=>'أسبوعياً','value_en'=>'Weekly','value_ur'=>'ہفتہ وار']];
         $this->post('/admin/packages',$data)->assertSessionHasNoErrors();
         $package = ServicePackage::where('code',$data['code'])->firstOrFail();
-        $this->get('/admin/packages')->assertOk()->assertSee('report-frequency');
+        $this->get('/admin/package-features')->assertOk()->assertSee('report-frequency');
         $this->get('/admin/packages/'.$package->id.'/edit')->assertOk()->assertSee('Weekly');
         app()->setLocale('en');
         $entry = app(ApiResidentPackageService::class)->index([], null)['data']->firstWhere('id',$package->id);

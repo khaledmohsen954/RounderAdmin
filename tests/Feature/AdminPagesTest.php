@@ -18,7 +18,7 @@ class AdminPagesTest extends TestCase
             'role_id'=>DB::table('roles')->where('code','admin')->value('id')]);
         $this->actingAs($admin);
         foreach(['ar','en'] as $locale) {
-            foreach(['dashboard','about','users','realestate','providers','packages','content','emergencies','service-orders'] as $page) {
+            foreach(['dashboard','about','users','realestate','providers','packages','content','emergencies','service-orders','services','services/create','packages/create','package-features','package-features/create','subscriptions','permissions','permissions/create','users/create','realestate/add','providers/create'] as $page) {
                 $this->withSession(['locale'=>$locale])->get('/admin/'.$page)->assertOk();
             }
         }

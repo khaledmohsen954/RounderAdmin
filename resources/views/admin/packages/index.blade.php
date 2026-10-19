@@ -1,82 +1,12 @@
 @extends('layouts.admin')
-@section('title', __('Packages and services').' · Rounder')
+@section('title', __('Customer packages').' · Rounder')
 @section('body')
-<div class="container-fluid"><div class="row g-3 p-3 p-lg-4">
-
-<main class="col-12 content">
-<div class="mb-4"><div class="small text-secondary">{{ __('Catalog management') }}</div><h1 class="h3 fw-bold">{{ __('Packages and services') }}</h1></div>
-@if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
-@if($errors->any())<div class="alert alert-danger"><ul class="mb-0">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
-
-@include('admin.packages.partials.feature-definitions')
-@adminCan('admin.services.create')<a class="btn btn-primary mb-4" href="{{ route('admin.services.create') }}">{{ __('Create service') }}</a>@endadminCan
-
-<div class="panel p-3 p-lg-4 mb-4"><h2 class="h5 fw-bold">{{ __('Create customer package') }}</h2>
-@adminCan('admin.packages.store','POST')<form method="post" enctype="multipart/form-data" action="{{ route('admin.packages.store') }}" id="package-form">@csrf
-<div class="row g-3">
-<div class="col-md-3"><label class="form-label">{{ __('Package code') }}</label><input name="code" class="form-control" required maxlength="60" pattern="[A-Za-z0-9_-]+"></div>
-<div class="col-md-3"><label class="form-label">{{ __('Billing cycle') }}</label><select name="billing_cycle_id" class="form-select" required><option value="">{{ __('Choose cycle') }}</option>@foreach($cycles as $cycle)<option value="{{ $cycle->id }}">{{ __($cycle->code === 'semiannual' ? 'Semiannual' : ucfirst($cycle->code)) }} · {{ $cycle->months }} {{ __('months') }}</option>@endforeach</select></div>
-<div class="col-md-2"><label class="form-label">{{ __('Customer price before discount') }}</label><input name="price" class="form-control" type="number" step=".01" min="0" required></div>
-<div class="col-md-2"><label class="form-label">{{ __('Currency') }}</label><input name="currency_code" class="form-control" value="SAR" required pattern="[A-Z]{3}" maxlength="3"></div>
-<div class="col-md-2"><label class="form-label">{{ __('Duration months') }}</label><input name="duration_months" class="form-control" type="number" min="1" max="120" value="1" required></div>
-@include('admin.packages.partials.pricing', ['item' => null, 'priceField' => 'price'])
-@foreach(['ar'=>'العربية','en'=>'English','ur'=>'اردو'] as $locale=>$label)
-<div class="col-md-4"><label class="form-label">{{ __('Package name') }} · {{ $label }}</label><input name="name_{{ $locale }}" class="form-control" required maxlength="140"></div>
-<div class="col-md-4"><label class="form-label">{{ __('Package details') }} · {{ $label }}</label><textarea name="description_{{ $locale }}" class="form-control" rows="2" maxlength="5000"></textarea></div>
-@endforeach
-</div>
-@include('admin.packages.partials.comparison-values', ['featureValues'=>collect()])
-<div class="d-flex justify-content-between align-items-center mt-4 mb-2"><h3 class="h6 fw-bold mb-0">{{ __('Included services and quantities') }}</h3><button type="button" class="btn btn-sm btn-outline-primary" id="add-service-row">+ {{ __('Add service') }}</button></div>
-<div id="package-service-rows"></div>
-<div class="d-flex justify-content-end mt-3"><button class="btn btn-primary px-4">{{ __('Save package') }}</button></div>
-<template id="service-row-template"><div class="row g-2 align-items-end mb-2 package-service-row">
-<div class="col-md-5"><label class="form-label">{{ __('Service') }}</label><select data-name="service_id" class="form-select" required><option value="">{{ __('Choose service') }}</option>@foreach($services as $service)<option value="{{ $service->id }}">{{ $service->name ?? $service->code }} · {{ number_format($service->base_price,2) }}</option>@endforeach</select></div>
-<div class="col-md-3"><label class="form-label">{{ __('Included quantity') }}</label><input data-name="included_quantity" type="number" min="1" max="1000" class="form-control" value="1"></div>
-<div class="col-md-3"><label class="form-label">{{ __('Usage limit') }}</label><select data-name="is_unlimited" class="form-select"><option value="0">{{ __('Limited quantity') }}</option><option value="1">{{ __('Unlimited') }}</option></select></div>
-<div class="col-md-1"><button type="button" class="btn btn-outline-danger remove-service-row" aria-label="{{ __('Remove') }}">×</button></div>
-</div></template>
-</form>@endadminCan
-</div>
-
-<div class="panel p-3 p-lg-4 mb-4"><h2 class="h5 fw-bold">{{ __('Available services') }}</h2><div class="table-responsive"><table class="table align-middle"><thead><tr><th>#</th><th>{{ __('Service') }}</th><th>{{ __('Category') }}</th><th>{{ __('Base price') }}</th><th>{{ __('Status') }}</th></tr></thead><tbody>
-@forelse($services as $service)<tr><td>{{ $service->id }}</td><td>{{ $service->name ?? $service->code }}<div class="small text-secondary">{{ $service->code }}</div></td><td>{{ $service->category_name ?? '' }}</td><td>@if($service->image_path)<img class="rounded me-2" width="48" height="48" style="object-fit:cover" src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($service->image_path) }}" alt="{{ __('Product image') }}">@endif
-@if($service->price_before_discount > $service->base_price)<del class="small text-secondary">{{ number_format($service->price_before_discount,2) }}</del> @endif{{ number_format($service->base_price,2) }} {{ __('SAR') }}</td><td>{{ $service->is_active ? __('Active') : __('Inactive') }} @adminCan('admin.packages.services.edit')<a class="btn btn-sm btn-outline-primary" href="{{ route('admin.packages.services.edit', $service->id) }}">{{ __('Edit') }}</a>@endadminCan</td></tr>@empty<tr><td colspan="5">{{ __('No services found') }}</td></tr>@endforelse
-</tbody></table></div></div>
-
+<main class="container py-4"><h1 class="h3 mb-4">{{ __('Customer packages') }}</h1>@include('admin.partials.feedback')
+@adminCan('admin.packages.create')<a class="btn btn-primary mb-3" href="{{ route('admin.packages.create') }}">{{ __('Create customer package') }}</a>@endadminCan
 <div class="panel p-3 p-lg-4"><h2 class="h5 fw-bold">{{ __('Customer packages') }}</h2><div class="table-responsive"><table class="table align-middle"><thead><tr><th>#</th><th>{{ __('Package') }}</th><th>{{ __('Cycle') }}</th><th>{{ __('Price') }}</th><th>{{ __('Services included') }}</th><th>{{ __('Duration') }}</th><th>{{ __('Status') }}</th></tr></thead><tbody>
 @forelse($packages as $package)<tr><td>{{ $package->id }}</td><td>{{ $package->name ?? $package->code }}<div class="small text-secondary">{{ $package->code }}</div></td><td>{{ __($package->cycle_code === 'semiannual' ? 'Semiannual' : ucfirst($package->cycle_code)) }}</td><td>@if($package->image_path)<img class="rounded me-2" width="48" height="48" style="object-fit:cover" src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($package->image_path) }}" alt="{{ __('Product image') }}">@endif
-@if($package->price_before_discount > $package->price)<del class="small text-secondary">{{ number_format($package->price_before_discount,2) }}</del> @endif{{ number_format($package->price,2) }} {{ $package->currency_code }}</td><td><strong>{{ $package->services_count }}</strong><div class="small text-secondary">@foreach($packageServices->get($package->id,collect()) as $included){{ $included->service_name ?? $included->service_code }} ({{ $included->is_unlimited ? __('Unlimited') : $included->included_quantity }})@if(!$loop->last), @endif @endforeach</div></td><td>{{ $package->duration_months }} {{ __('months') }}</td><td>{{ $package->is_active ? __('Active') : __('Inactive') }} @adminCan('admin.packages.edit')<a class="btn btn-sm btn-outline-primary" href="{{ route('admin.packages.edit', $package->id) }}">{{ __('Edit') }}</a>@endadminCan</td></tr>
+@if($package->price_before_discount > $package->price)<del class="small text-secondary">{{ number_format($package->price_before_discount,2) }}</del> @endif{{ number_format($package->price,2) }} {{ $package->currency_code }}</td><td><strong>{{ $package->services_count }}</strong><div class="small text-secondary">@foreach($packageServices->get($package->id,collect()) as $included){{ $included->service_name ?? $included->service_code }} ({{ $included->is_unlimited ? __('Unlimited') : $included->included_quantity }})@if(!$loop->last), @endif @endforeach</div></td><td>{{ $package->duration_months }} {{ __('months') }}</td><td>{{ $package->is_active ? __('Active') : __('Inactive') }} @adminCan('admin.packages.edit')<a class="btn btn-sm btn-outline-primary" href="{{ route('admin.packages.edit', $package->id) }}">{{ __('Edit') }}</a>@endadminCan@adminCan('admin.packages.destroy','DELETE')@include('admin.partials.delete-button',['action'=>route('admin.packages.destroy',$package->id)])@endadminCan</td></tr>
 @empty<tr><td colspan="7">{{ __('No packages found') }}</td>@endforelse
 </tbody></table>{{ $packages->links() }}</div></div>
-<div class="panel p-3 p-lg-4 mt-4"><h2 class="h5 fw-bold">{{ __('Customer subscriptions') }}</h2><div class="table-responsive"><table class="table align-middle"><thead><tr><th>#</th><th>{{ __('Resident') }}</th><th>{{ __('Home') }}</th><th>{{ __('Package') }}</th><th>{{ __('Status') }}</th><th>{{ __('Price') }}</th><th>{{ __('Start date') }}</th><th>{{ __('End date') }}</th></tr></thead><tbody>
-@forelse($subscriptions as $subscription)<tr><td>{{ $subscription->id }}</td><td>{{ $subscription->resident_name }}</td><td>{{ $subscription->home_name }}</td><td>{{ $subscription->package_name ?? $subscription->reference }}</td><td><span class="pill">{{ $subscription->status_name }}</span></td><td>{{ number_format($subscription->price_snapshot,2) }} {{ $subscription->currency_code }}</td><td>{{ $subscription->starts_at }}</td><td>{{ $subscription->ends_at }}</td></tr>@empty<tr><td colspan="8">{{ __('No subscriptions found') }}</td></tr>@endforelse
-</tbody></table>{{ $subscriptions->links() }}</div></div>
-</main></div></div>
-@endsection
-@push('scripts')
-<script>
-(() => {
- const container = document.getElementById('package-service-rows');
- const template = document.getElementById('service-row-template');
- let rowIndex = 0;
- function addRow() {
-   const node = template.content.cloneNode(true);
-   const row = node.querySelector('.package-service-row');
-   row.querySelectorAll('[data-name]').forEach((field) => {
-     field.name = 'services[' + rowIndex + '][' + field.dataset.name + ']';
-   });
-   row.querySelector('[data-name="is_unlimited"]').addEventListener('change', (event) => {
-     const quantity = row.querySelector('[data-name="included_quantity"]');
-     quantity.disabled = event.target.value === '1';
-     if (quantity.disabled) quantity.value = '';
-     else if (!quantity.value) quantity.value = '1';
-   });
-   row.querySelector('.remove-service-row').addEventListener('click', () => row.remove());
-   container.appendChild(row);
-   rowIndex++;
- }
- document.getElementById('add-service-row').addEventListener('click', addRow);
- addRow();
-})();
-</script>
-@endpush
+
+</main>@endsection

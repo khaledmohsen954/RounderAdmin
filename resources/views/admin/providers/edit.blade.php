@@ -14,7 +14,17 @@
 <div class="col-md-3"><label class="form-label">{{ __('Account language') }}</label><select class="form-select" name="locale" required><option value="ar" @selected(old('locale',$provider->user->locale instanceof \BackedEnum ? $provider->user->locale->value : $provider->user->locale)==='ar')>العربية</option><option value="en" @selected(old('locale',$provider->user->locale instanceof \BackedEnum ? $provider->user->locale->value : $provider->user->locale)==='en')>English</option><option value="ur" @selected(old('locale',$provider->user->locale instanceof \BackedEnum ? $provider->user->locale->value : $provider->user->locale)==='ur')>اردو</option></select></div>
 <div class="col-md-3"><label class="form-label">{{ __('Approval') }}</label><select class="form-select" name="is_approved" required><option value="0" @selected(old('is_approved',$provider->is_approved)==0)>{{ __('Pending approval') }}</option><option value="1" @selected(old('is_approved',$provider->is_approved)==1)>{{ __('Approved') }}</option></select></div>
 
-<div class="col-12"><p class="text-secondary">{{ __('Company edits do not change contract terms or accrued commissions.') }}</p><button class="btn btn-primary">{{ __('Save') }}</button></div>
+@if($contract)
+<input type="hidden" name="contract_id" value="{{ $contract->id }}">
+@foreach(['service_commission_percent'=>'Service commission (%)','emergency_commission_percent'=>'Emergency commission (%)'] as $field=>$label)
+<div class="col-md-6"><label class="form-label">{{ __($label) }}</label><input type="number" name="{{ $field }}" class="form-control" step=".01" min="0" max="100" value="{{ old($field,$contract->$field) }}" required></div>
+@endforeach
+@foreach(['starts_on'=>'Contract starts on','ends_on'=>'Contract ends on'] as $field=>$label)
+<div class="col-md-6"><label class="form-label">{{ __($label) }}</label><input type="date" name="{{ $field }}" class="form-control" value="{{ old($field,$contract->$field?->format('Y-m-d')) }}" @required($field==='starts_on')></div>
+@endforeach
+<div class="col-12">@include('admin.providers.partials.terms-editor',['terms'=>$contract->terms])</div>
+@endif
+<div class="col-12"><p class="text-secondary">{{ __('Contract edits apply to future calculations. Accrued commissions stay unchanged.') }}</p><button class="btn btn-primary">{{ __('Save') }}</button></div>
 </div></form>@endadminCan</div>
 </main>
 @endsection

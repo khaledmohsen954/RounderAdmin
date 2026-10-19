@@ -2,7 +2,7 @@
 @section('title', __('Edit service').' · Rounder')
 @section('body')
 <main class="container py-4">
-@adminCan('admin.packages.index')<a class="btn btn-outline-secondary mb-3" href="{{ route('admin.packages.index') }}">{{ __('Packages and services') }}</a>@endadminCan
+@adminCan('admin.services.index')<a class="btn btn-outline-secondary mb-3" href="{{ route('admin.services.index') }}">{{ __('Available services') }}</a>@endadminCan
 <div class="panel p-4">
 <h1 class="h3">{{ __('Edit service') }}</h1>
 @if($errors->any())<div class="alert alert-danger"><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
