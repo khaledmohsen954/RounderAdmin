@@ -1,0 +1,1576 @@
+{
+  "info": {
+    "name": "Rounder API — Resident App",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "37 API requests verified against RounderAdmin commit 46d58fd6ed19ae8a52da281031394cd3633b2f17. Import the environment, select it, set base_url (without /api), email/password/phone and run login. Token saves automatically. Set reference IDs from your test database/admin records. No live requests were executed when preparing this collection. Admin dashboard web/session routes are deliberately separate and not bearer-token APIs. See README.md."
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "locale",
+      "value": "ar",
+      "type": "string"
+    },
+    {
+      "key": "email",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "password",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "name",
+      "value": "مستخدم تجريبي",
+      "type": "string"
+    },
+    {
+      "key": "phone",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "property_code",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "unit_label",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "home_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "resident_home_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "service_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "service_package_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "emergency_type_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "facility_category_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "booking_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "subscription_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "emergency_request_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "post_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "initiative_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "notification_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "visit_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "facility_report_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "scheduled_at",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "starts_at",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "ends_at",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Dates are generated only when no explicit value is supplied.",
+          "const day = Date.now() + 86400000;",
+          "for (const [key, offset] of [[\"scheduled_at\",0],[\"starts_at\",0],[\"ends_at\",3600000]]) {",
+          " if (!pm.variables.get(key)) pm.variables.set(key,new Date(day+offset).toISOString());",
+          "}",
+          "const raw = pm.request.url.toString() + (pm.request.body?.raw || \"\");",
+          "const missing = [...raw.matchAll(/{{([a-zA-Z_][a-zA-Z0-9_]*)}}/g)].map(m=>m[1]).filter(k=>!String(pm.variables.get(k) ?? \"\").trim());",
+          "if (pm.request.auth?.type !== \"noauth\" && !String(pm.variables.get(\"token\") ?? \"\").trim()) missing.push(\"token\");",
+          "if (missing.length) throw new Error(\"Fill environment variables first: \" + [...new Set(missing)].join(\", \"));",
+          ""
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET /health",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/health",
+            "description": "مطابق للمسار الحالي في Rounder. استخدم IDs تابعة للمستخدم المسجل. طلبات التعديل تُغيّر بيانات فعلية.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Identity",
+      "item": [
+        {
+          "name": "POST /auth/register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/auth/register",
+            "description": "يسجل حساب resident. استخدم بريدًا وهاتفًا غير مسجلين وكلمة مرور 10–72 حرفًا تضم حرفًا كبيرًا وصغيرًا ورقمًا. تحفظ الاستجابة التوكن تلقائيًا.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{name}}\",\n  \"email\": \"{{email}}\",\n  \"phone\": \"{{phone}}\",\n  \"password\": \"{{password}}\",\n  \"password_confirmation\": \"{{password}}\",\n  \"locale\": \"{{locale}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300) { const body = pm.response.json(); pm.test(\"Token returned\", () => pm.expect(body.data.token).to.be.a(\"string\").and.not.empty); pm.environment.set(\"token\", body.data.token); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "POST /auth/login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/auth/login",
+            "description": "دخول سكان التطبيق فقط؛ حسابات admins لا تعمل هنا. يحفظ data.token في البيئة المحددة.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300) { const body = pm.response.json(); pm.test(\"Token returned\", () => pm.expect(body.data.token).to.be.a(\"string\").and.not.empty); pm.environment.set(\"token\", body.data.token); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "GET /me",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/me",
+            "description": "مطابق للمسار الحالي في Rounder. استخدم IDs تابعة للمستخدم المسجل. طلبات التعديل تُغيّر بيانات فعلية."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "POST /auth/logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/auth/logout",
+            "description": "مطابق للمسار الحالي في Rounder. استخدم IDs تابعة للمستخدم المسجل. طلبات التعديل تُغيّر بيانات فعلية."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300) pm.environment.unset(\"token\");"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "GET /resident/profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/resident/profile",
+            "description": "مطابق للمسار الحالي في Rounder. استخدم IDs تابعة للمستخدم المسجل. طلبات التعديل تُغيّر بيانات فعلية."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "PUT /resident/profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/resident/profile",
+            "description": "تغيير locale هنا يغير لغة الردود التالية؛ لغة المستخدم المخزنة تتقدم على Accept-Language.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{name}}\",\n  \"locale\": \"{{locale}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Properties",
+      "item": [
+        {
+          "name": "GET /resident/cities",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/resident/cities?per_page=20&page=1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "resident",
+                "cities"
+              ],
+              "query": [
+                {
+                  "key": "per_page",
+                  "value": "20"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "search",
+                  "value": "الرياض",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "مطابق للمسار الحالي في Rounder. استخدم IDs تابعة للمستخدم المسجل. طلبات التعديل تُغيّر بيانات فعلية."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "GET /resident/homes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/resident/homes",
+            "description": "يعيد home IDs، وليس IDs العضويات resident_homes."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "POST /resident/homes/link",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/resident/homes/link",
+            "description": "الكود ورقم الشقة يجب أن يكونا مسجلين في الإدارة. الرد يعيد home_id ولا يعيد resident_home_id.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"property_code\": \"{{property_code}}\",\n  \"unit_label\": \"{{unit_label}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300) pm.environment.set(\"home_id\", String(pm.response.json().data.home_id));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "GET /resident/visits",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/resident/visits",
+            "description": "مطابق للمسار الحالي في Rounder. استخدم IDs تابعة للمستخدم المسجل. طلبات التعديل تُغيّر بيانات فعلية."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "POST /resident/visits",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/resident/visits",
+            "description": "الموعدان في المستقبل والنهاية بعد البداية. يستخدم الانتماء السكني الافتراضي حسب الخدمة.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"visitor_name\": \"زائر تجريبي\",\n  \"visitor_phone\": \"{{phone}}\",\n  \"starts_at\": \"{{starts_at}}\",\n  \"ends_at\": \"{{ends_at}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300) { const id = pm.response.json().data?.id; if (id != null) pm.environment.set(\"visit_id\", String(id)); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "DELETE /resident/visits/{visitId}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/resident/visits/{{visit_id}}",
+            "description": "مطابق للمسار الحالي في Rounder. استخدم IDs تابعة للمستخدم المسجل. طلبات التعديل تُغيّر بيانات فعلية."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "GET /resident/dashboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/resident/dashboard",
+            "description": "مطابق للمسار الحالي في Rounder. استخدم IDs تابعة للمستخدم المسجل. طلبات التعديل تُغيّر بيانات فعلية."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Catalog",
+      "item": [
+        {
+          "name": "GET /resident/services",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/resident/services",
+            "description": "مطابق للمسار الحالي في Rounder. استخدم IDs تابعة للمستخدم المسجل. طلبات التعديل تُغيّر بيانات فعلية."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "GET /resident/packages",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/resident/packages",
+            "description": "يعرض الباقات النشطة وخدماتها وأسعارها وخصوماتها."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "POST /resident/subscriptions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/resident/subscriptions",
+            "description": "resident_home_id هو ID العضوية في resident_homes وليس home_id. الباقة المدفوعة تنشئ طلبًا pending ولا تُحصّل دفعة من هذا الطلب.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resident_home_id\": \"{{resident_home_id}}\",\n  \"service_package_id\": \"{{service_package_id}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300) { const id = pm.response.json().data?.id; if (id != null) pm.environment.set(\"subscription_id\", String(id)); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "DELETE /resident/subscriptions/{subscriptionId}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/resident/subscriptions/{{subscription_id}}",
+            "description": "إلغاء طلب اشتراك pending مملوك للمستخدم؛ ليس حذفًا لأي اشتراك نشط."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Bookings",
+      "item": [
+        {
+          "name": "GET /resident/bookings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/resident/bookings",
+            "description": "مطابق للمسار الحالي في Rounder. استخدم IDs تابعة للمستخدم المسجل. طلبات التعديل تُغيّر بيانات فعلية."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "POST /resident/bookings",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/resident/bookings",
+            "description": "home_id لعقار مرتبط بالمستخدم وservice_id لخدمة نشطة. الموعد يجب أن يكون في المستقبل.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"home_id\": \"{{home_id}}\",\n  \"service_id\": \"{{service_id}}\",\n  \"scheduled_at\": \"{{scheduled_at}}\",\n  \"notes\": \"طلب تجريبي لخدمة العقار\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300) { const id = pm.response.json().data?.id; if (id != null) pm.environment.set(\"booking_id\", String(id)); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "POST /resident/bookings/{bookingId}/cancel",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/resident/bookings/{{booking_id}}/cancel",
+            "description": "مطابق للمسار الحالي في Rounder. استخدم IDs تابعة للمستخدم المسجل. طلبات التعديل تُغيّر بيانات فعلية.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"إلغاء الطلب التجريبي\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "POST /resident/bookings/{bookingId}/rating",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/resident/bookings/{{booking_id}}/rating",
+            "description": "يتطلب حجزًا مملوكًا للمستخدم وفي الحالة التي تسمح بالتقييم.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"score\": 5,\n  \"comment\": \"تقييم تجريبي بعد إتمام الخدمة\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Emergencies",
+      "item": [
+        {
+          "name": "GET /resident/emergency-requests",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/resident/emergency-requests",
+            "description": "مطابق للمسار الحالي في Rounder. استخدم IDs تابعة للمستخدم المسجل. طلبات التعديل تُغيّر بيانات فعلية."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "POST /resident/emergency-requests",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/resident/emergency-requests",
+            "description": "اختبر على بيئة تجريبية. resident_home_id من عضوية المستخدم، وemergency_type_id من جدول emergency_types لنوع نشط. الهاتف بصيغة +966… والتأكيد true. الحد 3 طلبات بالدقيقة.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resident_home_id\": \"{{resident_home_id}}\",\n  \"emergency_type_id\": \"{{emergency_type_id}}\",\n  \"contact_phone\": \"{{phone}}\",\n  \"location_details\": \"الدور الأول، أمام الشقة\",\n  \"description\": \"طلب تجريبي للتحقق من تسجيل بلاغ الطوارئ\",\n  \"confirm_emergency\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300) { const id = pm.response.json().data?.id; if (id != null) pm.environment.set(\"emergency_request_id\", String(id)); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "DELETE /resident/emergency-requests/{requestId}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/resident/emergency-requests/{{emergency_request_id}}",
+            "description": "الإلغاء مسموح للطلب المملوك للمستخدم قبل إرساله للتنفيذ."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Facilities",
+      "item": [
+        {
+          "name": "GET /resident/facility-reports",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/resident/facility-reports",
+            "description": "مطابق للمسار الحالي في Rounder. استخدم IDs تابعة للمستخدم المسجل. طلبات التعديل تُغيّر بيانات فعلية."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "POST /resident/facility-reports",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/resident/facility-reports",
+            "description": "facility_category_id من جدول facility_categories لفئة نشطة. يستخدم الانتماء السكني الافتراضي حسب الخدمة.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"facility_category_id\": \"{{facility_category_id}}\",\n  \"title\": \"بلاغ صيانة تجريبي\",\n  \"description\": \"تفاصيل بلاغ تجريبي لاختبار تسجيل الصيانة\",\n  \"location\": \"مدخل العقار\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300) { const id = pm.response.json().data?.id; if (id != null) pm.environment.set(\"facility_report_id\", String(id)); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Community",
+      "item": [
+        {
+          "name": "GET /resident/announcements",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/resident/announcements",
+            "description": "مطابق للمسار الحالي في Rounder. استخدم IDs تابعة للمستخدم المسجل. طلبات التعديل تُغيّر بيانات فعلية."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "GET /resident/community/posts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/resident/community/posts",
+            "description": "مطابق للمسار الحالي في Rounder. استخدم IDs تابعة للمستخدم المسجل. طلبات التعديل تُغيّر بيانات فعلية."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "POST /resident/community/posts",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/resident/community/posts",
+            "description": "مطابق للمسار الحالي في Rounder. استخدم IDs تابعة للمستخدم المسجل. طلبات التعديل تُغيّر بيانات فعلية.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"body\": \"منشور تجريبي لسكان العقار\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));",
+                  "if (pm.response.code >= 200 && pm.response.code < 300) { const id = pm.response.json().data?.id; if (id != null) pm.environment.set(\"post_id\", String(id)); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "POST /resident/community/posts/{postId}/comments",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/resident/community/posts/{{post_id}}/comments",
+            "description": "مطابق للمسار الحالي في Rounder. استخدم IDs تابعة للمستخدم المسجل. طلبات التعديل تُغيّر بيانات فعلية.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"body\": \"تعليق تجريبي\",\n  \"parent_id\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "PUT /resident/community/posts/{postId}/reaction",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/resident/community/posts/{{post_id}}/reaction",
+            "description": "مطابق للمسار الحالي في Rounder. استخدم IDs تابعة للمستخدم المسجل. طلبات التعديل تُغيّر بيانات فعلية.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reaction_code\": \"like\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "GET /resident/initiatives",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/resident/initiatives",
+            "description": "مطابق للمسار الحالي في Rounder. استخدم IDs تابعة للمستخدم المسجل. طلبات التعديل تُغيّر بيانات فعلية."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "POST /resident/initiatives/{initiativeId}/participation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/resident/initiatives/{{initiative_id}}/participation",
+            "description": "مطابق للمسار الحالي في Rounder. استخدم IDs تابعة للمستخدم المسجل. طلبات التعديل تُغيّر بيانات فعلية.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pledged_amount\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Finance",
+      "item": [
+        {
+          "name": "GET /resident/association",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/resident/association",
+            "description": "مطابق للمسار الحالي في Rounder. استخدم IDs تابعة للمستخدم المسجل. طلبات التعديل تُغيّر بيانات فعلية."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "GET /resident/notifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/resident/notifications",
+            "description": "مطابق للمسار الحالي في Rounder. استخدم IDs تابعة للمستخدم المسجل. طلبات التعديل تُغيّر بيانات فعلية."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "PUT /resident/notifications/{notificationId}/read",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "{{locale}}"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/resident/notifications/{{notification_id}}/read",
+            "description": "مطابق للمسار الحالي في Rounder. استخدم IDs تابعة للمستخدم المسجل. طلبات التعديل تُغيّر بيانات فعلية."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Successful response\", () => pm.expect(pm.response.code).to.be.within(200, 299));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    }
+  ]
+}
