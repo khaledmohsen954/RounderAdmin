@@ -7,8 +7,13 @@ use App\Modules\Identity\Services\ApiAuthService;
 use App\Modules\Identity\Models\User;
 use App\Modules\Identity\Requests\ApiAuthRegisterRequest;
 use App\Modules\Identity\Requests\ApiAuthLoginRequest;
+use App\Modules\Identity\Requests\ApiSocialLoginRequest;
 use App\Modules\Identity\Requests\ApiAuthLogoutRequest;
 use App\Modules\Identity\Requests\ApiAuthMeRequest;
+use App\Modules\Identity\Requests\ApiValidateMobileRequest;
+use App\Modules\Identity\Requests\ApiSendOtpRequest;
+use App\Modules\Identity\Requests\ApiVerifyOtpRequest;
+use App\Modules\Identity\Services\ResidentSocialLoginService;
 
 /** متحكم HTTP لمجال Identity؛ يفوض جميع العمليات إلى الخدمة. */
 class AuthController extends Controller
@@ -45,6 +50,15 @@ class AuthController extends Controller
         return response()->json($this->service->login($request->validated(), null), 200);
     }
 
+    public function socialLogin(
+        ApiSocialLoginRequest $request,
+        ResidentSocialLoginService $socialLogin
+    ): \Illuminate\Http\JsonResponse {
+        $data = $request->validated();
+
+        return response()->json($socialLogin->login($data['provider'], $data['id_token']), 200);
+    }
+
     /**
      * تمرير الطلب المتحقق منه وإرجاع استجابة HTTP فقط.
      * @param ApiAuthLogoutRequest $request
@@ -65,5 +79,35 @@ class AuthController extends Controller
     public function me(ApiAuthMeRequest $request): \Illuminate\Http\JsonResponse
     {
         return response()->json($this->service->me($request->validated(), $request->user()), 200);
+    }
+
+    /**
+     * التحقق من رقم الجوال.
+     * @param ApiValidateMobileRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function validateMobile(ApiValidateMobileRequest $request): \Illuminate\Http\JsonResponse
+    {
+        return response()->json($this->service->validateMobile($request->validated(), null), 200);
+    }
+
+    /**
+     * إرسال رمز التحقق OTP.
+     * @param ApiSendOtpRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function sendOtp(ApiSendOtpRequest $request): \Illuminate\Http\JsonResponse
+    {
+        return response()->json($this->service->sendOtp($request->validated(), null), 200);
+    }
+
+    /**
+     * التحقق من رمز OTP وتأكيد الدخول.
+     * @param ApiVerifyOtpRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function verifyOtp(ApiVerifyOtpRequest $request): \Illuminate\Http\JsonResponse
+    {
+        return response()->json($this->service->verifyOtp($request->validated(), null), 200);
     }
 }

@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use App\Modules\Catalog\Models\{Service, ServiceCategory};
 use App\Modules\Identity\Models\{Role, User};
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
@@ -13,7 +13,7 @@ use Tests\TestCase;
 /** خدمة ينشئها المدير تظهر عبر API بالمعرّف نفسه، دون بيانات ثابتة في العميل. */
 class ServiceCreationIntegrationTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     /** @return void */
     public function test_created_service_is_persisted_and_available_for_integration(): void

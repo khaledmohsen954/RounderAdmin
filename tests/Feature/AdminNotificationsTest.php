@@ -1,7 +1,7 @@
 <?php
 namespace Tests\Feature;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use App\Modules\Identity\Models\Admin;
 use App\Modules\Access\Models\PermissionSet;
@@ -10,7 +10,7 @@ use App\Modules\Notifications\Services\AdminAlertService;
 use App\Modules\Notifications\Enums\AlertType;
 /** Verify visibility, isolated receipts and rollback semantics for dashboard alerts. */
 class AdminNotificationsTest extends TestCase {
-    use RefreshDatabase;
+    use DatabaseTransactions;
     /** @param string $email @param array<string> $permissions @return Admin */
     private function admin(string $email,array $permissions): Admin {
         $set=PermissionSet::create(['name_ar'=>$email,'name_en'=>$email,'permissions'=>$permissions]);

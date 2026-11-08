@@ -7,6 +7,7 @@ use App\Modules\Identity\Services\ApiProfileService;
 use App\Modules\Identity\Models\User;
 use App\Modules\Identity\Requests\ApiProfileProfileRequest;
 use App\Modules\Identity\Requests\ApiProfileUpdateProfileRequest;
+use App\Modules\Identity\Requests\ApiProfileUpdateMobileRequest;
 
 /** متحكم HTTP لمجال Identity؛ يفوض جميع العمليات إلى الخدمة. */
 class ProfileController extends Controller
@@ -41,5 +42,10 @@ class ProfileController extends Controller
     public function updateProfile(ApiProfileUpdateProfileRequest $request): \Illuminate\Http\JsonResponse
     {
         return response()->json($this->service->updateProfile($request->validated(), $request->user()), 200);
+    }
+
+    public function updateMobile(ApiProfileUpdateMobileRequest $request): \Illuminate\Http\JsonResponse
+    {
+        return response()->json($this->service->updateMobile($request->validated(), $request->user()), 200);
     }
 }

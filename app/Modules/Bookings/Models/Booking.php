@@ -5,8 +5,11 @@ namespace App\Modules\Bookings\Models;
 use App\Modules\Properties\Models\Home;
 use App\Modules\Finance\Models\Payment;
 use App\Modules\Providers\Models\ProviderCommissionEntry;
+use App\Modules\Providers\Models\ProviderProfile;
 use App\Modules\Properties\Models\ResidentHome;
 use App\Modules\Catalog\Models\Service;
+use App\Modules\Catalog\Models\SubService;
+use App\Modules\Catalog\Models\SubServicePrice;
 use App\Modules\Identity\Models\User;
 
 use Illuminate\Database\Eloquent\Model;
@@ -24,12 +27,15 @@ class Booking extends Model
         'resident_id',
         'home_id',
         'service_id',
+        'sub_service_id',
+        'sub_service_price_id',
         'provider_id',
         'booking_status_id',
         'scheduled_at',
         'total_amount',
         'notes',
         'resident_home_id',
+        'service_provider_id',
     ];
 
     /**
@@ -42,11 +48,14 @@ class Booking extends Model
             'resident_id' => 'integer',
             'home_id' => 'integer',
             'service_id' => 'integer',
+            'sub_service_id' => 'integer',
+            'sub_service_price_id' => 'integer',
             'provider_id' => 'integer',
             'booking_status_id' => 'integer',
             'scheduled_at' => 'datetime',
             'total_amount' => 'decimal:2',
             'resident_home_id' => 'integer',
+            'service_provider_id' => 'integer',
         ];
     }
 
@@ -78,12 +87,39 @@ class Booking extends Model
     }
 
     /**
+     * السجل المرتبط عبر sub_service_id.
+     * @return BelongsTo
+     */
+    public function subService(): BelongsTo
+    {
+        return $this->belongsTo(SubService::class, 'sub_service_id');
+    }
+
+    /**
+     * سجل التسعير المرتبط عبر sub_service_price_id.
+     * @return BelongsTo
+     */
+    public function subServicePrice(): BelongsTo
+    {
+        return $this->belongsTo(SubServicePrice::class, 'sub_service_price_id');
+    }
+
+    /**
      * السجل المرتبط عبر provider_id.
      * @return BelongsTo
      */
     public function provider(): BelongsTo
     {
         return $this->belongsTo(User::class, 'provider_id');
+    }
+
+    /**
+     * السجل المرتبط عبر service_provider_id.
+     * @return BelongsTo
+     */
+    public function serviceProvider(): BelongsTo
+    {
+        return $this->belongsTo(ProviderProfile::class, 'service_provider_id');
     }
 
     /**
@@ -147,6 +183,15 @@ class Booking extends Model
     public function bookingRatings(): HasMany
     {
         return $this->hasMany(BookingRating::class, 'booking_id');
+    }
+
+    /**
+     * التقييم الفردي للطلب عبر booking_id.
+     * @return HasOne
+     */
+    public function rating(): HasOne
+    {
+        return $this->hasOne(BookingRating::class, 'booking_id');
     }
 
     /**

@@ -22,6 +22,8 @@ use App\Modules\Identity\Models\User;
 use Illuminate\Support\Facades\DB;
 use App\Modules\Bookings\Events\BookingsChanged;
 use App\Modules\Bookings\Enums\Operation;
+use App\Modules\Notifications\Models\ResidentNotification;
+use App\Modules\Notifications\Models\NotificationType;
 
 /** قواعد عمل Bookings؛ تستقبل بيانات متحققاً منها دون الاعتماد على HTTP. */
 class AdminServiceOrderAdminService
@@ -44,6 +46,7 @@ class AdminServiceOrderAdminService
     {
         $locale = app()->getLocale();
         $orders = Booking::query()
+            ->with('bookingMedia')
             ->join('users as residents', 'bookings.resident_id', '=', 'residents.id')
             ->join('homes', 'bookings.home_id', '=', 'homes.id')
             ->join('services', 'bookings.service_id', '=', 'services.id')
@@ -58,8 +61,14 @@ class AdminServiceOrderAdminService
             })
             ->leftJoin('booking_provider_assignments', 'bookings.id', '=', 'booking_provider_assignments.booking_id')
             ->leftJoin('provider_profiles', 'booking_provider_assignments.provider_profile_id', '=', 'provider_profiles.id')
+            ->leftJoin('sub_services', 'bookings.sub_service_id', '=', 'sub_services.id')
+            ->leftJoin('sub_service_translations', function ($join) use ($locale) {
+                $join->on('sub_services.id', '=', 'sub_service_translations.sub_service_id')
+                    ->where('sub_service_translations.locale', '=', $locale);
+            })
             ->select('bookings.*', 'residents.name as resident_name', 'homes.name as home_name',
                 'services.code as service_code', 'service_translations.name as service_name',
+                'sub_services.code as sub_service_code', 'sub_service_translations.name as sub_service_name',
                 'booking_statuses.code as status_code', 'booking_status_translations.name as status_name',
                 'provider_profiles.id as provider_profile_id', 'provider_profiles.company_name as provider_name')
             ->orderByDesc('bookings.created_at')->paginate(25);
@@ -73,6 +82,63 @@ class AdminServiceOrderAdminService
         })->select('booking_statuses.id', 'booking_statuses.code', 'booking_status_translations.name')->get();
 
         return compact('orders', 'providers', 'statuses');
+    }
+
+    /**
+     * استرجاع تفاصيل حجز الخدمة وجميع العلاقات المرتبطة به للعرض في لوحة الإدارة.
+     * @param int $bookingId
+     * @param User|\App\Modules\Identity\Models\Admin|null $actor
+     * @return array<string, mixed>
+     * @throws \Throwable عند عدم العثور على الحجز.
+     */
+    public function show(int $bookingId, User|\App\Modules\Identity\Models\Admin|null $actor): array
+    {
+        $locale = app()->getLocale();
+        $booking = Booking::query()
+            ->with([
+                'resident',
+                'home.city.translations',
+                'residentHome.unit',
+                'service.translations',
+                'service.category.translations',
+                'subService.translations',
+                'subServicePrice',
+                'status.translations',
+                'provider',
+                'serviceProvider.user',
+                'assignment.providerProfile.user',
+                'assignment.providerContract',
+                'assignment.assignedBy',
+                'assignment.adminActor',
+                'bookingMedia.uploadedBy',
+                'bookingMedia.adminUploadedBy',
+                'bookingStatusHistory' => fn ($q) => $q->orderByDesc('created_at'),
+                'bookingStatusHistory.status.translations',
+                'bookingStatusHistory.changedBy',
+                'bookingStatusHistory.adminActor',
+                'payments.status',
+                'providerCommissionEntries.status',
+                'providerCommissionEntries.providerProfile',
+                'bookingAdditionalWork.status',
+                'bookingAdditionalWork.provider',
+                'bookingRatings.resident',
+                'bookingWarranties.provider',
+            ])
+            ->where('id', $bookingId)
+            ->first();
+
+        DomainViolation::unless($booking, FailureReason::NotFound);
+
+        $providers = ProviderProfile::query()->join('users', 'provider_profiles.user_id', '=', 'users.id')
+            ->where('provider_profiles.is_approved', true)->select('provider_profiles.id', 'provider_profiles.company_name', 'users.name')
+            ->orderBy('provider_profiles.company_name')->get();
+
+        $statuses = BookingStatus::query()->join('booking_status_translations', function ($join) use ($locale) {
+            $join->on('booking_statuses.id', '=', 'booking_status_translations.booking_status_id')
+                ->where('booking_status_translations.locale', '=', $locale);
+        })->select('booking_statuses.id', 'booking_statuses.code', 'booking_status_translations.name')->get();
+
+        return compact('booking', 'providers', 'statuses');
     }
 
     /**
@@ -108,6 +174,7 @@ class AdminServiceOrderAdminService
         DomainViolation::unless($booking, FailureReason::NotFound);
         
         $targetStatus = BookingStatus::query()->where('id', $data['booking_status_id'])->first();
+      $previousStatusId = (int) $booking->booking_status_id;
         $assignment = BookingProviderAssignment::query()->where('booking_id', $bookingId)->first();
         $providerId = $data['provider_profile_id'] ?? $assignment?->provider_profile_id;
         $contract = null;
@@ -135,7 +202,7 @@ class AdminServiceOrderAdminService
             throw ValidationException::withMessages(['gross_amount' => __('Assign a provider and enter the final amount before completing this booking.')]);
         }
 
-        DB::transaction(function () use ($input, $actor, $booking, $bookingId, $data, $targetStatus, $providerId, $contract, $assignment) {
+        DB::transaction(function () use ($input, $actor, $booking, $bookingId, $data, $targetStatus, $providerId, $contract, $assignment,$previousStatusId) {
             if ($providerId && $contract) {
                 $providerUserId = ProviderProfile::query()->where('id', $providerId)->value('user_id');
                 BookingProviderAssignment::query()->updateOrCreate(
@@ -161,6 +228,17 @@ class AdminServiceOrderAdminService
                 'booking_status_id' => $targetStatus->id,
                 'updated_at' => now(),
             ]);
+
+            $images = $input['images'] ?? [];
+            if (!empty($images) && is_array($images)) {
+                $storage = new \App\Modules\Bookings\Services\BookingMediaStorage();
+                foreach ($images as $image) {
+                    if ($image instanceof \Illuminate\Http\UploadedFile) {
+                        $storage->store($booking, $image, $actor, 'photo');
+                    }
+                }
+            }
+
             BookingStatusHistory::query()->create([
                 'booking_id' => $bookingId,
                 'booking_status_id' => $targetStatus->id,
@@ -168,6 +246,30 @@ class AdminServiceOrderAdminService
                 'note' => $data['note'] ?? null,
                 'created_at' => now(),
             ]);
+            if ($previousStatusId !== (int) $targetStatus->id && $booking->resident_id) {
+    $statusName = $targetStatus->translations()
+        ->where('locale', app()->getLocale())
+        ->value('name') ?? $targetStatus->code;
+
+    $typeId = NotificationType::query()
+        ->where('code', 'booking_status_changed')
+        ->value('id');
+
+    if ($typeId) {
+        ResidentNotification::query()->create([
+            'user_id' => $booking->resident_id,
+            'notification_type_id' => $typeId,
+            'reference_type' => 'booking',
+            'reference_id' => $bookingId,
+            'title' => __('Booking status updated'),
+            'body' => __('Your booking #:id is now: :status', [
+                'id' => $bookingId,
+                'status' => $statusName,
+            ]),
+            'read_at' => null,
+        ]);
+    }
+}
 
             if ($targetStatus->code === BookingStatusCode::Completed->value && $providerId && $contract) {
                 $this->commissions->record(CommissionSource::Booking, $bookingId, $contract,

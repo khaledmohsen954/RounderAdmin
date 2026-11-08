@@ -15,7 +15,15 @@ class EmergencyRequestStatus extends Model
     /** الحقول المسموح حفظها؛ يجب تمرير البيانات المتحقق منها فقط من طبقة الطلب. */
     protected $fillable = [
         'code',
+        'show_in_provider_portal',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'show_in_provider_portal' => 'boolean',
+        ];
+    }
 
     /**
      * السجلات التابعة عبر emergency_request_status_id.

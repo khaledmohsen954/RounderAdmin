@@ -2,12 +2,12 @@
 namespace Tests\Feature;
 use App\Modules\Identity\Models\{Admin,User,Role};
 use App\Modules\Properties\Models\{Home,City,ResidentHome};
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 /** حفظ الشقق وعلاقاتها وتأكيد منع حذف بيانات مأهولة. */
 class RealestateUnitsTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
     /** @return void */
     public function test_building_and_apartments_save_update_and_delete_with_guards(): void
     {

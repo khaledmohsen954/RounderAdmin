@@ -11,6 +11,7 @@ use App\Modules\Bookings\Models\BookingStatusHistory;
 use App\Modules\Emergencies\Models\EmergencyType;
 use App\Modules\Properties\Models\ResidentHome;
 use App\Modules\Catalog\Models\Service;
+use App\Modules\Catalog\Models\SubService;
 
 use Illuminate\Validation\ValidationException;
 use App\Modules\Identity\Models\User;
@@ -60,25 +61,47 @@ class AdminOrderCreationService
     private function performStoreService(array $input, User|\App\Modules\Identity\Models\Admin|null $actor): mixed
     {
         $data = $input;
+        $images = $input['images'] ?? [];
+        unset($data['images']);
 
-        
-        DB::transaction(function () use ($data, $input, $actor) {
+        DB::transaction(function () use ($data, $input, $actor, $images) {
             $membership = $this->membership($data['resident_home_id']);
             $service = Service::query()->where('id', $data['service_id'])->where('is_active', true)->lockForUpdate()->first();
             if (!$service) {
                 throw ValidationException::withMessages(['service_id' => __('Choose an active service.')]);
             }
+            $subService = null;
+            if (!empty($data['sub_service_id'])) {
+                $subService = SubService::query()->whereKey($data['sub_service_id'])
+                    ->where('service_id', $service->id)->where('is_active', true)->first();
+                if (!$subService) {
+                    throw ValidationException::withMessages(['sub_service_id' => __('Choose a sub service for the selected service.')]);
+                }
+            } elseif (SubService::query()->where('service_id', $service->id)->where('is_active', true)->exists()) {
+                throw ValidationException::withMessages(['sub_service_id' => __('Choose a sub service.')]);
+            }
             $status = BookingStatus::query()->where('code', BookingStatusCode::Pending->value)->firstOrFail();
             // Prices and resident IDs are always taken from trusted database records.
-            $id = Booking::query()->create([
+            $booking = Booking::query()->create([
                 'resident_id' => $membership->user_id, 'resident_home_id' => $membership->id,
                 'home_id' => $membership->home_id, 'service_id' => $service->id,
+                'sub_service_id' => $subService?->id,
                 'booking_status_id' => $status->id, 'scheduled_at' => $data['scheduled_at'],
                 'total_amount' => $service->base_price, 'notes' => $data['notes'] ?? null,
                 'created_at' => now(), 'updated_at' => now(),
-            ])->getKey();
+            ]);
+
+            if (!empty($images) && is_array($images)) {
+                $storage = new \App\Modules\Bookings\Services\BookingMediaStorage();
+                foreach ($images as $image) {
+                    if ($image instanceof \Illuminate\Http\UploadedFile) {
+                        $storage->store($booking, $image, $actor, 'photo');
+                    }
+                }
+            }
+
             BookingStatusHistory::query()->create([
-                'booking_id' => $id, 'booking_status_id' => $status->id,
+                'booking_id' => $booking->id, 'booking_status_id' => $status->id,
                 ...\App\Core\AdminActor::attributes($actor, 'changed_by'), 'note' => 'Created by administrator', 'created_at' => now(),
             ]);
         });
@@ -98,8 +121,8 @@ class AdminOrderCreationService
             ->join('roles', 'users.role_id', '=', 'roles.id')
             ->join('homes', 'resident_homes.home_id', '=', 'homes.id')
             ->where('roles.code', RoleCode::Resident->value)
-            ->select('resident_homes.id', 'resident_homes.unit_label', 'users.name as resident_name',
-                'homes.name as home_name')->orderBy('users.name')->get();
+            ->select('resident_homes.id', 'resident_homes.user_id', 'resident_homes.unit_label', 'users.name as resident_name',
+                'homes.name as home_name', 'users.phone as contact_phone')->orderBy('users.name')->get();
         $table = $emergency ? 'emergency_types' : 'services';
         $translations = $emergency ? 'emergency_type_translations' : 'service_translations';
         $foreign = $emergency ? 'emergency_type_id' : 'service_id';
@@ -107,7 +130,12 @@ class AdminOrderCreationService
             $join->on("$table.id", '=', "$translations.$foreign")->where("$translations.locale", app()->getLocale());
         })->where("$table.is_active", true)
             ->select("$table.id", "$table.code", "$translations.name")->orderBy("$table.code")->get();
-        return compact('emergency', 'memberships', 'options');
+        $subServices = $emergency
+            ? collect()
+            : SubService::query()->where('is_active', true)->with('translations')
+                ->orderBy('sort_order')->orderBy('id')->get();
+
+        return compact('emergency', 'memberships', 'options', 'subServices');
     }
 
     /**

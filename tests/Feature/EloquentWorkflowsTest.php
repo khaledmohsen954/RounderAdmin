@@ -15,7 +15,7 @@ use App\Modules\Community\Models\CommunityPost;
 use App\Modules\Community\Models\CommunityReaction;
 use App\Modules\Bookings\Models\Booking;
 use App\Modules\Bookings\Models\BookingStatusHistory;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -23,7 +23,7 @@ use Tests\TestCase;
 /** Regression coverage for ownership, snapshots and model writes after the ORM refactor. */
 class EloquentWorkflowsTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     private User $resident;
     private ResidentHome $membership;

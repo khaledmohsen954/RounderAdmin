@@ -30,11 +30,23 @@ All app endpoints are versioned under `/api/v1`.
 
 - Public: `GET /health`, `POST /auth/register`, `POST /auth/login`
 - Authenticated: `GET /me`, `POST /auth/logout`
+- Authenticated resident mobile updates: `PUT /resident/mobile` with `mobile` and the OTP sent to that number via `POST /auth/send-otp`
 - Resident: `GET /resident/dashboard`, `GET /resident/homes`, `POST /resident/homes/link`
 - Resident services: `GET /resident/services`
 - Resident bookings: `GET|POST /resident/bookings`, `POST /resident/bookings/{id}/cancel`
 
 Mobile requests use Sanctum bearer tokens and an `Accept-Language` header. Configure Flutter with `--dart-define=API_BASE_URL=https://your-host/api/v1`.
+
+Social resident sign-in accepts Google and Apple ID tokens at `POST /auth/social` with
+`provider` (`google` or `apple`) and `id_token`. Set `GOOGLE_CLIENT_IDS` and
+`APPLE_CLIENT_IDS` to comma-separated OAuth audience/client IDs for the mobile
+builds, then run `php artisan config:cache` after deployment. The API verifies
+the token signature and issuer, audience, expiry, and verified email using the
+identity provider's published signing keys. New resident accounts are created
+from verified identities; an existing resident with the same verified email is
+linked automatically. Phone-only accounts must first have an email address
+associated with the same verified identity. Provider and admin accounts cannot
+sign in through this endpoint.
 
 ## Accounts, data and security
 

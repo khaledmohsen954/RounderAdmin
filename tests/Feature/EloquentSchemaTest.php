@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use ReflectionClass;
 use ReflectionMethod;
 use Tests\TestCase;
@@ -12,7 +12,7 @@ use Tests\TestCase;
 /** Catch incorrect table/foreign-key mappings across all declared model relations. */
 class EloquentSchemaTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_declared_relations_can_query_the_migrated_schema(): void
     {

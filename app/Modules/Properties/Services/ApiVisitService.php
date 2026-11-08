@@ -68,8 +68,13 @@ class ApiVisitService
         DomainViolation::unless($membership, FailureReason::NotFound, 'Resident home not found.');
 
         
+        $startsAt = !empty($data['starts_at']) ? \Carbon\Carbon::parse($data['starts_at'])->format('Y-m-d H:i:s') : null;
+        $endsAt = !empty($data['ends_at']) ? \Carbon\Carbon::parse($data['ends_at'])->format('Y-m-d H:i:s') : null;
+
         $id = ResidentVisit::query()->create([
             ...$data,
+            'starts_at' => $startsAt,
+            'ends_at' => $endsAt,
             'resident_home_id' => $membership->id,
             'created_by' => $actor->id,
             'access_code' => Str::upper(Str::random(8)),

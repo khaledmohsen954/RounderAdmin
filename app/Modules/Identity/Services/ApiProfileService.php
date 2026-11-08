@@ -4,6 +4,8 @@ namespace App\Modules\Identity\Services;
 
 use App\Modules\Identity\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Validation\ValidationException;
 use App\Modules\Identity\Events\IdentityChanged;
 use App\Modules\Identity\Enums\Operation;
 
@@ -44,6 +46,30 @@ class ApiProfileService
             $result = $this->performUpdateProfile($input, $actor);
             DB::afterCommit(fn () => event(new IdentityChanged(Operation::ApiProfileUpdateProfile, $actor?->id)));
             return $result;
+        });
+    }
+
+    public function updateMobile(array $input, ?User $actor): array
+    {
+        return DB::transaction(function () use ($input, $actor): array {
+            $mobile = $input['mobile'];
+            $international = '+966' . substr($mobile, 1);
+            $otp = (string) $input['otp'];
+            $cachedOtp = Cache::pull('otp_' . $mobile);
+            $internationalOtp = Cache::pull('otp_' . $international);
+            $cachedOtp ??= $internationalOtp;
+
+            if (!is_string($cachedOtp) || !hash_equals($cachedOtp, $otp)) {
+                throw ValidationException::withMessages([
+                    'otp' => 'رمز التحقق غير صحيح أو منتهي الصلاحية.',
+                ]);
+            }
+
+            $actor->phone = $mobile;
+            $actor->save();
+            DB::afterCommit(fn () => event(new IdentityChanged(Operation::ApiProfileUpdateMobile, $actor->id)));
+
+            return $this->profile([], $actor);
         });
     }
 

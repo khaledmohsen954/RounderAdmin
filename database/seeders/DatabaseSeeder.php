@@ -60,6 +60,7 @@ class DatabaseSeeder extends Seeder {
     ['emergency_type_id'=>$typeId,'locale'=>$locale],['name'=>$name,'updated_at'=>now(),'created_at'=>now()]);
   }
   $this->call(SaudiCitiesSeeder::class);
+  $this->call(PagesSeeder::class);
   foreach(['monthly'=>1,'quarterly'=>3,'semiannual'=>6,'annual'=>12] as $code=>$months)
    PackageBillingCycle::query()->updateOrCreate(['code'=>$code],['months'=>$months,'updated_at'=>now(),'created_at'=>now()]);
   foreach(['draft','active','expired','terminated'] as $code)
@@ -86,5 +87,6 @@ class DatabaseSeeder extends Seeder {
   }
   $email=env('ROUND_ADMIN_EMAIL'); $password=env('ROUND_ADMIN_PASSWORD');
   if($email&&$password){$admin=Role::where('code','admin')->firstOrFail();\App\Modules\Identity\Models\Admin::updateOrCreate(['email'=>$email],['name'=>env('ROUND_ADMIN_NAME','Rounder Admin'),'is_super_admin'=>true,'is_active'=>true,'locale'=>'ar','password'=>$password]);}
+  $this->call(RegionsSeeder::class);
  }
 }

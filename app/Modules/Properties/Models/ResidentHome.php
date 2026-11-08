@@ -26,6 +26,11 @@ class ResidentHome extends Model
         'user_id',
         'home_id',
         'unit_label',
+        'residence_type',
+        'custom_name',
+        'floor_number',
+        'area_sqm',
+        'ownership_type',
         'home_unit_id',
         'is_primary',
     ];
@@ -40,6 +45,7 @@ class ResidentHome extends Model
             'user_id' => 'integer',
             'home_id' => 'integer',
             'home_unit_id' => 'integer',
+            'area_sqm' => 'decimal:2',
             'is_primary' => 'boolean',
         ];
     }

@@ -40,7 +40,7 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    protected $hidden = ['password', 'remember_token'];
+    protected $hidden = ['password', 'remember_token', 'permissions', 'provider_profile_id'];
 
     protected $table = 'users';
 
@@ -52,6 +52,8 @@ class User extends Authenticatable
         'phone',
         'locale',
         'password',
+        'provider_profile_id',
+        'permissions',
     ];
 
     /**
@@ -62,9 +64,20 @@ class User extends Authenticatable
     {
         return [
             'role_id' => 'integer',
+            'provider_profile_id' => 'integer',
+            'permissions' => 'array',
             'email_verified_at' => 'datetime:Y-m-d H:i:s',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * الحصول على رقم الجوال كاسم بديل لرقم الهاتف.
+     * @return string|null
+     */
+    public function getMobileAttribute(): ?string
+    {
+        return $this->attributes['phone'] ?? null;
     }
 
     /**
@@ -83,6 +96,16 @@ class User extends Authenticatable
     public function providerProfiles(): HasMany
     {
         return $this->hasMany(ProviderProfile::class, 'user_id');
+    }
+
+    public function providerProfile(): BelongsTo
+    {
+        return $this->belongsTo(ProviderProfile::class, 'provider_profile_id');
+    }
+
+    public function socialAccounts(): HasMany
+    {
+        return $this->hasMany(SocialAccount::class);
     }
 
     /**
@@ -317,6 +340,7 @@ class User extends Authenticatable
     public function residentHomes(): BelongsToMany
     {
         return $this->belongsToMany(Home::class, 'resident_homes')
-            ->withPivot(['unit_label', 'is_primary'])->withTimestamps();
+            ->withPivot(['id', 'unit_label', 'residence_type', 'custom_name', 'floor_number', 'area_sqm', 'ownership_type', 'is_primary'])
+            ->withTimestamps();
     }
 }

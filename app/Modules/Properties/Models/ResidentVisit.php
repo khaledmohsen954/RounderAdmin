@@ -34,10 +34,10 @@ class ResidentVisit extends Model
         return [
             'resident_home_id' => 'integer',
             'created_by' => 'integer',
-            'starts_at' => 'datetime:Y-m-d H:i:s',
-            'ends_at' => 'datetime:Y-m-d H:i:s',
-            'checked_in_at' => 'datetime:Y-m-d H:i:s',
-            'checked_out_at' => 'datetime:Y-m-d H:i:s',
+            'starts_at' => 'datetime',
+            'ends_at' => 'datetime',
+            'checked_in_at' => 'datetime',
+            'checked_out_at' => 'datetime',
         ];
     }
 

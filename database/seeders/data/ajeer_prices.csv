@@ -1,0 +1,352 @@
+﻿service_code,legacy_id,name_ar,name_en,price_eastern,price_qassim_madinah_kharj,page
+ac_split,1719,غسيل بلس,Plus wash,94,94,3
+ac_split,290,غسيل شامل وفحص الفريون,Full wash and freon check,72,72,3
+ac_split,1086,تهريب مويه,Water leak,83,83,3
+ac_split,1880,خدمات صيانة خفيفة,Light maintenance services,84,84,3
+ac_split,1881,خدمات صيانة متوسطة,Medium maintenance services,129,129,3
+ac_split,1876,فك وتركيب مكيف داخل المنازل,Remove and install AC inside homes,255,255,3
+ac_split,1883,تركيب مكيف سبليت (بدون تمديد),Install split AC (without piping),152,152,3
+ac_split,1882,تركيب مكيف سبليت مع التمديد,Install split AC with piping,153,153,3
+ac_split,1875,فك وتركيب مكيف سبليت خارج المنازل,Remove and install split AC outside homes,406,406,3
+ac_split,1874,فك مكيف سبليت,Remove split AC,107,107,3
+ac_split,375,كشف وإصلاح,Inspection and repair,49,49,3
+ac_split,581,تعبئة فريون أمريكي R410 — تعبئة كاملة,American freon R410 refill – full,256,256,3
+ac_split,298,تعبئة فريون أمريكي R410 — نصف تعبئة,American freon R410 refill – half,176,176,3
+ac_split,296,تعبئة فريون أمريكي R22 — تعبئة كاملة,American freon R22 refill – full,245,245,3
+ac_split,1884,تعبئة فريون أمريكي R22 — نصف تعبئة,American freon R22 refill – half,124,124,3
+ac_split,307,تعبئة فريون هندي R410 — تعبئة كاملة,Indian freon R410 refill – full,278,278,3
+ac_split,257,تعبئة فريون هندي R410 — نصف تعبئة,Indian freon R410 refill – half,147,147,3
+ac_split,1885,تعبئة فريون هندي R22 — تعبئة كاملة,Indian freon R22 refill – full,199,199,3
+ac_split,1886,تعبئة فريون هندي R22 — نصف تعبئة,Indian freon R22 refill – half,117,117,3
+ac_window,1924,خدمات صيانة خفيفة,Light maintenance services,72,72,4
+ac_window,1925,خدمات صيانة متوسطة,Medium maintenance services,83,83,4
+ac_window,531,تنظيف مكيف شباك,Clean window AC,61,61,4
+ac_window,173,نقل مكيف داخل المنزل — فك وتركيب,Move AC inside home – remove and install,72,72,4
+ac_window,174,تركيب مكيف شباك جديد,Install new window AC,67,67,4
+ac_window,1081,المكيف ما يبرّد,AC not cooling,55,55,4
+ac_window,1079,المكيف يكوّن ثلج,AC freezing up,55,55,4
+ac_window,240,تعبئة فريون هندي R22 — تعبئة كاملة,Indian freon R22 refill – full,176,176,4
+ac_window,309,تعبئة فريون هندي R22 — نصف تعبئة,Indian freon R22 refill – half,117,117,4
+ac_window,238,تعبئة فريون هندي R410 — تعبئة كاملة,Indian freon R410 refill – full,210,210,4
+ac_window,310,تعبئة فريون هندي R410 — نصف تعبئة,Indian freon R410 refill – half,147,147,4
+ac_window,295,تعبئة فريون أمريكي R410 — تعبئة كاملة,American freon R410 refill – full,256,256,4
+ac_window,299,تعبئة فريون أمريكي R410 — نصف تعبئة,American freon R410 refill – half,193,193,4
+ac_window,297,تعبئة فريون أمريكي R22 — تعبئة كاملة,American freon R22 refill – full,233,233,4
+ac_window,236,تعبئة فريون أمريكي R22 — نصف تعبئة,American freon R22 refill – half,124,124,4
+ac_window,1082,كشف وإصلاح,Inspection and repair,84,84,4
+ac_central,1007,غسيل مكيف مركزي,Central AC wash,210,210,5
+ac_central,1006,غسيل فلاتر,Filter wash,118,118,5
+ac_central,1008,أعطال بسيطة,Simple faults,61,61,5
+ac_central,377,إصلاح لوحة إلكترونية,Electronic board repair,348,348,5
+ac_central,1655,تغيير دينمو المكينة الداخلية,Replace indoor unit motor,463,463,5
+ac_central,1656,تغيير دينمو المكينة الخارجية,Replace outdoor unit motor,463,463,5
+ac_central,1657,عطل في المروحة الداخلية,Indoor fan fault,348,348,5
+ac_central,1658,عطل في المروحة الخارجية,Outdoor fan fault,406,406,5
+ac_central,1659,لف بوبينا,Coil winding,118,118,5
+ac_central,1700,تعبئة R410 — كامل — 5 طن,R410 refill – full – 5 ton,866,866,5
+ac_central,1701,تعبئة فريون أمريكي ٤١٠ — نصف — 5 طن,American freon 410 refill – half – 5 ton,406,406,5
+ac_central,1702,تعبئة فريون أمريكي ٤١٠ — كامل — 8 طن,American freon 410 refill – full – 8 ton,1038,1038,5
+ac_central,1703,تعبئة فريون أمريكي ٤١٠ — نصف — 8 طن,American freon 410 refill – half – 8 ton,578,578,5
+ac_central,1705,تعبئة فريون أمريكي ٢٢ — كامل — 5 طن,American freon 22 refill – full – 5 ton,521,521,5
+ac_central,1706,تعبئة فريون أمريكي ٢٢ — نصف — 5 طن,American freon 22 refill – half – 5 ton,291,291,5
+ac_central,1707,تعبئة فريون أمريكي ٢٢ — كامل — 8 طن,American freon 22 refill – full – 8 ton,808,808,5
+ac_central,1708,تعبئة فريون أمريكي ٢٢ — نصف — 8 طن,American freon 22 refill – half – 8 ton,463,463,5
+ac_central,1710,تعبئة فريون هندي ٢٢ — كامل — 5 طن,Indian freon 22 refill – full – 5 ton,406,406,5
+ac_central,1711,تعبئة فريون هندي ٢٢ — نصف — 5 طن,Indian freon 22 refill – half – 5 ton,210,210,5
+ac_central,1712,تعبئة فريون هندي ٢٢ — كامل — 8 طن,Indian freon 22 refill – full – 8 ton,636,636,5
+ac_central,1713,تعبئة فريون هندي ٢٢ — نصف — 8 طن,Indian freon 22 refill – half – 8 ton,406,406,5
+ac_concealed,1013,غسيل مكيف مخفي,Concealed AC wash,147,147,6
+ac_concealed,1014,إصلاح تهريب فريون,Freon leak repair,291,291,6
+ac_concealed,383,غسيل فلاتر,Filter wash,95,95,6
+ac_concealed,1592,أعطال بسيطة,Simple faults,61,61,6
+ac_concealed,575,تعبئة فريون أمريكي R410 — تعبئة كاملة,American freon R410 refill – full,751,751,6
+ac_concealed,576,تعبئة فريون أمريكي R410 — نصف تعبئة,American freon R410 refill – half,406,406,6
+ac_concealed,324,تعبئة فريون هندي R410 — تعبئة كاملة,Indian freon R410 refill – full,578,578,6
+ac_concealed,572,تعبئة فريون هندي R410 — نصف تعبئة,Indian freon R410 refill – half,291,291,6
+ac_concealed,571,تعبئة فريون أمريكي R22 — تعبئة كاملة,American freon R22 refill – full,521,521,6
+ac_concealed,235,تعبئة فريون أمريكي R22 — نصف تعبئة,American freon R22 refill – half,291,291,6
+ac_concealed,579,تعبئة فريون هندي R22 — تعبئة كاملة,Indian freon R22 refill – full,440,440,6
+ac_concealed,239,تعبئة فريون هندي R22 — نصف تعبئة,Indian freon R22 refill – half,279,279,6
+ac_concealed,1076,العناية الشاملة للمكيفات — باقة,Comprehensive AC care – package,703,703,6
+refrigerators,46,تغيير المؤقت,Replace timer,87,87,6
+refrigerators,48,تغيير حساس ديفروست,Replace defrost sensor,108,108,6
+refrigerators,1889,خدمات صيانة خفيفة,Light maintenance services,108,108,6
+refrigerators,1893,خدمات صيانة ثقيلة,Heavy maintenance services,304,304,6
+refrigerators,1074,٤ خدمات للثلاجة الواحدة — باقة,4 services for one refrigerator – package,107,107,6
+ovens,497,إصلاح أو استبدال المفاتيح المكسورة,Repair or replace broken knobs,78,78,7
+ovens,498,معالجة انسداد خط الغاز,Fix gas line blockage,152,152,7
+ovens,499,معالجة التماس الكهربائي,Fix electrical short circuit,152,152,7
+ovens,500,إصلاح أو استبدال هيتر الفرن,Repair or replace oven heater,140,140,7
+ovens,501,إصلاح أو استبدال هيتر الطبخ,Repair or replace stove heater,118,118,7
+ovens,502,تغيير زجاج باب الفرن,Replace oven door glass,140,140,7
+ovens,503,تغيير زجاج,Replace glass,186,186,7
+ovens,505,إصلاح أو استبدال المشعل الكهربائي,Repair or replace electric igniter,198,198,7
+ovens,507,تغيير ترموستات الحرارة,Replace temperature thermostat,118,118,7
+ovens,508,إصلاح أو تغيير مروحة الفرن,Repair or replace oven fan,140,140,7
+ovens,509,إصلاح موتور الشواية في الفرن,Repair grill motor in oven,140,140,7
+ovens,511,إصلاح أو استبدال مفاتيح الأمان,Repair or replace safety valves,163,163,7
+ovens,512,إصلاح أو استبدال المفصلات,Repair or replace hinges,106,106,7
+ovens,504,تنظيف بلف إشعال الموقد,Clean burner ignition valve,129,129,7
+ovens,506,تنظيف المشعل الكهربائي,Clean electric igniter,129,129,7
+ovens,1809,٣ خدمات لفرن واحد — باقة,3 services for one oven – package,233,233,7
+washing_machines,1901,خدمات صيانة خفيفة,Light maintenance services,107,107,7
+washing_machines,1905,خدمات صيانة متوسطة,Medium maintenance services,152,152,7
+washing_machines,1907,خدمات صيانة ثقيلة,Heavy maintenance services,232,232,7
+washing_machines,1810,باقة الغسالة — صيانة وتنظيف,Washing machine package – maintenance and cleaning,118,118,7
+plumbing,1,باقة الصيف لصيانة دورات المياه,Summer bathroom maintenance package,195.5,195.5,9
+plumbing,1903,باقة الصيف لتغيير مغسلة,Summer package: sink replacement,88.65,88.65,9
+plumbing,1767,تغيير كرسي افرنجي,Western toilet replacement,111.85,111.85,9
+plumbing,1768,تبديل قلب سيفون,Flush mechanism replacement,48.3,48.3,9
+plumbing,1769,تركيب أو تبديل خلاط,Install or replace mixer tap,52.9,52.9,9
+plumbing,1570,تركيب أو تبديل محابس زاوية مع الليات,Install or replace angle valves with hoses,35.65,35.65,9
+plumbing,1616,تغيير غطاء كرسي,Toilet seat cover replacement,33.75,33.75,9
+plumbing,1771,تركيب أو تبديل جرجور لحوض الغسيل,Install or replace sink faucet,22.25,22.25,9
+plumbing,1615,تركيب شطاف,Bidet sprayer installation,26.45,26.45,9
+plumbing,827,أعمال سباكة خفيفة بالساعة,Light plumbing work (hourly),86.25,86.25,9
+plumbing,1888,أعمال سباكة ثقيلة بالساعة,Heavy plumbing work (hourly),138,138,9
+plumbing,35,تغيير مروحة دينمو,Water pump fan replacement,63.25,63.25,10
+plumbing,923,ضعف في الماء,Weak water pressure,166.75,166.75,10
+plumbing,924,تركيب أو تغيير دينمو,Install or replace water pump,166.75,166.75,10
+plumbing,925,تهريب المياه في الدينمو,Water leak in the pump,120.75,120.75,10
+plumbing,926,صوت في الدينمو,Pump noise,132.25,132.25,10
+plumbing,1350,تركيب أو تبديل صفاية دينمو,Install or replace pump strainer,60.95,60.95,10
+plumbing,1483,أعمال خفيفة بالساعة الأولى,Light work – first hour,104.65,104.65,10
+plumbing,105,تغيير كرسي افرنجي,Western toilet replacement,118.45,118.45,10
+plumbing,459,تبديل قلب سيفون,Flush mechanism replacement,41.4,41.4,10
+plumbing,462,تركيب شطاف,Bidet sprayer installation,26.45,26.45,10
+plumbing,915,تغيير غطاء كرسي,Toilet seat cover replacement,41.4,41.4,10
+plumbing,916,تغيير كرسي عربي,Squat toilet replacement,189.75,189.75,10
+plumbing,1478,أعمال خفيفة بالساعة الأولى,Light work – first hour,109.25,109.25,10
+plumbing,1479,أعمال خفيفة بالساعة الإضافية,Light work – additional hour,74.75,74.75,10
+plumbing,1480,أعمال ثقيلة بالساعة الأولى,Heavy work – first hour,172.5,172.5,10
+plumbing,1481,أعمال ثقيلة بالساعة الإضافية,Heavy work – additional hour,92,92,10
+plumbing,72,تنظيف الخزان العلوي والسفلي,Clean upper and lower tanks,465.75,465.75,11
+plumbing,361,تنظيف خزان واحد العلوي أو السفلي,Clean one tank (upper or lower),247.25,247.25,11
+plumbing,942,تغيير عوامة الخزان,Tank float replacement,74.75,74.75,11
+plumbing,1466,تركيب أو تغيير عوامة كهربائية,Install or replace electric float,78.2,78.2,11
+plumbing,928,عزل الخزان السفلي,Lower tank insulation,2443.75,2443.75,11
+plumbing,1944,جهاز تبريد مياه الخزانات – فريون,Tank water cooler – freon,4485,4485,11
+plumbing,1943,جهاز مبرد مياه الخزانات – مروحة,Tank water cooler – fan,860.21,,11
+plumbing,1494,أعمال خفيفة بالساعة الأولى,Light work – first hour,109.25,109.25,11
+plumbing,1497,أعمال ثقيلة بالساعة الإضافية,Heavy work – additional hour,92,92,11
+plumbing,1496,أعمال ثقيلة بالساعة الأولى,Heavy work – first hour,172.5,172.5,11
+plumbing,1495,أعمال خفيفة بالساعة الإضافية,Light work – additional hour,74.75,74.75,11
+plumbing,104,تركيب مغسلة عادي,Install standard sink,86.25,86.25,11
+plumbing,453,تركيب مغسلة دولاب أو رخام,Install cabinet or marble sink,143.75,143.75,11
+plumbing,1482,أعمال خفيفة بالساعة الأولى,Light work – first hour,109.25,109.25,11
+plumbing,1484,أعمال خفيفة بالساعة الإضافية,Light work – additional hour,74.75,74.75,11
+plumbing,1485,أعمال ثقيلة بالساعة الأولى,Heavy work – first hour,172.5,172.5,11
+plumbing,1487,أعمال ثقيلة بالساعة الإضافية,Heavy work – additional hour,92,92,11
+plumbing,68,انسداد صفاية الحمام أو المطبخ (البلاعة),Blocked bathroom or kitchen drain,101.2,101.2,12
+plumbing,1021,انسداد البيارة (الحمام - المطبخ),Blocked sewage pit (bathroom – kitchen),201.25,201.25,12
+plumbing,1022,انسداد غرفة التفتيش,Blocked inspection chamber,454.25,454.25,12
+plumbing,1564,(أعمال خفيفة) انسداد غرفة التفتيش,Blocked inspection chamber (light work),373.75,373.75,12
+plumbing,1565,(أعمال متوسطة) انسداد غرفة التفتيش,Blocked inspection chamber (medium work),661.25,661.25,12
+plumbing,1566,(أعمال معقدة) انسداد غرفة التفتيش,Blocked inspection chamber (complex work),891.25,891.25,12
+plumbing,108,تمديد غسالات خط بارد حار - ١ متر,"Washing machine piping, hot & cold line – 1 m",92,92,12
+plumbing,1600,تمديد غسالات خط بارد حار - ٢ متر,"Washing machine piping, hot & cold line – 2 m",97.75,97.75,12
+plumbing,1601,تمديد غسالات خط بارد حار - ٣ متر,"Washing machine piping, hot & cold line – 3 m",103.5,103.5,12
+plumbing,1602,تمديد غسالات خط بارد فقط - ١ متر,"Washing machine piping, cold line only – 1 m",86.25,86.25,12
+plumbing,1603,تمديد غسالات خط بارد فقط - ٢ متر,"Washing machine piping, cold line only – 2 m",97.75,97.75,12
+plumbing,1604,تمديد غسالات خط بارد فقط - ٣ متر,"Washing machine piping, cold line only – 3 m",103.5,103.5,12
+plumbing,210,تركيب صيانة ستيل,Stainless steel fixture installation,35.65,35.65,13
+plumbing,944,تركيب ضغطة سيفون,Install flush button,28.75,28.75,13
+plumbing,945,تركيب علاقة مناشف,Install towel hanger,35.65,35.65,13
+plumbing,946,تركيب مراية حمام,Install bathroom mirror,49.45,49.45,13
+plumbing,947,تركيب عامود سنادة,Install support pole,35.65,35.65,13
+plumbing,1498,أعمال خفيفة بالساعة الأولى,Light work – first hour,109.25,109.25,13
+plumbing,1499,أعمال خفيفة بالساعة الإضافية,Light work – additional hour,74.75,74.75,13
+plumbing,1500,أعمال ثقيلة بالساعة الأولى,Heavy work – first hour,172.5,172.5,13
+plumbing,1502,أعمال ثقيلة بالساعة الإضافية,Heavy work – additional hour,92,92,13
+plumbing,106,تبديل صفاية فتحة الصرف الأرضية (البلاعة),Replace floor drain cover,52.9,52.9,13
+plumbing,682,تغيير محبس زاوية مع لي,Angle valve replacement with hose,29.9,29.9,13
+plumbing,1475,تغيير هراب عادي,Standard tap replacement,35.65,35.65,13
+plumbing,454,تركيب أو تبديل جرجور لحوض الغسيل,Install or replace sink faucet,29.9,29.9,13
+plumbing,456,تركيب أو تبديل محابس زاوية مع الليات,Install or replace angle valves with hoses,41.4,41.4,13
+plumbing,683,تركيب أو تبديل خلاط,Install or replace mixer tap,52.9,52.9,14
+plumbing,457,تركيب أو تغيير راس خلاط متحرك,Install or replace movable mixer head,35.65,35.65,14
+plumbing,684,تركيب أو تبديل سماعة دش الاستحمام,Install or replace shower head,29.9,29.9,14
+plumbing,917,تركيب بانيو قدم,Install foot bathtub,103.5,103.5,14
+plumbing,1476,تركيب عامود دش مع توصيلة,Install shower column with connection,101.2,101.2,14
+plumbing,685,كشف التسربات باستخدام الجهاز,Leak detection using device,132.25,132.25,14
+plumbing,1424,فحص ارتفاع فواتير المياه أقل من 1000 متر,Water bill increase inspection – under 1000 m,155.25,155.25,14
+plumbing,1425,فحص ارتفاع فواتير المياه أكبر من 1000 متر,Water bill increase inspection – over 1000 m,419.75,419.75,14
+plumbing,1451,عزل سطح,Roof insulation,1857.25,1857.25,14
+plumbing,750,فحص وإصلاح أعطال السباكة,Plumbing fault inspection and repair,46,46,14
+plumbing,1887,أعمال سباكة خفيفة بالساعة,Light plumbing work (hourly),103.5,103.5,14
+plumbing,1815,أعمال سباكة ثقيلة بالساعة,Heavy plumbing work (hourly),161,161,14
+electrical,2,باقة الصيف للكهرباء,Summer electrical package,80.5,80.5,15
+electrical,1569,أفياش الكهرباء,Electrical sockets,28.75,28.75,15
+electrical,1572,تركيب أو صيانة مفاتيح الإنارة,Install or repair light switches,28.75,28.75,15
+electrical,1772,تركيب أو إصلاح فيش سخان,Install or repair water heater plug,40.25,40.25,15
+electrical,1662,استبدال لمبة ليد ٧سم - عرض ١٠ حبات وأكثر,Replace 7 cm LED bulb – offer for 10+ bulbs,13.8,13.8,15
+electrical,1671,استبدال لمبة ليد ١٤سم - عرض ١٠ حبات وأكثر,Replace 14 cm LED bulb – offer for 10+ bulbs,14.95,14.95,15
+electrical,1773,تركيب أو إصلاح جرس باب,Install or repair door bell,92,92,15
+electrical,828,أعمال كهرباء خفيفة بالساعة,Light electrical work (hourly),88.55,88.55,15
+electrical,1892,أعمال كهرباء ثقيلة بالساعة,Heavy electrical work (hourly),182.85,182.85,15
+electrical,98,تغيير لمبات سبوت 7 سم,Replace 7 cm spot lights,11.5,11.5,16
+electrical,429,تغيير لمبات سبوت 14 سم,Replace 14 cm spot lights,12.65,12.65,16
+electrical,430,تغيير لمبات نيون طويلة,Replace long neon tubes,11.5,11.5,16
+electrical,431,تغيير لمبات نيون قصيرة,Replace short neon tubes,12.65,12.65,16
+electrical,432,تغيير لمبات قمرية,Replace moon-type lights,19.55,19.55,16
+electrical,434,فك وتركيب لمبات السطح,Remove and install roof lights,25.3,25.3,16
+electrical,1503,أعمال خفيفة بالساعة الأولى,Light work – first hour,109.25,109.25,16
+electrical,1504,أعمال خفيفة بالساعة الإضافية,Light work – additional hour,74.75,74.75,16
+electrical,1505,أعمال ثقيلة بالساعة الأولى,Heavy work – first hour,172.5,172.5,16
+electrical,1506,أعمال ثقيلة بالساعة الإضافية,Heavy work – additional hour,92,92,16
+electrical,691,تركيب أو صيانة مفاتيح الإنارة,Install or repair light switches,26.45,26.45,17
+electrical,440,تركيب أو إصلاح فيش فرن,Install or repair oven plug,40.25,40.25,17
+electrical,426,تركيب أو تغيير مفتاح مكيف,Install or replace AC switch,40.25,40.25,17
+electrical,427,تركيب مفتاح فوتوسيل,Install photocell switch,72.45,72.45,17
+electrical,443,تركيب أو إصلاح فيش سخان,Install or repair water heater plug,34.5,34.5,17
+electrical,1077,عرض الكهرباء - ٣ خدمات,Electrical offer – 3 services,135.7,135.7,17
+electrical,1507,أعمال خفيفة بالساعة الأولى,Light work – first hour,109.25,109.25,17
+electrical,567,تركيب فيش كهربائي,Install electrical plug,26.45,26.45,17
+electrical,1508,أعمال خفيفة بالساعة الإضافية,Light work – additional hour,74.75,74.75,17
+electrical,1509,أعمال ثقيلة بالساعة الأولى,Heavy work – first hour,172.5,172.5,17
+electrical,1511,أعمال ثقيلة بالساعة الإضافية,Heavy work – additional hour,92,92,17
+electrical,456,بكج تأسيس خط واحد مع جهاز الانتركم,Package: one intercom line setup with device,799.25,799.25,17
+electrical,1686,تأسيس خط واحد - جرس انتركوم,Set up one line – intercom bell,244.95,244.95,17
+electrical,1693,صيانة خط واحد,Maintenance of one line,172.5,172.5,17
+electrical,1716,صيانة خط واحد انتركوم - أعمال بسيطة,Intercom single line maintenance – simple work,111.55,111.55,17
+electrical,1717,صيانة خط واحد انتركوم - أعمال متوسطة,Intercom single line maintenance – medium work,143.75,143.75,17
+electrical,100,تمديد سلك كهربائي خارجي - أقل من 15 متر,External electrical wire extension – under 15 m,10.35,10.35,18
+electrical,1594,تمديد سلك كهربائي - أكثر من ١٥ متر,Electrical wire extension – over 15 m,10.35,10.35,18
+electrical,1595,تركيب فيش كهربائي,Install electrical plug,34.5,34.5,18
+electrical,1596,تغيير فيش كهربائي,Replace electrical plug,28.75,28.75,18
+electrical,1811,أعمال خفيفة بالساعة الأولى,Light work – first hour,109.25,109.25,18
+electrical,1812,أعمال خفيفة بالساعة الإضافية,Light work – additional hour,74.75,74.75,18
+electrical,1813,أعمال ثقيلة بالساعة الأولى,Heavy work – first hour,172.5,172.5,18
+electrical,1814,أعمال ثقيلة بالساعة الإضافية,Heavy work – additional hour,92,92,18
+electrical,101,تركيب أو إصلاح جرس باب,Install or repair door bell,80.5,80.5,18
+electrical,1514,أعمال خفيفة بالساعة الأولى,Light work – first hour,109.25,109.25,18
+electrical,1516,أعمال خفيفة بالساعة الإضافية,Light work – additional hour,74.75,74.75,18
+electrical,1517,أعمال ثقيلة بالساعة الأولى,Heavy work – first hour,172.5,172.5,18
+electrical,1518,أعمال ثقيلة بالساعة الإضافية,Heavy work – additional hour,92,92,18
+electrical,103,فك وتركيب مروحة شفط جدارية,Remove and install wall exhaust fan,51.75,51.75,19
+electrical,1258,فك وتركيب مروحة شفط سقف,Remove and install ceiling exhaust fan,86.25,86.25,19
+electrical,1519,أعمال خفيفة بالساعة الأولى,Light work – first hour,109.25,109.25,19
+electrical,1520,أعمال خفيفة بالساعة الإضافية,Light work – additional hour,74.75,74.75,19
+electrical,1521,أعمال خفيفة بالساعة الإضافية,Light work – additional hour,74.75,74.75,19
+electrical,1522,أعمال ثقيلة بالساعة الأولى,Heavy work – first hour,172.5,172.5,19
+electrical,1523,أعمال ثقيلة بالساعة الإضافية,Heavy work – additional hour,92,92,19
+electrical,99,تركيب كشافات خارجية جديدة,Install new outdoor floodlights,51.75,51.75,19
+electrical,438,تغيير كشافات خارجية - فك وتركيب,Replace outdoor floodlights – remove and install,74.75,74.75,19
+pest_control,657,خدمة مكافحة حشرات الفراش لكل غرفة,Bed bug control service (per room),405.95,405.95,20
+pest_control,127,خدمة مكافحة النمل الأبيض لكل موقع,Termite control service (per location),908.5,908.5,20
+pest_control,128,خدمة مكافحة الحشرات الطائرة,Flying insect control service,569.25,569.25,20
+pest_control,129,خدمة تعقيم المنازل,Home disinfection service,379.5,379.5,20
+pest_control,233,مكافحة حشرات استديو,Pest control – studio,166.75,166.75,20
+pest_control,231,مكافحة حشرات لشقة سكنية,Pest control – apartment,339.25,339.25,20
+pest_control,232,مكافحة حشرات لفيلا,Pest control – villa,534.75,534.75,20
+carpentry,7,باقة الصيف للتركيبات,Summer installation package,40.25,40.25,20
+carpentry,1697,بكج فتح باب مغلق وتغيير كيلون,Package: open locked door and replace lock,126.5,126.5,20
+carpentry,1696,بكج تغيير أو تركيب مقبض باب وتغيير كيلون,Package: replace or install door handle and lock,92,92,20
+carpentry,1698,بكج وزن باب وتغيير جلدة باب,Package: door leveling and door seal replacement,126.5,126.5,20
+carpentry,1664,تركيب ستارة رول,Install roller curtain,69,69,20
+carpentry,1665,تركيب ستارة قطعة واحدة,Install curtain – one piece,74.75,74.75,20
+carpentry,1666,تركيب ستارة قطعتين,Install curtain – two pieces,120.75,120.75,20
+carpentry,1667,تركيب رف,Install shelf,34.5,34.5,20
+carpentry,1668,تركيب رف,Install shelf,40.25,40.25,20
+carpentry,1669,تركيب لوحة حائطية,Install wall painting,34.5,34.5,20
+carpentry,81,عرض وزن الباب وتغيير الجلدة,Offer: door leveling and seal replacement,120.75,120.75,21
+carpentry,400,فك أو تركيب دفاش,Remove or install door leaf,51.75,51.75,21
+carpentry,631,كشط أو قص أطراف الباب,Scrape or trim door edges,92,92,21
+carpentry,796,وزن باب,Door leveling,86.25,86.25,21
+carpentry,797,تركيب أو تغيير جلدة باب,Install or replace door seal,46,46,21
+carpentry,798,تغيير قفل الباب,Door lock replacement,46,46,21
+carpentry,885,دهن باب,Door painting,185.15,185.15,21
+carpentry,85,تركيب ستارة رول,Install roller curtain,58.65,58.65,21
+carpentry,643,تركيب ستائر أمريكي مودرن,Install modern American curtains,116.15,116.15,21
+carpentry,644,تركيب ستارة قطعة واحدة,Install curtain – one piece,64.4,64.4,21
+carpentry,645,تركيب ستارة قطعتين,Install curtain – two pieces,116.15,116.15,21
+carpentry,83,تركيب رف (20*100 cm),Install shelf (20×100 cm),32.2,32.2,21
+carpentry,636,تركيب رف (30*120 cm),Install shelf (30×120 cm),34.5,34.5,21
+carpentry,637,تركيب رف (40*110 cm),Install shelf (40×110 cm),40.25,40.25,21
+carpentry,82,تركيب خزائن خشبية ٣ أبواب,Install wooden wardrobe – 3 doors,120.75,120.75,22
+carpentry,1588,فك وتركيب خزانة ٣ أبواب,Remove and install wardrobe – 3 doors,231.15,231.15,22
+carpentry,633,تركيب خزائن خشبية ٤ أبواب,Install wooden wardrobe – 4 doors,150.65,150.65,22
+carpentry,1589,فك أو تركيب خزانة ٤ أبواب,Remove or install wardrobe – 4 doors,317.4,317.4,22
+carpentry,634,تركيب خزائن خشبية ٥ أبواب,Install wooden wardrobe – 5 doors,185.15,185.15,22
+carpentry,1590,فك وتركيب خزانة ٥ أبواب,Remove and install wardrobe – 5 doors,394.45,394.45,22
+carpentry,1101,تركيب خزائن خشبية ٦ أبواب,Install wooden wardrobe – 6 doors,244.95,244.95,22
+carpentry,1591,فك وتركيب خزانة ٦ أبواب,Remove and install wardrobe – 6 doors,400,474.95,22
+carpentry,635,تركيب خزانة باب سحاب خشبي,Install wooden sliding-door wardrobe,149.5,149.5,22
+carpentry,1597,فك وتركيب خزانة باب سحاب,Remove and install sliding-door wardrobe,346.15,346.15,22
+carpentry,84,تركيب سرير مزدوج,Install double bed,140.3,140.3,22
+carpentry,1583,فك وتركيب سرير مزدوج,Remove and install double bed,325.45,325.45,22
+carpentry,1584,فك وتركيب سرير مفرد,Remove and install single bed,231.15,231.15,22
+carpentry,638,تركيب سرير مفرد,Install single bed,117.3,117.3,22
+carpentry,1585,تركيب سرير أطفال,Install kids bed,186.3,186.3,22
+carpentry,640,فك أو تركيب سرير أطفال,Remove or install kids bed,110.4,110.4,22
+carpentry,1586,نقل سرير داخل المنزل,Move bed inside the home,97.75,97.75,22
+carpentry,1587,وزن سرير,Bed leveling,74.75,74.75,22
+carpentry,86,تركيب طاولة,Install table,74.75,74.75,23
+carpentry,653,تركيب طاولة تلفزيون,Install TV table,97.75,97.75,23
+carpentry,655,تركيب طاولة طعام,Install dining table,80.5,80.5,23
+carpentry,658,تركيب طاولة قهوة,Install coffee table,74.75,74.75,23
+carpentry,153,تركيب مرايا حجم صغير مقاس ٥٠ سم في ٧٠ سم,Install mirror – small (50×70 cm),40.25,40.25,23
+carpentry,647,تركيب مرايا حجم وسط مقاس ٦٠ سم في ١٠٠ سم,Install mirror – medium (60×100 cm),63.25,63.25,23
+carpentry,648,تركيب مرايا حجم كبير مقاس ٧٠ سم في ١٢٠ سم,Install mirror – large (70×120 cm),92,92,23
+carpentry,649,تركيب لوحة حائطية حجم صغير مقاس ٢٠ سم في ٥٠ سم,Install wall painting – small (20×50 cm),34.5,34.5,23
+carpentry,650,تركيب لوحة حائطية حجم وسط مقاس ٥٠ سم في ٨٠ سم,Install wall painting – medium (50×80 cm),51.75,51.75,23
+carpentry,651,تركيب لوحة حائطية حجم كبير مقاس ٦٠ سم ١٠٠ سم,Install wall painting – large (60×100 cm),63.25,63.25,23
+carpentry,716,عرض فتح باب مغلق وتغيير كيلون,Offer: open locked door and replace lock,109.25,109.25,23
+carpentry,1704,عرض تغيير أو تركيب مقبض باب وتغيير كيلون,Offer: replace or install door handle and lock,92,92,23
+carpentry,398,فتح باب مغلق,Open locked door,69,69,23
+carpentry,399,فك أو تركيب مقبض الباب,Remove or install door handle,51.75,51.75,23
+carpentry,717,تركيب لوحة حائطية,Install wall painting,34.5,34.5,24
+carpentry,2018,تركيب لوحة حائطية – حجم وسط 50×80 سم,Install wall painting – medium (50×80 cm),46,46,24
+carpentry,2019,تركيب لوحة حائطية – حجم كبير 60×100 سم,Install wall painting – large (60×100 cm),57.5,57.5,24
+carpentry,909,باقة التركيبات (اكسسوارات، تثبيت، ضبط، صيانة),"Installation package (accessories, fixing, adjustment, maintenance)",304.75,304.75,24
+water_heaters,102,تركيب سخان عادي حجم ٣٠-٥٠ لتر,Install standard water heater (30–50 L),69,69,24
+water_heaters,624,تركيب سخان عادي حجم ٨٠ لتر,Install standard water heater (80 L),74.75,74.75,24
+water_heaters,623,تركيب سخان فوري,Install instant water heater,63.25,63.25,24
+water_heaters,627,تركيب سخان مخفي,Install concealed water heater,109.25,109.25,24
+water_heaters,626,تركيب سخان مركزي,Install central water heater,196.65,196.65,24
+water_heaters,1663,تنظيف وصيانة سخان عادي,Clean and maintain standard water heater,69,69,24
+water_heaters,628,صيانة سخان مخفي,Maintain concealed water heater,74.75,74.75,24
+water_heaters,598,صيانة سخان مركزي,Maintain central water heater,120.75,120.75,24
+ikea,154,فك أو تركيب خزانة ٣ أبواب,Remove or install wardrobe – 3 doors,126.5,126.5,25
+ikea,666,فك أو تركيب خزانة ٤ أبواب,Remove or install wardrobe – 4 doors,155.25,155.25,25
+ikea,667,فك أو تركيب خزانة ٥ أبواب,Remove or install wardrobe – 5 doors,223.1,223.1,25
+ikea,668,فك أو تركيب خزانة باب سحاب,Remove or install sliding-door wardrobe,264.5,264.5,25
+ikea,156,تركيب رف 30*30 سم,Install shelf 30×30 cm,40.25,40.25,25
+ikea,673,تركيب رف 30*120 سم,Install shelf 30×120 cm,46,46,25
+ikea,674,تركيب رف 30*150 سم,Install shelf 30×150 cm,46,46,25
+ikea,670,تركيب لوحة حائطية,Install wall painting,40.25,40.25,25
+ikea,671,فك أو تركيب مرايا,Remove or install mirrors,40.25,40.25,25
+ikea,157,فك أو تركيب سرير مفرد,Remove or install single bed,126.5,126.5,25
+ikea,678,فك أو تركيب سرير مزدوج,Remove or install double bed,185.15,185.15,25
+ikea,679,فك أو تركيب سرير أطفال,Remove or install kids bed,115,115,25
+ikea,680,نقل سرير داخل المنزل,Move bed inside the home,103.5,103.5,25
+ikea,676,وزن سرير,Bed leveling,80.5,80.5,25
+ikea,158,تركيب ستارة رول,Install roller curtain,69,69,26
+ikea,686,تركيب ستائر أمريكي مودرن,Install modern American curtains,149.5,149.5,26
+ikea,687,تركيب ستارة قطعة واحدة,Install curtain – one piece,80.5,80.5,26
+ikea,688,تركيب ستارة قطعتين,Install curtain – two pieces,115,115,26
+ikea,159,تركيب طاولة,Install table,92,92,26
+ikea,690,تركيب طاولة تلفزيون,Install TV table,97.75,97.75,26
+ikea,691,فك أو تركيب طاولة تلفزيون,Remove or install TV table,92,92,26
+ikea,692,تركيب طاولة طعام,Install dining table,92,92,26
+ikea,693,فك أو تركيب طاولة طعام,Remove or install dining table,115,115,26
+ikea,694,فك أو تركيب طاولة طعام مقاس ٥م,Remove or install dining table (5 m),126.5,126.5,26
+ikea,695,تركيب طاولة قهوة,Install coffee table,86.25,86.25,26
+water_filters,719,طلب كشف فني,Technical inspection request,32.2,32.2,26
+home_cleaning,653,تنظيف شقة صغيرة,Clean small apartment,400.2,400.2,27
+home_cleaning,1091,تنظيف شقة كبيرة,Clean large apartment,598,598,27
+home_cleaning,1409,تنظيف مجلس,Clean majlis (sitting room),370.3,370.3,27
+home_cleaning,692,زيارة نظافة واحدة مدة ساعتين ٣ عمالة,"Single cleaning visit – 2 hours, 3 workers",309.35,309.35,27
+home_cleaning,693,تنظيف حوش (صغير),Clean yard (small),195.5,195.5,27
+home_cleaning,1355,تنظيف حوش (كبير),Clean yard (large),241.5,241.5,27
+home_cleaning,694,تنظيف مطبخ,Clean kitchen,402.5,402.5,27
+home_cleaning,722,تنظيف غرفة صغيرة,Clean small room,184,184,27
+home_cleaning,724,تنظيف حمّام,Clean bathroom,120.75,120.75,28
+home_cleaning,725,تنظيف دور فيلا,Clean villa floor,908.5,908.5,28
+home_cleaning,726,باقة نظافة شقة وأحواش,Apartment and yard cleaning package,415.15,415.15,28
+home_cleaning,1792,نظافة أحواش + مكافحة حشرات + تقليم النباتات,Yard cleaning + pest control + plant trimming,519.8,519.8,28
+blacksmith,297,تغيير كيلون,Lock replacement,120.75,120.75,28
+blacksmith,1391,فك أو تركيب مقبض الباب,Remove or install door handle,63.25,63.25,28
+blacksmith,1392,فك أو تركيب دفاش,Remove or install door leaf,115,115,28
+blacksmith,1416,تركيب قفل إلكتروني,Install electronic lock,149.5,149.5,28
+blacksmith,311,تركيب أو تغيير شبك (شباك),Install or replace window grille,63.25,63.25,28

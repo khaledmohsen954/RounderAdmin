@@ -11,7 +11,7 @@ class SetLocale {
  * @throws \Throwable
  */
  public function handle(Request $request, Closure $next) {
-  $locale=$request->user()?->locale ?? $request->session()->get('locale',config('app.locale','ar'));
+  $locale=$request->user('provider')?->locale ?? $request->user()?->locale ?? $request->session()->get('locale',config('app.locale','ar'));
   App::setLocale(in_array($locale,['ar','en'],true)?$locale:'ar');
   return $next($request);
  }

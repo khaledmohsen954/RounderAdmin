@@ -15,7 +15,9 @@ class AppServiceProvider extends ServiceProvider {
  * @return mixed
  * @throws \Throwable
  */
- public function boot():void { Paginator::useBootstrapFive();
+ public function boot():void {
+ \Illuminate\Support\Facades\DB::prohibitDestructiveCommands(true);
+ Paginator::useBootstrapFive();
  foreach ([\App\Modules\Emergencies\Models\EmergencyRequest::class,\App\Modules\Properties\Models\Home::class,\App\Modules\Bookings\Models\Booking::class,\App\Modules\Providers\Models\ProviderProfile::class] as $model) {
      $model::observe(\App\Modules\Notifications\Observers\AdminActivityObserver::class);
  }

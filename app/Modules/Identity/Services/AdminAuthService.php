@@ -14,7 +14,14 @@ class AdminAuthService
      */
     public function login(array $input): void
     {
-        if (!Auth::attempt(['email' => $input['email'], 'password' => $input['password'], 'is_active'=>true],
+        $login = trim((string) ($input['email'] ?? ''));
+        $credentialKey = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
+
+        if ($credentialKey === 'phone') {
+            $login = \App\Core\Support\SaudiPhone::normalize($login);
+        }
+
+        if (!Auth::attempt([$credentialKey => $login, 'password' => $input['password'], 'is_active'=>true],
             (bool) ($input['remember'] ?? false)) || !(Auth::user() instanceof \App\Modules\Identity\Models\Admin)) {
             Auth::logout();
             throw ValidationException::withMessages(['email' => __('auth.failed')]);

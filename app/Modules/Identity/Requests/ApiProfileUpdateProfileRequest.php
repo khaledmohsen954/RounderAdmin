@@ -5,7 +5,6 @@ use App\Core\Enums\SupportedLocale;
 
 use App\Core\Http\Requests\ResidentRequest;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Str;
 
 /** التحقق من مدخلات ProfileController::updateProfile قبل تشغيل الخدمة. */
 class ApiProfileUpdateProfileRequest extends ResidentRequest
@@ -19,9 +18,18 @@ class ApiProfileUpdateProfileRequest extends ResidentRequest
     {
         return [
             'name' => ['sometimes', 'required', 'string', 'min:2', 'max:120'],
-            'email' => ['sometimes', 'required', 'email:rfc', 'max:255', Rule::unique('users', 'email')->ignore($this->user()->id)],
-            'phone' => ['sometimes', 'nullable', 'regex:/^\+[1-9]\d{7,14}$/', Rule::unique('users', 'phone')->ignore($this->user()->id)],
+            'email' => ['sometimes', 'nullable', 'email:rfc', 'max:255', Rule::unique('users', 'email')->ignore($this->user()->id)],
+            'phone' => ['prohibited'],
+            'mobile' => ['prohibited'],
             'locale' => ['sometimes', 'required', Rule::in(array_column(SupportedLocale::cases(), 'value'))],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'phone.prohibited' => 'يجب تحديث رقم الجوال عبر التحقق من رمز OTP.',
+            'mobile.prohibited' => 'يجب تحديث رقم الجوال عبر التحقق من رمز OTP.',
         ];
     }
 }

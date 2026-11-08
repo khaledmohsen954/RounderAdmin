@@ -156,6 +156,7 @@ class AdminPackageAdminService
                 ...$attributes,
                 'service_category_id' => $data['service_category_id'],
                 'code' => Str::lower($data['code']),
+                'icon' => $data['icon'] ?? null,
                 'is_active' => $data['is_active'] ?? true,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -311,6 +312,7 @@ class AdminPackageAdminService
             Service::query()->where('id', $serviceId)->update([
                 ...$attributes,
                 'service_category_id' => $data['service_category_id'], 'code' => $data['code'],
+                'icon' => $data['icon'] ?? null,
                 'is_active' => $data['is_active'], 'updated_at' => now(),
             ]);
             foreach (array_column(SupportedLocale::cases(), 'value') as $locale) {

@@ -4,12 +4,12 @@ use App\Modules\Identity\Models\Admin;
 use App\Modules\Access\Models\PermissionSet;
 use App\Modules\Catalog\Models\Service;
 use App\Modules\Community\Models\Announcement;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 /** الحذف مؤكد في الواجهة ومقيد بالخادم؛ تعديل المحتوى لا يفقد الترجمات. */
 class AdminCrudTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
     /** @return Admin */
     private function admin(): Admin
     {

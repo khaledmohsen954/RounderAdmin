@@ -21,6 +21,8 @@ class AdminServiceOrderAdminUpdateRequest extends AdminRequest
             'booking_status_id' => ['required', 'integer', 'exists:booking_statuses,id'],
             'gross_amount' => ['nullable', 'numeric', 'min:0', 'max:9999999999.99'],
             'note' => ['nullable', 'string', 'max:2000'],
+            'images' => ['sometimes', 'nullable', 'array', 'max:5'],
+            'images.*' => ['file', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
         ];
     }
 }

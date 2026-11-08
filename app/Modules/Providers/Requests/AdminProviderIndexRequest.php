@@ -16,6 +16,11 @@ class AdminProviderIndexRequest extends AdminRequest
      */
     public function rules(): array
     {
-        return ['resident_home_id' => ['nullable', 'integer'], 'status_id' => ['nullable', 'integer'], 'per_page' => ['sometimes', 'integer', 'between:1,50']];
+        return [
+            'q' => ['nullable', 'string', 'max:120'],
+            'resident_home_id' => ['nullable', 'integer'],
+            'status_id' => ['nullable', 'integer'],
+            'per_page' => ['sometimes', 'integer', 'between:1,50'],
+        ];
     }
 }

@@ -1,2 +1,5 @@
 <?php
-return ['name'=>env('APP_NAME','Rounder'),'env'=>env('APP_ENV','production'),'debug'=>(bool)env('APP_DEBUG',false),'url'=>env('APP_URL','http://localhost'),'timezone'=>'Asia/Riyadh','locale'=>env('APP_LOCALE','ar'),'fallback_locale'=>env('APP_FALLBACK_LOCALE','en'),'faker_locale'=>env('APP_FAKER_LOCALE','ar_EG'),'cipher'=>'AES-256-CBC','key'=>env('APP_KEY'),'previous_keys'=>array_filter(explode(',',env('APP_PREVIOUS_KEYS',''))),'maintenance'=>['driver'=>env('APP_MAINTENANCE_DRIVER','file'),'store'=>env('APP_MAINTENANCE_STORE','database')]];
+return ['name'=>env('APP_NAME','Rounder'),'env'=>env('APP_ENV','production'),'debug'=>(bool)env('APP_DEBUG',false),'url'=>env('APP_URL','http://localhost'),'timezone'=>'Asia/Riyadh','locale'=>env('APP_LOCALE','ar'),'fallback_locale'=>env('APP_FALLBACK_LOCALE','en'),'faker_locale'=>env('APP_FAKER_LOCALE','ar_EG'),'cipher'=>'AES-256-CBC','key'=>env('APP_KEY'),'previous_keys'=>array_filter(explode(',',env('APP_PREVIOUS_KEYS',''))),'maintenance'=>['driver'=>env('APP_MAINTENANCE_DRIVER','file'),'store'=>env('APP_MAINTENANCE_STORE','database')],  'sms_username' => env('SMS_USERNAME'),
+    'sms_password' => env('SMS_PASSWORD'),
+    'sms_sender' => env('SMS_SENDER'),
+    'sms_url' => env('SMS_URL', 'https://www.dreams.sa/index.php/api/sendsms/'),];

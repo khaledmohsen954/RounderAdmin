@@ -3,16 +3,18 @@
 namespace Tests\Feature;
 
 use App\Modules\Identity\Models\{User, Role};
+use App\Modules\Catalog\Models\Service;
+use App\Modules\Catalog\Models\ServiceCategory;
 use App\Modules\Providers\Models\ProviderProfile;
 use App\Services\RichTextSanitizer;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 /** تغطية رحلة الإضافة والتعديل وعزل بيانات العقود على MySQL. */
 class ProviderFormsTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     /** @return User */
     private function admin(): \App\Modules\Identity\Models\Admin
@@ -43,22 +45,42 @@ class ProviderFormsTest extends TestCase
             $this->withSession(['locale'=>$locale])->get('/admin/providers/create')->assertOk()
                 ->assertSee('contenteditable="true"', false)->assertSee('name="terms"', false);
         }
+        $category = ServiceCategory::create(['code' => 'provider-service']);
+        $service = Service::create([
+            'service_category_id' => $category->id,
+            'code' => 'provider-service-test',
+            'base_price' => 100,
+            'is_active' => true,
+        ]);
         $data = $this->payload();
+        $data['service_ids'] = [$service->id];
         $this->post('/admin/providers', $data)->assertRedirect(route('admin.providers.index'))->assertSessionHasNoErrors();
         $provider = ProviderProfile::where('company_name',$data['company_name'])->firstOrFail();
+        $this->assertDatabaseHas('provider_services', [
+            'provider_profile_id' => $provider->id,
+            'service_id' => $service->id,
+        ]);
         $contract = $provider->contracts()->firstOrFail();
         $this->assertSame('<h2>Terms</h2><p><strong>Approved</strong></p>', $contract->terms);
         $this->assertTrue(Hash::check($data['password'], $provider->user->password));
         $this->get('/admin/providers')->assertSee(route('admin.providers.edit',$provider->id));
-        $this->get('/admin/providers/'.$provider->id.'/edit')->assertOk()->assertSee($data['company_name']);
+        $this->get('/admin/providers/'.$provider->id.'/edit')->assertOk()
+            ->assertSee($data['company_name'])
+            ->assertSee('name="service_ids[]"', false)
+            ->assertSee('checked', false);
         $data['company_name'] = 'Updated company';
         $data['name'] = 'Updated contact';
         $data['is_approved'] = 0;
+        $data['service_ids'] = [];
         // هذه الحقول ليست ضمن قائمة التعديل المسموح بها.
         $data['password'] = 'InjectedPassword123!';
         $data['service_commission_percent'] = 99;
         $this->put('/admin/providers/'.$provider->id,$data)->assertRedirect(route('admin.providers.index'))->assertSessionHasNoErrors();
         $this->assertDatabaseHas('provider_profiles',['id'=>$provider->id,'company_name'=>'Updated company','is_approved'=>0]);
+        $this->assertDatabaseMissing('provider_services', [
+            'provider_profile_id' => $provider->id,
+            'service_id' => $service->id,
+        ]);
         $this->assertDatabaseHas('users',['id'=>$provider->user_id,'name'=>'Updated contact']);
         $this->assertTrue(Hash::check('StrongPassword123!',$provider->user->fresh()->password));
         $this->assertEquals(10, $contract->fresh()->service_commission_percent);

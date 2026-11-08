@@ -19,8 +19,10 @@ final class ProviderAccountService
         return DB::transaction(function () use ($input, $actorId) {
             $role = Role::where('code', RoleCode::Provider->value)->firstOrFail();
             $user = User::create([
-                'role_id' => $role->id, 'name' => $input['name'], 'email' => $input['email'],
+                'role_id' => $role->id, 'name' => $input['name'], 'email' => $input['email'] ?? null,
                 'phone' => $input['phone'], 'locale' => $input['locale'], 'password' => $input['password'],
+                'provider_profile_id' => $input['provider_profile_id'] ?? null,
+                'permissions' => $input['permissions'] ?? null,
             ]);
             DB::afterCommit(fn () => event(new IdentityChanged(Operation::CreateProviderAccount, $actorId)));
             return $user;
@@ -38,7 +40,7 @@ final class ProviderAccountService
         DB::transaction(function () use ($userId, $input) {
             $user = User::lockForUpdate()->findOrFail($userId);
             $user->update([
-                'name' => $input['name'], 'email' => $input['email'],
+                'name' => $input['name'], 'email' => $input['email'] ?? null,
                 'phone' => $input['phone'], 'locale' => $input['locale'],
             ]);
         });

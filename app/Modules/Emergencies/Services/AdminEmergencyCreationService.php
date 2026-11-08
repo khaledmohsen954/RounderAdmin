@@ -94,7 +94,7 @@ class AdminEmergencyCreationService
             ->join('roles', 'users.role_id', '=', 'roles.id')
             ->join('homes', 'resident_homes.home_id', '=', 'homes.id')
             ->where('roles.code', RoleCode::Resident->value)
-            ->select('resident_homes.id', 'resident_homes.unit_label', 'users.name as resident_name',
+            ->select('resident_homes.id', 'resident_homes.user_id', 'resident_homes.unit_label', 'users.name as resident_name',
                 'homes.name as home_name', 'users.phone as contact_phone')->orderBy('users.name')->get();
         $table = $emergency ? 'emergency_types' : 'services';
         $translations = $emergency ? 'emergency_type_translations' : 'service_translations';

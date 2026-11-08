@@ -9,7 +9,18 @@ class AdminLoginRequest extends PublicRequest
      */
     public function rules(): array
     {
-        return ['email' => ['required','email:rfc','max:254'],
-            'password' => ['required','string','max:200'], 'remember' => ['sometimes','boolean']];
+        return [
+            'email' => ['required', 'string', 'max:254'],
+            'password' => ['required', 'string', 'max:200'],
+            'remember' => ['sometimes', 'boolean'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'email.required' => 'البريد الإلكتروني أو رقم الهاتف مطلوب.',
+            'password.required' => 'كلمة المرور مطلوبة.',
+        ];
     }
 }

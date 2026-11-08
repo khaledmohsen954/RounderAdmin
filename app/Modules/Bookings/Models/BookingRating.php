@@ -18,6 +18,7 @@ class BookingRating extends Model
         'resident_id',
         'score',
         'comment',
+        'tags',
     ];
 
     /**
@@ -30,6 +31,7 @@ class BookingRating extends Model
             'booking_id' => 'integer',
             'resident_id' => 'integer',
             'score' => 'integer',
+            'tags' => 'array',
         ];
     }
 

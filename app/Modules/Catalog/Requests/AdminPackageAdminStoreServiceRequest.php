@@ -29,6 +29,7 @@ class AdminPackageAdminStoreServiceRequest extends AdminRequest
         return array_merge($this->pricingRules(), [
             'service_category_id' => ['required', 'integer', 'exists:service_categories,id'],
             'code' => ['required', 'alpha_dash', 'min:2', 'max:60', 'unique:services,code'],
+            'icon' => ['nullable', 'string', 'max:60'],
             'is_active' => ['sometimes', 'boolean'],
             'base_price' => ['required', 'numeric', 'min:0', 'max:9999999999.99', 'decimal:0,2'],
             'name_ar' => ['required', 'string', 'min:2', 'max:160'],

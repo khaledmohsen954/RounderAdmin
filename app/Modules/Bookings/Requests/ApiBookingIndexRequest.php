@@ -16,6 +16,11 @@ class ApiBookingIndexRequest extends ResidentRequest
      */
     public function rules(): array
     {
-        return ['resident_home_id' => ['nullable', 'integer'], 'status_id' => ['nullable', 'integer'], 'per_page' => ['sometimes', 'integer', 'between:1,50']];
+        return [
+            'resident_home_id' => ['nullable', 'integer'],
+            'status_id' => ['nullable', 'integer'],
+            'status_code' => ['nullable', 'string'],
+            'per_page' => ['sometimes', 'integer', 'between:1,50'],
+        ];
     }
 }

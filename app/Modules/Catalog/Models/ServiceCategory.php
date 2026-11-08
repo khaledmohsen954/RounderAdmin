@@ -15,6 +15,7 @@ class ServiceCategory extends Model
     /** الحقول المسموح حفظها؛ يجب تمرير البيانات المتحقق منها فقط من طبقة الطلب. */
     protected $fillable = [
         'code',
+        'image_path',
         'is_active',
     ];
 

@@ -27,6 +27,9 @@ class Home extends Model
         'floors_count',
         'name',
         'address',
+        'district',
+        'latitude',
+        'longitude',
         'property_code',
         'health_percent',
         'association_balance',
@@ -43,6 +46,8 @@ class Home extends Model
             'floors_count' => 'integer',
             'health_percent' => 'integer',
             'association_balance' => 'decimal:2',
+            'latitude' => 'decimal:8',
+            'longitude' => 'decimal:8',
         ];
     }
 

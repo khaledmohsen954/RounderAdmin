@@ -31,6 +31,7 @@ class AdminPackageAdminUpdateServiceRequest extends AdminRequest
             'service_category_id' => ['required', 'integer', 'exists:service_categories,id'],
             'code' => ['required', 'alpha_dash', 'min:2', 'max:60',
                 \Illuminate\Validation\Rule::unique('services', 'code')->ignore($this->route('serviceId'))],
+            'icon' => ['nullable', 'string', 'max:60'],
             'base_price' => ['required', 'numeric', 'min:0', 'max:9999999999.99', 'decimal:0,2'],
             'is_active' => ['required', 'boolean'],
         ];

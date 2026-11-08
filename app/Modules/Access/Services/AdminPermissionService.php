@@ -34,17 +34,24 @@ final class AdminPermissionService
         $section = match (true) {
             $route === 'admin.dashboard' => DashboardSection::Dashboard,
             $route === 'admin.about' => DashboardSection::About,
-            str_starts_with($route, 'admin.users.') => DashboardSection::Users,
+            str_starts_with($route, 'admin.users.'), str_starts_with($route, 'admin.residents.'), str_starts_with($route, 'admin.support-tickets.') => DashboardSection::Users,
             str_starts_with($route, 'admin.providers.') => DashboardSection::Providers,
             str_starts_with($route, 'admin.realestate.') => DashboardSection::Realestate,
+            str_starts_with($route, 'admin.regions.') => DashboardSection::Regions,
+            str_starts_with($route, 'admin.cities.') => DashboardSection::Cities,
             str_starts_with($route, 'admin.packages.services.'), str_starts_with($route, 'admin.services.') => DashboardSection::Services,
             str_starts_with($route, 'admin.packages.') => DashboardSection::Packages,
+            str_starts_with($route, 'admin.sub-services.'), str_starts_with($route, 'admin.sub_services.') => DashboardSection::SubServices,
+            str_starts_with($route, 'admin.service-categories.') => DashboardSection::ServiceCategories, // جديد
+            str_starts_with($route, 'admin.prices.') => DashboardSection::Prices,
+
             str_starts_with($route, 'admin.package-features.') => DashboardSection::Features,
             str_starts_with($route, 'admin.subscriptions.') => DashboardSection::Subscriptions,
             str_starts_with($route, 'admin.content.') => DashboardSection::Content,
-            str_starts_with($route, 'admin.service-orders.') => DashboardSection::Orders,
+            str_starts_with($route, 'admin.service-orders.'), str_starts_with($route, 'admin.bookings.'), str_starts_with($route, 'admin.order-statuses.') => DashboardSection::Orders,
             str_starts_with($route, 'admin.emergencies.') => DashboardSection::Emergencies,
             str_starts_with($route, 'admin.permissions.') => DashboardSection::Permissions,
+            str_starts_with($route, 'admin.pages.'), str_starts_with($route, 'admin.company-settings.') => DashboardSection::Pages,
             default => null,
         };
         if (!$section) return false;

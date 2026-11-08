@@ -12,13 +12,19 @@ final class AdminDeletionService
         DB::transaction(function () use ($id,$adminId) {
             $record = \App\Modules\Bookings\Models\Booking::lockForUpdate()->findOrFail($id);
             if ($record->payments()->exists()) $this->blocked();
-            if ($record->bookingMedia()->exists()) $this->blocked();
             if ($record->bookingAdditionalWork()->exists()) $this->blocked();
             if ($record->bookingRatings()->exists()) $this->blocked();
             if ($record->bookingWarranties()->exists()) $this->blocked();
             if ($record->providerCommissionEntries()->exists()) $this->blocked();
             if ($record->bookingProviderAssignments()->exists()) $this->blocked();
             if (!in_array($record->status->code, [\App\Modules\Bookings\Enums\BookingStatusCode::Pending->value, \App\Modules\Bookings\Enums\BookingStatusCode::Cancelled->value], true)) $this->blocked();
+
+            foreach ($record->bookingMedia as $media) {
+                if ($media->path) {
+                    \Illuminate\Support\Facades\Storage::disk($media->disk ?: 'public')->delete($media->path);
+                }
+                $media->delete();
+            }
             try { $record->delete(); }
             catch (\Illuminate\Database\QueryException $error) {
                 if (($error->errorInfo[1] ?? null) !== 1451) throw $error;

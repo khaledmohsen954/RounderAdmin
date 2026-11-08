@@ -49,7 +49,7 @@ class ProviderController extends Controller
      */
     public function create(AdminProviderIndexRequest $request): \Illuminate\Contracts\View\View
     {
-        return view('admin.providers.create');
+        return view('admin.providers.create', $this->service->create());
     }
 
     /**
@@ -75,4 +75,3 @@ class ProviderController extends Controller
             $this->service->update($provider->getKey(), $request->validated(), $request->user()));
     }
 }
-

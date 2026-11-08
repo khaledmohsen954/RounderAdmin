@@ -1,5 +1,5 @@
 <div class="dropdown" id="admin-notifications" data-feed="{{ route('admin.notifications.index') }}" data-read-all="{{ route('admin.notifications.read-all') }}" data-read-template="{{ route('admin.notifications.read',['id'=>0]) }}">
-<button class="btn btn-sm btn-outline-secondary position-relative" id="notification-bell" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" aria-label="{{ __('Notifications') }}">
+<button class="topbar-circle-btn position-relative" id="notification-bell" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" aria-label="{{ __('Notifications') }}" title="{{ __('Notifications') }}">
 <i class="fa-solid fa-bell" aria-hidden="true"></i><span id="notification-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none" aria-live="polite"></span>
 </button>
 <div class="dropdown-menu dropdown-menu-end p-0 shadow notification-dropdown" aria-labelledby="notification-bell">

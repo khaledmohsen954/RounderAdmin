@@ -8,6 +8,7 @@ Route::prefix('admin')->name('admin.')->middleware(['guest'])->group(function ()
     Route::post('/login', [\App\Modules\Identity\Controllers\Admin\AuthController::class, 'login'])->middleware('throttle:8,1')->name('login.submit');
 });
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
+    Route::get('/residents', [\App\Modules\Identity\Controllers\Admin\ResidentController::class, 'index'])->name('residents.index');
     Route::get('/users', [\App\Modules\Identity\Controllers\Admin\UserController::class, 'index'])->name('users.index');
     Route::post('/users', [\App\Modules\Identity\Controllers\Admin\UserController::class, 'store'])->name('users.store');
     Route::get('/users/create', [\App\Modules\Identity\Controllers\Admin\UserController::class, 'create'])->name('users.create');

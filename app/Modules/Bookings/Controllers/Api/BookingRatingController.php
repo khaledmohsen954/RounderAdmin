@@ -4,8 +4,8 @@ namespace App\Modules\Bookings\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Modules\Bookings\Services\ApiBookingRatingService;
-use App\Modules\Identity\Models\User;
 use App\Modules\Bookings\Requests\ApiBookingRatingRateBookingRequest;
+use Illuminate\Http\Request;
 
 /** متحكم HTTP لمجال Bookings؛ يفوض جميع العمليات إلى الخدمة. */
 class BookingRatingController extends Controller
@@ -14,10 +14,20 @@ class BookingRatingController extends Controller
      * حقن خدمة المجال؛ لا توجد استعلامات أو قواعد عمل داخل المتحكم.
      * @param ApiBookingRatingService $service
      * @return void
-     * @throws \Throwable عند فشل التحقق من قواعد العمل أو حفظ البيانات.
      */
     public function __construct(private readonly ApiBookingRatingService $service)
     {
+    }
+
+    /**
+     * جلب تفاصيل شاشة التقييم للطلب لتطبيق الجوال.
+     * @param int $bookingId
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function show(int $bookingId, Request $request): \Illuminate\Http\JsonResponse
+    {
+        return response()->json($this->service->show($bookingId, $request->user()), 200);
     }
 
     /**

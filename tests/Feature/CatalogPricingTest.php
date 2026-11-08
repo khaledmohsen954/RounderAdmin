@@ -5,7 +5,7 @@ use App\Modules\Catalog\Models\{Service, ServicePackage, PackageBillingCycle, Re
 use App\Modules\Catalog\Services\{CatalogPricingService, ApiResidentPackageService};
 use App\Modules\Identity\Models\{User, Role};
 use App\Modules\Properties\Models\{City, Home, ResidentHome};
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
@@ -15,7 +15,7 @@ use Tests\TestCase;
 /** تغطية مالية وحفظ فعلي على MySQL، مع التأكد من بقاء حقوق المشترك القديمة. */
 class CatalogPricingTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     /** @return User */
     private function admin(): \App\Modules\Identity\Models\Admin

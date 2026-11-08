@@ -3,13 +3,13 @@ namespace Tests\Feature;
 use App\Modules\Identity\Models\{Role, User};
 use App\Modules\Properties\Models\City;
 use App\Modules\Properties\Services\SaudiCityImportService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 /** بيانات مرجعية حقيقية وعلاقات محلية ثابتة عبر إعادة الاستيراد. */
 class SaudiCitiesTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
     /** @return void */
     public function test_saudi_cities_are_id_based_and_legacy_foreign_keys_are_preserved(): void
     {

@@ -1,12 +1,12 @@
 <?php
 namespace Tests\Feature;
 use App\Modules\Identity\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 class AdminServiceEditingTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
     private function admin(): \App\Modules\Identity\Models\Admin
     {
         $this->seed();

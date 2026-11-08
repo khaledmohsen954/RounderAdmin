@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Modules\Bookings\Services\AdminServiceOrderAdminService;
 use App\Modules\Identity\Models\User;
 use App\Modules\Bookings\Requests\AdminServiceOrderAdminIndexRequest;
+use App\Modules\Bookings\Requests\AdminServiceOrderAdminShowRequest;
 use App\Modules\Bookings\Requests\AdminServiceOrderAdminUpdateRequest;
 
 /** متحكم HTTP لمجال Bookings؛ يفوض جميع العمليات إلى الخدمة. */
@@ -30,6 +31,18 @@ class ServiceOrderAdminController extends Controller
     public function index(AdminServiceOrderAdminIndexRequest $request): \Illuminate\Contracts\View\View
     {
         return view('admin.service-orders.index', $this->service->index($request->validated(), $request->user()));
+    }
+
+    /**
+     * عرض تفاصيل حجز الخدمة المحدد.
+     * @param AdminServiceOrderAdminShowRequest $request
+     * @param int $bookingId
+     * @return \Illuminate\Contracts\View\View
+     * @throws \Throwable عند عدم العثور على الحجز أو فشل قراءة البيانات.
+     */
+    public function show(AdminServiceOrderAdminShowRequest $request, int $bookingId): \Illuminate\Contracts\View\View
+    {
+        return view('admin.service-orders.show', $this->service->show($bookingId, $request->user()));
     }
 
     /**

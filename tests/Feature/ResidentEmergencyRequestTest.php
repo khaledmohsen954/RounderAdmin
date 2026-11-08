@@ -4,14 +4,14 @@ namespace Tests\Feature;
 
 use App\Modules\Identity\Models\Role;
 use App\Modules\Identity\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class ResidentEmergencyRequestTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     private User $resident;
     private int $membershipId;
@@ -85,6 +85,50 @@ class ResidentEmergencyRequestTest extends TestCase
             'status_id' => $this->receivedStatusId,
         ]);
         $this->assertDatabaseCount('bookings', 0);
+    }
+
+    public function test_resident_can_list_active_emergency_types_with_localized_names(): void
+    {
+        DB::table('emergency_type_translations')->insert([
+            'emergency_type_id' => $this->emergencyTypeId,
+            'locale' => 'en',
+            'name' => 'Fire',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('emergency_type_translations')->insert([
+            'emergency_type_id' => $this->emergencyTypeId,
+            'locale' => 'ar',
+            'name' => 'حريق',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $inactiveTypeId = DB::table('emergency_types')->insertGetId([
+            'code' => 'inactive_type',
+            'is_active' => false,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('emergency_type_translations')->insert([
+            'emergency_type_id' => $inactiveTypeId,
+            'locale' => 'en',
+            'name' => 'Inactive type',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->getJson('/api/v1/resident/emergency-types', ['Accept-Language' => 'en'])
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', $this->emergencyTypeId)
+            ->assertJsonPath('data.0.code', 'fire')
+            ->assertJsonPath('data.0.name', 'Fire');
+
+        $this->resident->locale = 'ar';
+        $this->resident->save();
+        $this->getJson('/api/v1/resident/emergency-types', ['Accept-Language' => 'ar'])
+            ->assertOk()
+            ->assertJsonPath('data.0.name', 'حريق');
     }
 
     public function test_resident_cannot_create_an_emergency_request_for_another_residents_home(): void

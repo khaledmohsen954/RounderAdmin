@@ -3,13 +3,13 @@ namespace Tests\Feature;
 use App\Modules\Identity\Models\{Admin,User,Role};
 use App\Modules\Access\Models\PermissionSet;
 use App\Modules\Access\Services\AdminPermissionService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 /** اختبار الفصل الفعلي للمصادقة والصلاحيات، وليس ظهور الأزرار فقط. */
 class AdminAccessTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
     /** @return Admin */
     private function superAdmin(): Admin
     {

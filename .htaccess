@@ -1,0 +1,36 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Block access to hidden files and sensitive directories
+    RewriteRule ^\.env - [F,L,NC]
+    RewriteRule ^composer\.(json|lock) - [F,L,NC]
+    RewriteRule ^artisan - [F,L,NC]
+    RewriteRule ^app/ - [F,L,NC]
+    RewriteRule ^bootstrap/ - [F,L,NC]
+    RewriteRule ^config/ - [F,L,NC]
+    RewriteRule ^database/ - [F,L,NC]
+    RewriteRule ^resources/ - [F,L,NC]
+    RewriteRule ^routes/ - [F,L,NC]
+    RewriteRule ^storage/framework/ - [F,L,NC]
+    RewriteRule ^storage/logs/ - [F,L,NC]
+    RewriteRule ^tests/ - [F,L,NC]
+    RewriteRule ^vendor/ - [F,L,NC]
+
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # Redirect Trailing Slashes If Not A Folder...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+
+    # Serve existing files from public/ directly
+    RewriteCond %{DOCUMENT_ROOT}/public/$1 -f
+    RewriteRule ^(.+)$ public/$1 [L]
+
+    # Send Requests To Front Controller...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+</IfModule>

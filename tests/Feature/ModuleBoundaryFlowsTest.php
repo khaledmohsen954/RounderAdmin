@@ -6,13 +6,13 @@ use App\Modules\Providers\Models\{ProviderProfile, ProviderCommissionEntry};
 use App\Modules\Bookings\Models\{Booking, BookingStatus};
 use App\Modules\Emergencies\Models\{EmergencyRequest, EmergencyRequestStatus, EmergencyType};
 use App\Modules\Catalog\Models\Service;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 /** Exercise cross-module writes and emergency route identifiers. */
 class ModuleBoundaryFlowsTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
     /**
      * @return void
      */
